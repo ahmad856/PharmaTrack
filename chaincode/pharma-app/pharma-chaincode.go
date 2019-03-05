@@ -124,7 +124,18 @@ Will add test data (10 medicines)to our network
  */
 func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Response {
 	assets := []PharmaAsset{
-		PharmaAsset{ID: "1", QRCode: "abcdf", Name: "Panadol", Description: "This is a description", Owner: "owner1", AssetType: "Carton", Price: 40.9, ManufactureDate: "10-01-2008", ExpiryDate: "10-01-2009",  Quantity: 54, Timestamp: 1504054225},
+		PharmaAsset{ID: "asset1", QRCode: "abcdf", Name: "Panadol", Description: "This is a description of medicine", Owner: "owner1", AssetType: "Medicine", Price: 40.9, ManufactureDate: "10-01-2008", ExpiryDate: "10-01-2009",  Quantity: 54, Timestamp: 1504054225},
+		PharmaAsset{ID: "asset2", QRCode: "ghijk", Name: "Xyzal", Description: "This is a description of medicine", Owner: "owner1", AssetType: "Medicine", Price: 50.8, ManufactureDate: "10-01-2008", ExpiryDate: "10-01-2009",  Quantity: 54, Timestamp: 1504054225},
+		PharmaAsset{ID: "asset3", QRCode: "lmnop", Name: "Castine", Description: "This is a description of medicine", Owner: "owner1", AssetType: "Medicine", Price: 10, ManufactureDate: "10-01-2008", ExpiryDate: "10-01-2009",  Quantity: 54, Timestamp: 1504054225},
+		PharmaAsset{ID: "asset4", QRCode: "qrstu", Name: "Calpol", Description: "This is a description of medicine", Owner: "owner1", AssetType: "Medicine", Price: 20, ManufactureDate: "10-01-2008", ExpiryDate: "10-01-2009",  Quantity: 54, Timestamp: 1504054225},
+		PharmaAsset{ID: "asset5", QRCode: "vwxyz", Name: "Forceps", Description: "This is a description of surgical instrument", Owner: "owner1", AssetType: "Surgical Instrument", Price: 40, ManufactureDate: "10-01-2008", ExpiryDate: "10-01-2009",  Quantity: 54, Timestamp: 1504054225},
+		PharmaAsset{ID: "asset6", QRCode: "abcdf", Name: "Scissors", Description: "This is a description of surgical instrument", Owner: "owner1", AssetType: "Surgical Instrument", Price: 70.5, ManufactureDate: "10-01-2008", ExpiryDate: "10-01-2009",  Quantity: 54, Timestamp: 1504054225},
+		PharmaAsset{ID: "asset7", QRCode: "ghijk", Name: "Speculums", Description: "This is a description of surgical instrument", Owner: "owner1", AssetType: "Surgical Instrument", Price: 22.3, ManufactureDate: "10-01-2008", ExpiryDate: "10-01-2009",  Quantity: 54, Timestamp: 1504054225},
+		PharmaAsset{ID: "asset8", QRCode: "lmnop", Name: "Syringe", Description: "This is a description of hospital equipment", Owner: "owner1", AssetType: "Hospital Equipment", Price: 15.6, ManufactureDate: "10-01-2008", ExpiryDate: "10-01-2009",  Quantity: 54, Timestamp: 1504054225},
+		PharmaAsset{ID: "asset9", QRCode: "qrstu", Name: "Nebulizers", Description: "This is a description of hospital equipment", Owner: "owner1", AssetType: "Hospital Equipment", Price: 78.2, ManufactureDate: "10-01-2008", ExpiryDate: "10-01-2009",  Quantity: 54, Timestamp: 1504054225},
+		PharmaAsset{ID: "asset10", QRCode: "vwxyz", Name: "Catheter", Description: "This is a description of hospital equipment", Owner: "owner1", AssetType: "Hospital Equipment", Price: 32.4, ManufactureDate: "10-01-2008", ExpiryDate: "10-01-2009",  Quantity: 54, Timestamp: 1504054225},
+		PharmaAsset{ID: "asset11", QRCode: "abcdf", Name: "Medical Gloves", Description: "This is a description of personal saftey equipment", Owner: "owner1", AssetType: "Saftey Equipment", Price: 55, ManufactureDate: "10-01-2008", ExpiryDate: "10-01-2009",  Quantity: 54, Timestamp: 1504054225},
+		PharmaAsset{ID: "asset12", QRCode: "ghijk", Name: "Head Covering", Description: "This is a description of personal saftey equipment", Owner: "owner1", AssetType: "Saftey Equipment", Price: 64, ManufactureDate: "10-01-2008", ExpiryDate: "10-01-2009",  Quantity: 54, Timestamp: 1504054225},
 	}
 
 	manufacturers := []Manufacturer{
