@@ -52,7 +52,7 @@ func (s *SmartContract) queryOwner(APIstub shim.ChaincodeStubInterface, args []s
 /*
  * The queryAllMedicines method *
 allows for assessing all the records added to the ledger(all medicines)
-This method does not take any arguments. Returns JSON string containing results. 
+This method does not take any arguments. Returns JSON string containing results.
  */
 
 func (s *SmartContract) queryAllAssets(APIstub shim.ChaincodeStubInterface) sc.Response {

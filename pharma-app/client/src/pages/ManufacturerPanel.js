@@ -206,7 +206,7 @@ class ManufacturerPanel extends Component {
         var qty=this.state.qtyValue;
         this.closePanel();
         e.preventDefault();
-        const response = await fetch('/api/world', {
+        const response = await fetch('/add_medicine', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -226,15 +226,15 @@ class ManufacturerPanel extends Component {
     // }
 
     componentDidMount() {
-        this.callApi()
+        this.callGetAllMedicines()
         .then(res => this.setState({ assets: res.express }))
         .catch(err => console.log(err));
         console.log("Assets");
         console.log(this.state.assets);
     }
 
-    callApi = async () => {
-        const response = await fetch('/api/hello');
+    callGetAllMedicines = async () => {
+        const response = await fetch('/get_all_medicines');
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
         console.log(body);
