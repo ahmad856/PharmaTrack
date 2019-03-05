@@ -9,11 +9,11 @@
 
 package main
 
-/* Imports  
-* 4 utility libraries for handling bytes, reading and writing JSON, 
-formatting, and string manipulation  
-* 2 specific Hyperledger Fabric specific libraries for Smart Contracts  
-*/ 
+/* Imports
+* 4 utility libraries for handling bytes, reading and writing JSON,
+formatting, and string manipulation
+* 2 specific Hyperledger Fabric specific libraries for Smart Contracts
+*/
 import (
 	"encoding/json"
 	"fmt"
@@ -28,7 +28,7 @@ type SmartContract struct {
 
 }
 
-/* Define PharmaAsset structure, with 4 properties.  
+/* Define PharmaAsset structure, with 4 properties.
 Structure tags are used by encoding/json library
 */
 type PharmaAsset struct {
@@ -67,7 +67,7 @@ type Chemist struct {
 }
 
 type Transaction struct {
-	
+
 }
 
 type TransactionHistory struct {
@@ -78,7 +78,7 @@ type TransactionHistory struct {
 /*
  * The Init method *
  called when the Smart Contract "medicine-chaincode" is instantiated by the network
- * Best practice is to have any Ledger initialization in separate function 
+ * Best practice is to have any Ledger initialization in separate function
  -- see initLedger()
  */
 func (s *SmartContract) Init(APIstub shim.ChaincodeStubInterface) sc.Response {
@@ -124,7 +124,7 @@ Will add test data (10 medicines)to our network
  */
 func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Response {
 	assets := []PharmaAsset{
-		PharmaAsset{ID: "asset1", QRCode: "abcdf", Name: "Panadol", Description: "This is a description", Owner: "owner1", AssetType: "Carton", Price: 40.9, ManufactureDate: "10-01-2008", ExpiryDate: "10-01-2009",  Quantity: 54, Timestamp: 1504054225},
+		PharmaAsset{ID: "1", QRCode: "abcdf", Name: "Panadol", Description: "This is a description", Owner: "owner1", AssetType: "Carton", Price: 40.9, ManufactureDate: "10-01-2008", ExpiryDate: "10-01-2009",  Quantity: 54, Timestamp: 1504054225},
 	}
 
 	manufacturers := []Manufacturer{
@@ -144,7 +144,7 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 	for i < len(assets) {
 		fmt.Println("i is ", i)
 		medicineAsBytes, _ := json.Marshal(assets[i])
-		APIstub.PutState("asset" + strconv.Itoa(i+1), medicineAsBytes)
+		APIstub.PutState(strconv.Itoa(i+1), medicineAsBytes)
 		fmt.Println("Added", assets[i])
 		i = i + 1
 	}
@@ -154,7 +154,7 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 
 /*
  * main function *
-calls the Start function 
+calls the Start function
 The main function starts the chaincode in the container during instantiation.
  */
 func main() {

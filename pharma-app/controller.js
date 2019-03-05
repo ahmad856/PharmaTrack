@@ -143,7 +143,7 @@ return{
 		        if (query_responses[0] instanceof Error) {
 		            console.error("error from query = ", query_responses[0]);
 		            res.send("Could not locate medicine")
-		            
+
 		        } else {
 		            console.log("Response is ", query_responses[0].toString());
 		            res.send(query_responses[0].toString())
@@ -210,7 +210,7 @@ return{
 		    tx_id = fabric_client.newTransactionID();
 		    console.log("Assigning transaction_id: ", tx_id._transaction_id);
 
-		    // recordMedicine - requires 4 args, ID, name, timestamp, owner - ex: args: ['10', 'panadol', '1504054225', 'Hansel'], 
+		    // recordMedicine - requires 4 args, ID, name, timestamp, owner - ex: args: ['10', 'panadol', '1504054225', 'Hansel'],
 		    // send proposal to endorser
 		    const request = {
 		        //targets : --- letting this default to the peers assigned to the channel
@@ -370,7 +370,7 @@ return{
 		    tx_id = fabric_client.newTransactionID();
 		    console.log("Assigning transaction_id: ", tx_id._transaction_id);
 
-		    // recordMedicine - requires 4 args, ID, name, timestamp, owner - ex: args: ['10', 'panadol', '1504054225', 'Hansel'], 
+		    // recordMedicine - requires 4 args, ID, name, timestamp, owner - ex: args: ['10', 'panadol', '1504054225', 'Hansel'],
 		    // send proposal to endorser
 		    const request = {
 		        //targets : --- letting this default to the peers assigned to the channel
@@ -478,7 +478,7 @@ return{
 	},
 
 	add_manufacturer: function(req, res){
-		console.log("submit recording of a medicine: ");
+		console.log("submit recording of a manufacturer: ");
 
 		var array = req.params.medicine.split("-");
 		console.log(array);
@@ -529,7 +529,7 @@ return{
 		    tx_id = fabric_client.newTransactionID();
 		    console.log("Assigning transaction_id: ", tx_id._transaction_id);
 
-		    // recordMedicine - requires 4 args, ID, name, timestamp, address - ex: args: ['10', 'panadol', '1504054225', 'Hansel'], 
+		    // recordMedicine - requires 4 args, ID, name, timestamp, address - ex: args: ['10', 'panadol', '1504054225', 'Hansel'],
 		    // send proposal to endorser
 		    const request = {
 		        //targets : --- letting this default to the peers assigned to the channel
@@ -637,7 +637,7 @@ return{
 	},
 
 	add_distributor: function(req, res){
-		console.log("submit recording of a medicine: ");
+		console.log("submit recording of a Distributor: ");
 
 		var array = req.params.medicine.split("-");
 		console.log(array);
@@ -646,6 +646,7 @@ return{
 		var name = array[1]
 		var timestamp = array[2]
 		var address = array[3]
+
 
 
 		var fabric_client = new Fabric_Client();
@@ -688,7 +689,7 @@ return{
 		    tx_id = fabric_client.newTransactionID();
 		    console.log("Assigning transaction_id: ", tx_id._transaction_id);
 
-		    // recordMedicine - requires 4 args, ID, name, timestamp, address - ex: args: ['10', 'panadol', '1504054225', 'Hansel'], 
+		    // recordMedicine - requires 4 args, ID, name, timestamp, address - ex: args: ['10', 'panadol', '1504054225', 'Hansel'],
 		    // send proposal to endorser
 		    const request = {
 		        //targets : --- letting this default to the peers assigned to the channel
@@ -796,7 +797,7 @@ return{
 	},
 
 	add_chemist: function(req, res){
-		console.log("submit recording of a medicine: ");
+		console.log("submit recording of a Chemist: ");
 
 		var array = req.params.medicine.split("-");
 		console.log(array);
@@ -847,7 +848,7 @@ return{
 		    tx_id = fabric_client.newTransactionID();
 		    console.log("Assigning transaction_id: ", tx_id._transaction_id);
 
-		    // recordMedicine - requires 4 args, ID, name, timestamp, address - ex: args: ['10', 'panadol', '1504054225', 'Hansel'], 
+		    // recordMedicine - requires 4 args, ID, name, timestamp, address - ex: args: ['10', 'panadol', '1504054225', 'Hansel'],
 		    // send proposal to endorser
 		    const request = {
 		        //targets : --- letting this default to the peers assigned to the channel
@@ -958,8 +959,11 @@ return{
 		console.log("changing owner of medicine: ");
 
 		var array = req.params.owner.split("-");
+
 		var key = array[0]
 		var owner = array[1];
+
+
 
 		var fabric_client = new Fabric_Client();
 

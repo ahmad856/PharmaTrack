@@ -265,7 +265,7 @@ class ManufacturerPanel extends Component {
         var qty=this.state.qtyValue;
         this.closePanel();
         e.preventDefault();
-        const response = await fetch('/api/world', {
+        const response = await fetch('/add_medicine', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
