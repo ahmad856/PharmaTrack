@@ -11,28 +11,73 @@ import 'react-sliding-pane/dist/react-sliding-pane.css';
 import Select from 'react-select';
 
 class BSTable extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state={};
+        this.state.isTransactionPaneOpen=false;
+        this.state.distID="";
+        this.handleInputChange = this.handleInputChange.bind(this);
+    }
+
+    handleInputChange(event) {
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+        this.setState({
+            [name]: value
+        });
+    };
+    //,()=>{this.validate(name,value)}
+
+
+    closeTransactionPanel = () => {
+        this.setState({ isTransactionPaneOpen: false });
+    };
+
     render() {
         if (this.props.data) {
             return (
                 <MDBContainer>
+                {/* Show Transactions side pane */}
+                <SlidingPane closeIcon={<div>[ X ]</div>} isOpen={ this.state.isTransactionPaneOpen } title='Transactions'
+                from='left' width='400px' onRequestClose={ this.closeTransactionPanel }>
+                    <div>
+
+                    </div>
+                </SlidingPane>
+
                 <MDBCard border="info" className="m-3" style={{ maxWidth: "70rem" }}>
                     <MDBCardHeader> Asset Details</MDBCardHeader>
                     <MDBCardBody className="text-info">
                         <MDBRow className="justify-content-center">
                             <MDBListGroup className="my-4 mx-4" style={{ width: "20rem" }}>
-                                <MDBListGroupItem color="primary">Description: Panadol Tablet</MDBListGroupItem>
-                                <MDBListGroupItem color="primary">Price: 45</MDBListGroupItem>
-                                <MDBListGroupItem color="primary">Timestamp: 1234343</MDBListGroupItem>
-                                <MDBListGroupItem color="primary">Type: Tablets</MDBListGroupItem>
+                                <MDBListGroupItem color="primary">ID: {this.props.data.ID}</MDBListGroupItem>
+                                <MDBListGroupItem color="primary">QRCode: {this.props.data.QRCode}</MDBListGroupItem>
+                                <MDBListGroupItem color="primary">Description: {this.props.data.Description}</MDBListGroupItem>
+                                <MDBListGroupItem color="primary">Type: {this.props.data.AssetType}</MDBListGroupItem>
                             </MDBListGroup>
                             <MDBListGroup className="my-4 mx-4" style={{ width: "20rem" }}>
-                                <MDBListGroupItem color="primary">Salt: paracetamol</MDBListGroupItem>
-                                <MDBListGroupItem color="primary">Quantity: 3452</MDBListGroupItem>
-                                <MDBListGroupItem color="primary">Mfg Date: Jan. 1, 2018</MDBListGroupItem>
-                                <MDBListGroupItem color="primary">Expiry Date: Jan. 1, 2020</MDBListGroupItem>
+                                <MDBListGroupItem color="primary">Mfg Date: {this.props.data.ManufactureDate}</MDBListGroupItem>
+                                <MDBListGroupItem color="primary">ExpiryDate: {this.props.data.ExpiryDate}</MDBListGroupItem>
+                                <MDBListGroupItem color="primary">Timestamp: {this.props.data.Timestamp}</MDBListGroupItem>
+                                <MDBListGroupItem color="primary">Price: {this.props.data.Price}</MDBListGroupItem>
                             </MDBListGroup>
                         </MDBRow>
-                        <center><MDBBtn size="sm" color="primary">Show Details</MDBBtn></center>
+                        <center>
+                            <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isTransactionPaneOpen: true })}>Show Details</MDBBtn>
+                            {/* <MDBBtn size="sm" color="primary">Transact Asset</MDBBtn> */}
+                            <MDBDropdown>
+                                <MDBDropdownToggle caret>
+                                    Transact Asset
+                                </MDBDropdownToggle>
+                                <MDBDropdownMenu className="dropdown-default" right>
+                                    <form>
+                                        <MDBInput label="Distributor ID *" name="distID" type="text" value={this.state.distID} onChange={this.handleInputChange}/>
+                                        <MDBBtn size="sm">Transact</MDBBtn>
+                                    </form>
+                                </MDBDropdownMenu>
+                            </MDBDropdown>
+                        </center>
                     </MDBCardBody>
                 </MDBCard>
                 </MDBContainer>
@@ -50,6 +95,7 @@ class BSTable extends React.Component {
     }
 }
 
+// ID string `json:"id"`
 // QRCode string `json:"qr"`
 // Name string `json:"name"`
 // Description string `json:"description"`
@@ -60,6 +106,7 @@ class BSTable extends React.Component {
 // Quantity int `json:"quantity"`
 // Timestamp uint64 `json:"timestamp"`
 // Owner  string `json:"owner"`
+
 const assetTypes = [
     { label: "Medicine", value: 1 },
     { label: "Surgical Instrument", value: 2 },
@@ -84,13 +131,12 @@ const assetNames = [
     { label: "Nebulizers", value: 14 },
     { label: "Syringe", value: 15 },
     { label: "Catheter", value: 16 },
-    { label: "Speculum", value: 17 },
-    { label: "Medical Gloves", value: 18 },
-    { label: "Obstetrical Forceps", value: 19 },
-    { label: "Surgical Mask", value: 20 },
-    { label: "Gowns", value: 21 },
-    { label: "Head Covering", value: 22 },
-    { label: "Shoe Covering", value: 23 },
+    { label: "Medical Gloves", value: 17 },
+    { label: "Obstetrical Forceps", value: 18 },
+    { label: "Surgical Mask", value: 19 },
+    { label: "Gowns", value: 20 },
+    { label: "Head Covering", value: 21 },
+    { label: "Shoe Covering", value: 22 },
 ];
 
 class ManufacturerPanel extends Component {
@@ -164,7 +210,7 @@ class ManufacturerPanel extends Component {
         );
     }
 
-    closePanel = () => {
+    closeAssetPanel = () => {
         this.setState({
             isAssetPaneOpen: false,
             nameValue:'',
@@ -183,16 +229,25 @@ class ManufacturerPanel extends Component {
             formValid:false
         });
     };
+
+
     /////////////////////////////////////////////////////////////
     flattenData (assets_array) {
         var temp_asset=[];
         for(let i=0;i<assets_array.length;i++){
             var temp={};
             temp['#'] = i+1;
-            temp['Key'] = assets_array[i].Key;
+            temp['ID'] = assets_array[i].Record.id;
+            temp['QRCode'] = assets_array[i].Record.qr;
             temp['Name'] = assets_array[i].Record.name;
+            temp['Description'] = assets_array[i].Record.description;
+            temp['AssetType'] = assets_array[i].Record.type;
+            temp['Price'] = assets_array[i].Record.price;
+            temp['ManufactureDate'] = assets_array[i].Record.manufactureDate;
+            temp['ExpiryDate'] = assets_array[i].Record.expiryDate;
+            temp['Quantity'] = assets_array[i].Record.quantity;
+            temp['Timestamp'] = assets_array[i].Record.timestamp;
             temp['Owner'] = assets_array[i].Record.owner;
-            temp['TimeStamp'] = assets_array[i].Record.timestamp;
             temp_asset.push(temp);
         }
         return temp_asset;
@@ -263,7 +318,7 @@ class ManufacturerPanel extends Component {
         var price=this.state.priceValue;
         var type=this.state.typeValue;
         var qty=this.state.qtyValue;
-        this.closePanel();
+        this.closeAssetPanel();
         e.preventDefault();
         const response = await fetch('/add_medicine', {
             method: 'POST',
@@ -291,9 +346,9 @@ class ManufacturerPanel extends Component {
         return (
             <MDBContainer>
                 <PanelHeading title="Manufacturer Panel"/>
-
+                {/* Add asset side pane */}
                 <SlidingPane closeIcon={<div>[ X ]</div>} isOpen={ this.state.isAssetPaneOpen } title='Add Asset'
-                from='right' width='400px' height='100px' onRequestClose={ this.closePanel }>
+                from='right' width='400px' onRequestClose={ this.closeAssetPanel }>
                     <div>
                         <form onSubmit={this.handleSubmit}>
                             <Select placeholder="Asset Name *" value={this.state.nameValue} onChange={this.handleChange} options={assetNames}/>
@@ -316,9 +371,6 @@ class ManufacturerPanel extends Component {
                     <NavItem>
                         <NavLink className={classnames({ active: this.state.activeTab === '2' })} onClick={() => { this.toggle('2'); }}>Distributor</NavLink>
                     </NavItem>
-                    <NavItem>
-                        <NavLink className={classnames({ active: this.state.activeTab === '3' })} onClick={() => { this.toggle('3'); }}>Transaction</NavLink>
-                    </NavItem>
                 </Nav>
                 <TabContent activeTab={this.state.activeTab}>
                     <TabPane tabId="1">
@@ -329,9 +381,8 @@ class ManufacturerPanel extends Component {
                                 <BootstrapTable data={ this.state.assets } version='4' hover condensed pagination expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponent } options={ options }>
                                     <TableHeaderColumn isKey dataField='#'>No.</TableHeaderColumn>
                                     <TableHeaderColumn dataField='Name' filter={{ type: 'TextFilter', delay: 100 }}>Asset Name</TableHeaderColumn>
-                                    <TableHeaderColumn dataField='Type' filter={{ type: 'TextFilter', delay: 100 }}>Asset Type</TableHeaderColumn>
-                                    <TableHeaderColumn dataField='Price' filter={{ type: 'TextFilter', delay: 100 }}>Price</TableHeaderColumn>
-                                    <TableHeaderColumn dataField='Quantity' filter={{ type: 'TextFilter', delay: 100 }}>Quantity</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='Owner' filter={{ type: 'TextFilter', delay: 100 }}>Owner</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='Quantity' >Quantity</TableHeaderColumn>
                                 </BootstrapTable>
                                 <br/><br/>
                             </Col>
@@ -341,13 +392,6 @@ class ManufacturerPanel extends Component {
                         <Row>
                             <Col sm={12}>
                                 <h4>Tab 2 Contents</h4>
-                            </Col>
-                        </Row>
-                    </TabPane>
-                    <TabPane tabId="3">
-                        <Row>
-                            <Col sm={12}>
-                                <h4>Tab 3 Contents</h4>
                             </Col>
                         </Row>
                     </TabPane>
