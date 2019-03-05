@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
-import { MDBContainer, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBCardText, MDBListGroup, MDBListGroupItem, MDBRow } from "mdbreact";
+import { MDBContainer, MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBDropdownItem, MDBInput, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBCardText, MDBListGroup, MDBListGroupItem, MDBRow } from "mdbreact";
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import '../../node_modules/react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import classnames from 'classnames';
 import PanelHeading from "../components/PanelHeading";
 import { Row, Col } from 'react-bootstrap'
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
+import SlidingPane from 'react-sliding-pane';
+import 'react-sliding-pane/dist/react-sliding-pane.css';
+import Select from 'react-select';
 
 class BSTable extends React.Component {
     render() {
@@ -47,40 +50,109 @@ class BSTable extends React.Component {
     }
 }
 
+// QRCode string `json:"qr"`
+// Name string `json:"name"`
+// Description string `json:"description"`
+// AssetType string `json:"type"`
+// Price float32 `json:"price"`
+// ManufactureDate string `json:"manufactureDate"`
+// ExpiryDate string `json:"expiryDate"`
+// Quantity int `json:"quantity"`
+// Timestamp uint64 `json:"timestamp"`
+// Owner  string `json:"owner"`
+const assetTypes = [
+    { label: "Medicine", value: 1 },
+    { label: "Surgical Instrument", value: 2 },
+    { label: "Hospital Equipment", value: 3 },
+    { label: "Saftey Equipment", value: 4 },
+];
+
+const assetNames = [
+    { label: "Panadol", value: 1 },
+    { label: "Xyzal", value: 2 },
+    { label: "Castine", value: 3 },
+    { label: "Panadol Extra", value: 4 },
+    { label: "Calpol", value: 5 },
+    { label: "Brufen", value: 6 },
+    { label: "Paracetamol", value: 7 },
+    { label: "Castine", value: 8 },
+    { label: "Forceps", value: 9 },
+    { label: "Scissors", value: 10 },
+    { label: "Speculums", value: 11 },
+    { label: "Spatulas", value: 12 },
+    { label: "Needle Holders", value: 13 },
+    { label: "Nebulizers", value: 14 },
+    { label: "Syringe", value: 15 },
+    { label: "Catheter", value: 16 },
+    { label: "Speculum", value: 17 },
+    { label: "Medical Gloves", value: 18 },
+    { label: "Obstetrical Forceps", value: 19 },
+    { label: "Surgical Mask", value: 20 },
+    { label: "Gowns", value: 21 },
+    { label: "Head Covering", value: 22 },
+    { label: "Shoe Covering", value: 23 },
+];
+
 class ManufacturerPanel extends Component {
     constructor(props) {
         super(props);
-        this.toggle = this.toggle.bind(this);
         this.state={};
         this.state.activeTab="1";
-        this.state.isPaneOpen=false;
-        this.state.assetTypes=['Medicines', 'Surgical Instruments'];
-        this.state.nameValue="";
-        this.state.priceValue="";
-        this.state.typeValue="";
-        this.state.qtyValue="";
-        this.state.errors={nameVal:'',priceVal:'',typeVal:'',qtyVal:''};
-        this.state.nameValid=false;
-        this.state.priceValid=false;
-        this.state.qtyValid=false;
-        this.state.typeValid=false;
-        this.state.formValid=false;
+        this.state.isAssetPaneOpen=false;
         this.state.response="";
         this.state.responseToPost="";
         this.state.post="";
         this.state.assets = [];
+        this.state.distributors = [];
+        this.state.transactions = [];
+        /////////////////////////ASSET/////////////////////////
+        this.state.nameValue="";
+        this.state.discriptionValue="";
+        this.state.assetType=null;
+        this.state.priceValue="";
+        this.state.manufacDate="";
+        this.state.expiryDate="";
+        this.state.qtyValue="";
+        this.state.ownerValue="";
+
+        // this.state.errors={nameVal:'',priceVal:'',typeVal:'',qtyVal:''};
+        // this.state.nameValid=false;
+        // this.state.priceValid=false;
+        // this.state.qtyValid=false;
+        // this.state.typeValid=false;
+        // this.state.formValid=false;
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.state.key="asset";
+        this.toggle = this.toggle.bind(this);
     }
 
-    handleInputChange(event) {
-        const target = event.target;
-        const value = target.value;
-        const name = target.name;
-        this.setState({
-            [name]: value
-        },()=>{this.validate(name,value)});
+    handleChange = (selectedOption) => {
+        this.setState({ assetType: selectedOption });
+        console.log(`Option selected:`, selectedOption);
+    }
+
+    componentDidMount() {
+        this.callApi()
+        .then(res => this.setState({ assets: this.flattenData(res.express) }))
+        .catch(err => console.log(err));
+        console.log("Assets");
+        console.log(this.state.assets);
+    }
+
+    callApi = async () => {
+        const response = await fetch('/api/hello');
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+        console.log(body);
+        return body;
     };
+
+    toggle(tab) {
+        if (this.state.activeTab !== tab) {
+            this.setState({
+                activeTab: tab
+            });
+        }
+    }
 
     isExpandableRow(row) {
         return true;
@@ -91,6 +163,49 @@ class ManufacturerPanel extends Component {
             <BSTable data={ row } />
         );
     }
+
+    closePanel = () => {
+        this.setState({
+            isAssetPaneOpen: false,
+            nameValue:'',
+            discriptionValue:'',
+            assetType:'',
+            priceValue:'',
+            manufacDate:'',
+            expiryDate:'',
+            qtyValue:'',
+            ownerValue:'',
+            errors:{nameVal:'',priceVal:'',typeVal:'',qtyVal:''},
+            nameValid:false,
+            priceValid:false,
+            qtyValid:false,
+            typeValid:false,
+            formValid:false
+        });
+    };
+    /////////////////////////////////////////////////////////////
+    flattenData (assets_array) {
+        var temp_asset=[];
+        for(let i=0;i<assets_array.length;i++){
+            var temp={};
+            temp['#'] = i+1;
+            temp['Key'] = assets_array[i].Key;
+            temp['Name'] = assets_array[i].Record.name;
+            temp['Owner'] = assets_array[i].Record.owner;
+            temp['TimeStamp'] = assets_array[i].Record.timestamp;
+            temp_asset.push(temp);
+        }
+        return temp_asset;
+    }
+
+    handleInputChange(event) {
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+        this.setState({
+            [name]: value
+        },()=>{this.validate(name,value)});
+    };
 
     validate(name,value){
         var fieldErrors=this.state.errors;
@@ -130,45 +245,6 @@ class ManufacturerPanel extends Component {
         this.setState({formValid: this.state.nameValid && this.state.priceValid && this.state.qtyValid && this.state.typeValid});
     }
 
-    assetNameValidator(value, row) {
-        const response = { isValid: true, notification: { type: 'success', msg: '', title: '' } };
-        if (!value) {
-            response.isValid = false;
-            response.notification.type = 'error';
-            response.notification.msg = 'Value must be inserted';
-            response.notification.title = 'Requested Value';
-        } else if (value.length < 4) {
-            response.isValid = false;
-            response.notification.type = 'error';
-            response.notification.msg = 'Value must have 4+ characters';
-            response.notification.title = 'Invalid Value';
-        }
-        return response;
-    }
-
-    assetStatusValidator(value, row) {
-        const nan = isNaN(parseInt(value, 10));
-        if (nan) {
-            return 'Asset Status must be a integer!';
-        }
-        return true;
-    }
-
-    closePanel = () => {
-        this.setState({ isPaneOpen: false,
-            nameValue:'',
-            priceValue:'',
-            typeValue:'',
-            qtyValue:'',
-            errors:{nameVal:'',priceVal:'',typeVal:'',qtyVal:''},
-            nameValid:false,
-            priceValid:false,
-            qtyValid:false,
-            typeValid:false,
-            formValid:false
-        });
-    };
-
     handleAddAsset(name,price,type,quantity) {
         var asset = {
             Key: name,
@@ -181,23 +257,6 @@ class ManufacturerPanel extends Component {
     };
 
     //tasks.map((task) => task.name )
-    display=()=>{
-        console.log(this.state.assets);
-    }
-
-    flattenData (assets_array) {
-        var temp_asset=[];
-        for(let i=0;i<assets_array.length;i++){
-            var temp={};
-            temp['Key']=assets_array[i].Key;
-            temp['Name']=assets_array[i].Record.name;
-            temp['Owner']=assets_array[i].Record.owner;
-            temp['TimeStamp']=assets_array[i].Record.timestamp;
-            temp_asset.push(temp);
-        }
-        return temp_asset;
-    }
-
     handleSubmit = async e => {
         this.handleAddAsset(this.state.nameValue,this.state.priceValue,this.state.typeValue,this.state.qtyValue);
         var name=this.state.nameValue;
@@ -220,35 +279,6 @@ class ManufacturerPanel extends Component {
         this.setState({ responseToPost: body });
     };
 
-    // componentDidMount() {
-    //     this.setState({assets:this.flattenData([{"Key":"1","Record":{"name":"panadol","owner":"Miriam","timestamp":"1504054225"}},{"Key":"2","Record":{"name":"xyzal","owner":"Ahmad","timestamp":"1504057825"},},{"Key":"3","Record":{"name":"castine","owner":"Igor","timestamp":"1493517025"}},{"Key":"4", "Record":{"name":"panadol extra","owner":"Amalea","timestamp":"1496105425"}},{"Key":"5", "Record":{"name":"calpol","owner":"Rafa","timestamp":"1493512301"}},{"Key":"6", "Record":{"name":"brufen","owner":"Shen","timestamp":"1494117101"}},{"Key":"7", "Record":{"name":"paracetamol","owner":"Leila","timestamp":"1496104301"}},{"Key":"8", "Record":{"name":"panadol","owner":"Miriam","timestamp":"1504054225"}},{"Key":"9", "Record":{"name":"xyzal","owner":"Dave","timestamp":"1504057825"}},{"Key":"10", "Record":{"name":"castine","owner":"Igor","timestamp":"1493517025"}},{"Key":"11", "Record":{"name":"panadol extra","owner":"Amalea","timestamp":"1496105425"}},{"Key":"12", "Record":{"name":"calpol","owner":"Rafa","timestamp":"1493512301"}},{"Key":"13", "Record":{"name":"brufen","owner":"Shen","timestamp":"1494117101"}},{"Key":"14", "Record":{"name":"paracetamol","owner":"Leila","timestamp":"1496104301"}}])});
-    //     console.log(this.state.assets);
-    // }
-
-    componentDidMount() {
-        this.callApi()
-        .then(res => this.setState({ assets: res.express }))
-        .catch(err => console.log(err));
-        console.log("Assets");
-        console.log(this.state.assets);
-    }
-
-    callApi = async () => {
-        const response = await fetch('/api/hello');
-        const body = await response.json();
-        if (response.status !== 200) throw Error(body.message);
-        console.log(body);
-        return body;
-    };
-
-    toggle(tab) {
-        if (this.state.activeTab !== tab) {
-            this.setState({
-                activeTab: tab
-            });
-        }
-    }
-
     //height='240' scrollTop={ 'Top' }
 
     render() {
@@ -261,6 +291,23 @@ class ManufacturerPanel extends Component {
         return (
             <MDBContainer>
                 <PanelHeading title="Manufacturer Panel"/>
+
+                <SlidingPane closeIcon={<div>[ X ]</div>} isOpen={ this.state.isAssetPaneOpen } title='Add Asset'
+                from='right' width='400px' height='100px' onRequestClose={ this.closePanel }>
+                    <div>
+                        <form onSubmit={this.handleSubmit}>
+                            <Select placeholder="Asset Name *" value={this.state.nameValue} onChange={this.handleChange} options={assetNames}/>
+                            <MDBInput type="textarea" label="Description" rows="2" name="discriptionValue" value={this.state.discriptionValue} onChange={this.handleInputChange}/>
+                            <Select placeholder="Asset Type *" value={this.state.assetType} onChange={this.handleChange} options={assetTypes}/>
+                            <MDBInput label="Price *" name="priceValue" type="number" min="1" value={this.state.priceValue} onChange={this.handleInputChange}/>
+                            <MDBInput label="Manufacture Date *" hint="mm/dd/yyyy" name="manufacDate" type="date" value={this.state.manufacDate} onChange={this.handleInputChange}/>
+                            <MDBInput label="Expiry Date *" hint="mm/dd/yyyy" name="expiryDate" type="date" value={this.state.expiryDate} onChange={this.handleInputChange}/>
+                            <MDBInput label="Quantity *" name="qtyValue" type="number" min="1" value={this.state.qtyValue} onChange={this.handleInputChange}/>
+                            <MDBInput label="Owner Name *" name="ownerValue" type="text" value={this.state.ownerValue} onChange={this.handleInputChange}/>
+                            <center><MDBBtn size="sm" color="primary" type="submit" >Add</MDBBtn></center>
+                        </form>
+                    </div>
+                </SlidingPane>
 
                 <Nav tabs pills>
                     <NavItem>
@@ -277,12 +324,14 @@ class ManufacturerPanel extends Component {
                     <TabPane tabId="1">
                         <Row>
                             <Col sm={12}>
-                                <MDBBtn size="sm" color="primary" onClick={this.display} >Add Asset</MDBBtn>
+                                <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isAssetPaneOpen: true })} >Add Asset</MDBBtn>
+
                                 <BootstrapTable data={ this.state.assets } version='4' hover condensed pagination expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponent } options={ options }>
-                                    <TableHeaderColumn isKey dataField='Key'>Asset ID</TableHeaderColumn>
-                                    <TableHeaderColumn dataField='Owner' filter={{ type: 'TextFilter', delay: 100 }}>Asset Owner</TableHeaderColumn>
+                                    <TableHeaderColumn isKey dataField='#'>No.</TableHeaderColumn>
                                     <TableHeaderColumn dataField='Name' filter={{ type: 'TextFilter', delay: 100 }}>Asset Name</TableHeaderColumn>
-                                    <TableHeaderColumn dataField='TimeStamp' filter={{ type: 'TextFilter', delay: 100 }}>Time Stamp</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='Type' filter={{ type: 'TextFilter', delay: 100 }}>Asset Type</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='Price' filter={{ type: 'TextFilter', delay: 100 }}>Price</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='Quantity' filter={{ type: 'TextFilter', delay: 100 }}>Quantity</TableHeaderColumn>
                                 </BootstrapTable>
                                 <br/><br/>
                             </Col>
