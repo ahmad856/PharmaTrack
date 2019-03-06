@@ -185,6 +185,11 @@ class ManufacturerPanel extends Component {
     }
 
     handleChange = (selectedOption) => {
+        this.setState({ nameValue: selectedOption });
+        console.log(`Option selected:`, selectedOption);
+    }
+
+    handleTypeChange = (selectedOption) => {
         this.setState({ assetType: selectedOption });
         console.log(`Option selected:`, selectedOption);
     }
@@ -290,8 +295,9 @@ class ManufacturerPanel extends Component {
         const name = target.name;
         this.setState({
             [name]: value
-        },()=>{this.validate(name,value)});
+        });
     };
+    //,()=>{this.validate(name,value)}
 
     validate(name,value){
         var fieldErrors=this.state.errors;
@@ -339,13 +345,14 @@ class ManufacturerPanel extends Component {
             'Name': name,
             'Description': description,
             'AssetType':type,
-            'Price': type,
+            'Price': price,
             'ManufactureDate': mgfDate,
             'ExpiryDate':expDate,
             'Quantity': qty,
             'Timestamp': owner,
             'Owner':timestamp,
         }
+        alert(asset);
         this.state.assets.push(asset);
         this.setState(this.state.assets);
     };
@@ -353,15 +360,15 @@ class ManufacturerPanel extends Component {
     //tasks.map((task) => task.name )
     handleSubmit = async e => {
         var id="asset"+(this.state.assets.length+1);
-        var qr="abc";
-        var name=this.state.nameValue;
+        var qr="abcdef";
+        var name=this.state.nameValue.label;
         var description=this.state.discriptionValue;
-        var type=this.state.typeValue;
+        var owner=this.state.ownerValue;
+        var type=this.state.typeValue.label;
         var price=this.state.priceValue;
         var mgfDate=this.state.manufacDate;
         var expDate=this.state.expiryDate;
         var qty=this.state.qtyValue;
-        var owner=this.state.ownerValue;
         var timestamp=Date.now();
         this.handleAddAsset(id, qr, name, description, type, price, mgfDate, expDate, qty, owner, timestamp);
         this.closeAssetPanel();
@@ -428,7 +435,7 @@ class ManufacturerPanel extends Component {
                         <form onSubmit={this.handleSubmit}>
                             <Select placeholder="Asset Name *" value={this.state.nameValue} onChange={this.handleChange} options={assetNames}/>
                             <MDBInput type="textarea" label="Description" rows="2" name="discriptionValue" value={this.state.discriptionValue} onChange={this.handleInputChange}/>
-                            <Select placeholder="Asset Type *" value={this.state.assetType} onChange={this.handleChange} options={assetTypes}/>
+                            <Select placeholder="Asset Type *" value={this.state.assetType} onChange={this.handleTypeChange} options={assetTypes}/>
                             <MDBInput label="Price *" name="priceValue" type="number" min="1" value={this.state.priceValue} onChange={this.handleInputChange}/>
                             <MDBInput label="Manufacture Date *" hint="mm/dd/yyyy" name="manufacDate" type="date" value={this.state.manufacDate} onChange={this.handleInputChange}/>
                             <MDBInput label="Expiry Date *" hint="mm/dd/yyyy" name="expiryDate" type="date" value={this.state.expiryDate} onChange={this.handleInputChange}/>
