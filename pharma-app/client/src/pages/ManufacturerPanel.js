@@ -95,17 +95,25 @@ class BSTable extends React.Component {
     }
 }
 
+///////////////////////////////ASSET//////////////////////
 // ID string `json:"id"`
 // QRCode string `json:"qr"`
+// Name string `json:"name"` done
+// Description string `json:"description"` done
+// AssetType string `json:"type"` done
+// Price float32 `json:"price"` done
+// ManufactureDate string `json:"manufactureDate" done`
+// ExpiryDate string `json:"expiryDate"` done
+// Quantity int `json:"quantity"` done
+// Timestamp uint64 `json:"timestamp"` done
+// Owner  string `json:"owner"`  done
+
+///////////////////////////////Distributor///////////////////
+// ID string `json:"id"`
 // Name string `json:"name"`
-// Description string `json:"description"`
-// AssetType string `json:"type"`
-// Price float32 `json:"price"`
-// ManufactureDate string `json:"manufactureDate"`
-// ExpiryDate string `json:"expiryDate"`
-// Quantity int `json:"quantity"`
+// Owner string 'json:"owner"'
+// Address  string `json:"address"`
 // Timestamp uint64 `json:"timestamp"`
-// Owner  string `json:"owner"`
 
 const assetTypes = [
     { label: "Medicine", value: 1 },
@@ -145,6 +153,7 @@ class ManufacturerPanel extends Component {
         this.state={};
         this.state.activeTab="1";
         this.state.isAssetPaneOpen=false;
+        this.state.isDistributorPaneOpen=false;
         this.state.response="";
         this.state.responseToPost="";
         this.state.post="";
@@ -160,6 +169,10 @@ class ManufacturerPanel extends Component {
         this.state.expiryDate="";
         this.state.qtyValue="";
         this.state.ownerValue="";
+        ////////////////////////Distributor////////////////////
+        this.state.distNameValue="";
+        this.state.distOwnerValue="";
+        this.state.distAddressValue="";
 
         // this.state.errors={nameVal:'',priceVal:'',typeVal:'',qtyVal:''};
         // this.state.nameValid=false;
@@ -178,7 +191,7 @@ class ManufacturerPanel extends Component {
 
     componentDidMount() {
         this.callGetAllMedicines()
-        .then(res => this.setState({ assets: this.flattenData(res.express) }))
+        .then(res => this.setState({ assets: this.flattenAssetData(res.express) }))
         .catch(err => console.log(err));
         console.log("Assets");
         console.log(this.state.assets);
@@ -230,9 +243,27 @@ class ManufacturerPanel extends Component {
         });
     };
 
+    closeDistributorPanel = () => {
+        this.setState({
+            isDistributorPaneOpen: false,
+            nameValue:'',
+            discriptionValue:'',
+            assetType:'',
+            priceValue:'',
+            manufacDate:'',
+            expiryDate:'',
+            qtyValue:'',
+            ownerValue:'',
+            errors:{nameVal:'',priceVal:'',typeVal:'',qtyVal:''},
+            nameValid:false,
+            priceValid:false,
+            qtyValid:false,
+            typeValid:false,
+            formValid:false
+        });
+    };
 
-    /////////////////////////////////////////////////////////////
-    flattenData (assets_array) {
+    flattenAssetData (assets_array) {
         var temp_asset=[];
         for(let i=0;i<assets_array.length;i++){
             var temp={};
@@ -252,7 +283,7 @@ class ManufacturerPanel extends Component {
         }
         return temp_asset;
     }
-
+    /////////////////////////////////////////////////////////////
     handleInputChange(event) {
         const target = event.target;
         const value = target.value;
@@ -300,12 +331,20 @@ class ManufacturerPanel extends Component {
         this.setState({formValid: this.state.nameValid && this.state.priceValid && this.state.qtyValid && this.state.typeValid});
     }
 
-    handleAddAsset(name,price,type,quantity) {
+    handleAddAsset(id, qr, name, description, type, price, mgfDate, expDate, qty, owner, timestamp) {
         var asset = {
-            Key: name,
-            name: price,
-            owner: type,
-            timestamp: quantity
+            '#': (this.state.assets.length+1),
+            'ID': id,
+            'QRCode':qr,
+            'Name': name,
+            'Description': description,
+            'AssetType':type,
+            'Price': type,
+            'ManufactureDate': mgfDate,
+            'ExpiryDate':expDate,
+            'Quantity': qty,
+            'Timestamp': owner,
+            'Owner':timestamp,
         }
         this.state.assets.push(asset);
         this.setState(this.state.assets);
@@ -313,11 +352,18 @@ class ManufacturerPanel extends Component {
 
     //tasks.map((task) => task.name )
     handleSubmit = async e => {
-        this.handleAddAsset(this.state.nameValue,this.state.priceValue,this.state.typeValue,this.state.qtyValue);
+        var id="asset"+(this.state.assets.length+1);
+        var qr="abc";
         var name=this.state.nameValue;
-        var price=this.state.priceValue;
+        var description=this.state.discriptionValue;
         var type=this.state.typeValue;
+        var price=this.state.priceValue;
+        var mgfDate=this.state.manufacDate;
+        var expDate=this.state.expiryDate;
         var qty=this.state.qtyValue;
+        var owner=this.state.ownerValue;
+        var timestamp=Date.now();
+        this.handleAddAsset(id, qr, name, description, type, price, mgfDate, expDate, qty, owner, timestamp);
         this.closeAssetPanel();
         e.preventDefault();
         const response = await fetch('/add_medicine', {
@@ -325,7 +371,36 @@ class ManufacturerPanel extends Component {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ post: name.concat('-',price,'-',type,'-',qty) })
+            body: JSON.stringify({ post: id.concat('-',qr,'-',name,'-',description,'-',owner,'-',type,'-',price,'-',mgfDate,'-',expDate,'-',qty,'-',timestamp) })
+        });
+        console.log("Assets");
+        console.log(this.state.assets);
+        console.log(response.text());
+        const body = await response.text();
+        this.setState({ responseToPost: body });
+    };
+
+    handleAddDistributor(name,address) {
+        var distributor = {
+            Name: name,
+            Address: address
+        }
+        this.state.distributors.push(distributor);
+        this.setState(this.state.distributors);
+    };
+
+    handleDistributorSubmit = async e => {
+        this.handleAddDistributor(this.state.distNameValue, this.state.distAddressValue);
+        var name=this.state.distNameValue;
+        var address=this.state.distAddressValue;
+        this.closeAssetPanel();
+        e.preventDefault();
+        const response = await fetch('/add_medicine', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            //body: JSON.stringify({ post: name.concat('-',price,'-',type,'-',qty) })
         });
         console.log("Assets");
         console.log(this.state.assets);
@@ -364,6 +439,19 @@ class ManufacturerPanel extends Component {
                     </div>
                 </SlidingPane>
 
+                {/* Add Distributor side pane */}
+                <SlidingPane closeIcon={<div>[ X ]</div>} isOpen={ this.state.isDistributorPaneOpen } title='Add Distributor'
+                from='right' width='400px' onRequestClose={ this.closeDistributorPanel }>
+                    <div>
+                        <form onSubmit={this.handleDistributorSubmit}>
+                            <MDBInput label="Name *" name="distNameValue" type="text" value={this.state.distNameValue} onChange={this.handleInputChange}/>
+                            <MDBInput label="Owner Name *" name="distOwnerValue" type="text" value={this.state.distOwnerValue} onChange={this.handleInputChange}/>
+                            <MDBInput label="Address *" name="distAddressValue" type="text" value={this.state.distAddressValue} onChange={this.handleInputChange}/>
+                            <center><MDBBtn size="sm" color="primary" type="submit" >Add</MDBBtn></center>
+                        </form>
+                    </div>
+                </SlidingPane>
+
                 <Nav tabs pills>
                     <NavItem>
                         <NavLink className={classnames({ active: this.state.activeTab === '1' })} onClick={() => { this.toggle('1'); }}>Asset</NavLink>
@@ -378,7 +466,7 @@ class ManufacturerPanel extends Component {
                             <Col sm={12}>
                                 <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isAssetPaneOpen: true })} >Add Asset</MDBBtn>
 
-                                <BootstrapTable data={ this.state.assets } version='4' hover condensed pagination expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponent } options={ options }>
+                                <BootstrapTable data={ this.state.assets } version='4' hover condensed pagination options={ options }>
                                     <TableHeaderColumn isKey dataField='#'>No.</TableHeaderColumn>
                                     <TableHeaderColumn dataField='Name' filter={{ type: 'TextFilter', delay: 100 }}>Asset Name</TableHeaderColumn>
                                     <TableHeaderColumn dataField='Owner' filter={{ type: 'TextFilter', delay: 100 }}>Owner</TableHeaderColumn>
@@ -391,7 +479,15 @@ class ManufacturerPanel extends Component {
                     <TabPane tabId="2">
                         <Row>
                             <Col sm={12}>
-                                <h4>Tab 2 Contents</h4>
+                            <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isDistributorPaneOpen: true })} >Add Distributor</MDBBtn>
+
+                            <BootstrapTable data={ this.state.assets } version='4' hover condensed pagination expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponent } options={ options }>
+                                <TableHeaderColumn isKey dataField='#'>No.</TableHeaderColumn>
+                                <TableHeaderColumn dataField='Name' filter={{ type: 'TextFilter', delay: 100 }}>Asset Name</TableHeaderColumn>
+                                <TableHeaderColumn dataField='Owner' filter={{ type: 'TextFilter', delay: 100 }}>Owner</TableHeaderColumn>
+                                <TableHeaderColumn dataField='Quantity' >Quantity</TableHeaderColumn>
+                            </BootstrapTable>
+                            <br/><br/>
                             </Col>
                         </Row>
                     </TabPane>
