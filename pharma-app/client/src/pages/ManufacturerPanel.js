@@ -41,7 +41,7 @@ class BSTable extends React.Component {
                     {/* Show Transactions side pane */}
                     <SlidingPane isOpen={this.state.isTransactionPaneOpen} title='Transactions History' closeIcon={<div>[ X ]</div>} from='left' width='400px' onRequestClose={this.closeTransactionPanel}>
                         <MDBContainer>
-                            {/* Iterate */}
+                            {/* Iterates */}
                             <MDBCard border="info" className="m-3" style={{ maxWidth: "35rem" }}>
                                 <MDBCardHeader> Transaction Details</MDBCardHeader>
                                 <MDBCardBody className="text-info">
@@ -55,7 +55,7 @@ class BSTable extends React.Component {
                                     </MDBRow>
                                 </MDBCardBody>
                             </MDBCard>
-                            {/* Iterate */}
+                            {/* Iterates */}
                         </MDBContainer>
                     </SlidingPane>
 
