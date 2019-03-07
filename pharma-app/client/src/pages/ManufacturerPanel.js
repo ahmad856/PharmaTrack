@@ -473,7 +473,7 @@ class ManufacturerPanel extends Component {
                             <Col sm={12}>
                                 <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isAssetPaneOpen: true })} >Add Asset</MDBBtn>
 
-                                <BootstrapTable data={ this.state.assets } version='4' hover condensed pagination options={ options }>
+                                <BootstrapTable data={ this.state.assets } version='4' hover condensed pagination options={ options } expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponent }>
                                     <TableHeaderColumn isKey dataField='#'>No.</TableHeaderColumn>
                                     <TableHeaderColumn dataField='Name' filter={{ type: 'TextFilter', delay: 100 }}>Asset Name</TableHeaderColumn>
                                     <TableHeaderColumn dataField='Owner' filter={{ type: 'TextFilter', delay: 100 }}>Owner</TableHeaderColumn>
@@ -488,7 +488,7 @@ class ManufacturerPanel extends Component {
                             <Col sm={12}>
                             <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isDistributorPaneOpen: true })} >Add Distributor</MDBBtn>
 
-                            <BootstrapTable data={ this.state.assets } version='4' hover condensed pagination expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponent } options={ options }>
+                            <BootstrapTable data={ this.state.assets } version='4' hover condensed pagination options={ options }>
                                 <TableHeaderColumn isKey dataField='#'>No.</TableHeaderColumn>
                                 <TableHeaderColumn dataField='Name' filter={{ type: 'TextFilter', delay: 100 }}>Asset Name</TableHeaderColumn>
                                 <TableHeaderColumn dataField='Owner' filter={{ type: 'TextFilter', delay: 100 }}>Owner</TableHeaderColumn>
