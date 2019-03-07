@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { MDBContainer, MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBDropdownItem, MDBInput, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBCardText, MDBListGroup, MDBListGroupItem, MDBRow } from "mdbreact";
+import { MDBContainer, MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBInput, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBCardText, MDBListGroup, MDBListGroupItem, MDBRow } from "mdbreact";
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import '../../node_modules/react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import classnames from 'classnames';
@@ -16,6 +16,7 @@ class BSTable extends React.Component {
         this.state={};
         this.state.isTransactionPaneOpen=false;
         this.state.distID="";
+        this.state.transactions = [];
         this.handleInputChange = this.handleInputChange.bind(this);
     }
 
@@ -29,7 +30,6 @@ class BSTable extends React.Component {
     };
     //,()=>{this.validate(name,value)}
 
-
     closeTransactionPanel = () => {
         this.setState({ isTransactionPaneOpen: false });
     };
@@ -38,48 +38,59 @@ class BSTable extends React.Component {
         if (this.props.data) {
             return (
                 <MDBContainer>
-                {/* Show Transactions side pane */}
-                <SlidingPane closeIcon={<div>[ X ]</div>} isOpen={ this.state.isTransactionPaneOpen } title='Transactions'
-                from='left' width='400px' onRequestClose={ this.closeTransactionPanel }>
-                    <div>
+                    {/* Show Transactions side pane */}
+                    <SlidingPane isOpen={this.state.isTransactionPaneOpen} title='Transactions History' closeIcon={<div>[ X ]</div>} from='left' width='400px' onRequestClose={this.closeTransactionPanel}>
+                        <MDBContainer>
+                            {/* Iterate */}
+                            <MDBCard border="info" className="m-3" style={{ maxWidth: "35rem" }}>
+                                <MDBCardHeader> Transaction Details</MDBCardHeader>
+                                <MDBCardBody className="text-info">
+                                    <MDBRow className="justify-content-center">
+                                        <MDBListGroup className="my-4 mx-4" style={{ width: "25rem" }}>
+                                            <MDBListGroupItem color="primary">ID: {this.props.data.ID}</MDBListGroupItem>
+                                            <MDBListGroupItem color="primary">QRCode: {this.props.data.QRCode}</MDBListGroupItem>
+                                            <MDBListGroupItem color="primary">Description: {this.props.data.Description}</MDBListGroupItem>
+                                            <MDBListGroupItem color="primary">Type: {this.props.data.AssetType}</MDBListGroupItem>
+                                        </MDBListGroup>
+                                    </MDBRow>
+                                </MDBCardBody>
+                            </MDBCard>
+                            {/* Iterate */}
+                        </MDBContainer>
+                    </SlidingPane>
 
-                    </div>
-                </SlidingPane>
-
-                <MDBCard border="info" className="m-3" style={{ maxWidth: "70rem" }}>
-                    <MDBCardHeader> Asset Details</MDBCardHeader>
-                    <MDBCardBody className="text-info">
-                        <MDBRow className="justify-content-center">
-                            <MDBListGroup className="my-4 mx-4" style={{ width: "20rem" }}>
-                                <MDBListGroupItem color="primary">ID: {this.props.data.ID}</MDBListGroupItem>
-                                <MDBListGroupItem color="primary">QRCode: {this.props.data.QRCode}</MDBListGroupItem>
-                                <MDBListGroupItem color="primary">Description: {this.props.data.Description}</MDBListGroupItem>
-                                <MDBListGroupItem color="primary">Type: {this.props.data.AssetType}</MDBListGroupItem>
-                            </MDBListGroup>
-                            <MDBListGroup className="my-4 mx-4" style={{ width: "20rem" }}>
-                                <MDBListGroupItem color="primary">Mfg Date: {this.props.data.ManufactureDate}</MDBListGroupItem>
-                                <MDBListGroupItem color="primary">ExpiryDate: {this.props.data.ExpiryDate}</MDBListGroupItem>
-                                <MDBListGroupItem color="primary">Timestamp: {this.props.data.Timestamp}</MDBListGroupItem>
-                                <MDBListGroupItem color="primary">Price: {this.props.data.Price}</MDBListGroupItem>
-                            </MDBListGroup>
-                        </MDBRow>
-                        <center>
-                            <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isTransactionPaneOpen: true })}>Show Details</MDBBtn>
-                            {/* <MDBBtn size="sm" color="primary">Transact Asset</MDBBtn> */}
-                            <MDBDropdown>
-                                <MDBDropdownToggle caret>
-                                    Transact Asset
-                                </MDBDropdownToggle>
-                                <MDBDropdownMenu className="dropdown-default" right>
-                                    <form>
-                                        <MDBInput label="Distributor ID *" name="distID" type="text" value={this.state.distID} onChange={this.handleInputChange}/>
-                                        <MDBBtn size="sm">Transact</MDBBtn>
-                                    </form>
-                                </MDBDropdownMenu>
-                            </MDBDropdown>
-                        </center>
-                    </MDBCardBody>
-                </MDBCard>
+                    <MDBCard border="info" className="m-3" style={{ maxWidth: "70rem" }}>
+                        <MDBCardHeader> Asset Details</MDBCardHeader>
+                        <MDBCardBody className="text-info">
+                            <MDBRow className="justify-content-center">
+                                <MDBListGroup className="my-4 mx-4" style={{ width: "20rem" }}>
+                                    <MDBListGroupItem color="primary">ID: {this.props.data.ID}</MDBListGroupItem>
+                                    <MDBListGroupItem color="primary">QRCode: {this.props.data.QRCode}</MDBListGroupItem>
+                                    <MDBListGroupItem color="primary">Description: {this.props.data.Description}</MDBListGroupItem>
+                                    <MDBListGroupItem color="primary">Type: {this.props.data.AssetType}</MDBListGroupItem>
+                                </MDBListGroup>
+                                <MDBListGroup className="my-4 mx-4" style={{ width: "20rem" }}>
+                                    <MDBListGroupItem color="primary">Mfg Date: {this.props.data.ManufactureDate}</MDBListGroupItem>
+                                    <MDBListGroupItem color="primary">ExpiryDate: {this.props.data.ExpiryDate}</MDBListGroupItem>
+                                    <MDBListGroupItem color="primary">Timestamp: {this.props.data.Timestamp}</MDBListGroupItem>
+                                    <MDBListGroupItem color="primary">Price: {this.props.data.Price}</MDBListGroupItem>
+                                </MDBListGroup>
+                            </MDBRow>
+                                <MDBRow className="justify-content-center">
+                                {/* <MDBBtn size="sm" color="primary">Transact Asset</MDBBtn> */}
+                                <MDBDropdown dropup size="sm">
+                                    <MDBDropdownToggle caret color="primary">Transact Asset</MDBDropdownToggle>
+                                    <MDBDropdownMenu basic>
+                                        <form>
+                                            <MDBInput label="Distributor ID *" name="distID" type="text" value={this.state.distID} onChange={this.handleInputChange}/>
+                                            <MDBBtn size="sm" color="primary">Transact</MDBBtn>
+                                        </form>
+                                    </MDBDropdownMenu>
+                                </MDBDropdown>
+                                <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isTransactionPaneOpen: true })}>Show Details</MDBBtn>
+                                </MDBRow>
+                        </MDBCardBody>
+                    </MDBCard>
                 </MDBContainer>
             );
         } else {
@@ -161,7 +172,7 @@ class ManufacturerPanel extends Component {
         this.state.distributors = [];
         this.state.transactions = [];
         /////////////////////////ASSET/////////////////////////
-        this.state.nameValue="";
+        this.state.nameValue=null;
         this.state.discriptionValue="";
         this.state.assetType=null;
         this.state.priceValue="";
@@ -231,40 +242,35 @@ class ManufacturerPanel extends Component {
     closeAssetPanel = () => {
         this.setState({
             isAssetPaneOpen: false,
-            nameValue:'',
+            nameValue:null,
             discriptionValue:'',
-            assetType:'',
+            assetType:null,
             priceValue:'',
             manufacDate:'',
             expiryDate:'',
             qtyValue:'',
             ownerValue:'',
-            errors:{nameVal:'',priceVal:'',typeVal:'',qtyVal:''},
-            nameValid:false,
-            priceValid:false,
-            qtyValid:false,
-            typeValid:false,
-            formValid:false
+            // errors:{nameVal:'',priceVal:'',typeVal:'',qtyVal:''},
+            // nameValid:false,
+            // priceValid:false,
+            // qtyValid:false,
+            // typeValid:false,
+            // formValid:false
         });
     };
 
     closeDistributorPanel = () => {
         this.setState({
             isDistributorPaneOpen: false,
-            nameValue:'',
-            discriptionValue:'',
-            assetType:'',
-            priceValue:'',
-            manufacDate:'',
-            expiryDate:'',
-            qtyValue:'',
-            ownerValue:'',
-            errors:{nameVal:'',priceVal:'',typeVal:'',qtyVal:''},
-            nameValid:false,
-            priceValid:false,
-            qtyValid:false,
-            typeValid:false,
-            formValid:false
+            distNameValue:'',
+            distOwnerValue:'',
+            distAddressValue:'',
+            // errors:{nameVal:'',priceVal:'',typeVal:'',qtyVal:''},
+            // nameValid:false,
+            // priceValid:false,
+            // qtyValid:false,
+            // typeValid:false,
+            // formValid:false
         });
     };
 
@@ -352,7 +358,7 @@ class ManufacturerPanel extends Component {
             'Timestamp': owner,
             'Owner':timestamp,
         }
-        alert(asset);
+        console.log(asset);
         this.state.assets.push(asset);
         this.setState(this.state.assets);
     };
@@ -378,7 +384,7 @@ class ManufacturerPanel extends Component {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ post: id.concat('-',qr,'-',name,'-',description,'-',owner,'-',type,'-',price,'-',mgfDate,'-',expDate,'-',qty,'-',timestamp) })
+            body: JSON.stringify({ post: id.concat('~',qr,'~',name,'~',description,'~',owner,'~',type,'~',price,'~',mgfDate,'~',expDate,'~',qty,'~',timestamp) })
         });
         console.log("Assets");
         console.log(this.state.assets);
@@ -407,7 +413,7 @@ class ManufacturerPanel extends Component {
             headers: {
                 'Content-Type': 'application/json',
             },
-            //body: JSON.stringify({ post: name.concat('-',price,'-',type,'-',qty) })
+            //body: JSON.stringify({ post: name.concat('~',price,'~',type,'~',qty) })
         });
         console.log("Assets");
         console.log(this.state.assets);
@@ -429,34 +435,28 @@ class ManufacturerPanel extends Component {
             <MDBContainer>
                 <PanelHeading title="Manufacturer Panel"/>
                 {/* Add asset side pane */}
-                <SlidingPane closeIcon={<div>[ X ]</div>} isOpen={ this.state.isAssetPaneOpen } title='Add Asset'
-                from='right' width='400px' onRequestClose={ this.closeAssetPanel }>
-                    <div>
-                        <form onSubmit={this.handleSubmit}>
-                            <Select placeholder="Asset Name *" value={this.state.nameValue} onChange={this.handleChange} options={assetNames}/>
-                            <MDBInput type="textarea" label="Description" rows="2" name="discriptionValue" value={this.state.discriptionValue} onChange={this.handleInputChange}/>
-                            <Select placeholder="Asset Type *" value={this.state.assetType} onChange={this.handleTypeChange} options={assetTypes}/>
-                            <MDBInput label="Price *" name="priceValue" type="number" min="1" value={this.state.priceValue} onChange={this.handleInputChange}/>
-                            <MDBInput label="Manufacture Date *" hint="mm/dd/yyyy" name="manufacDate" type="date" value={this.state.manufacDate} onChange={this.handleInputChange}/>
-                            <MDBInput label="Expiry Date *" hint="mm/dd/yyyy" name="expiryDate" type="date" value={this.state.expiryDate} onChange={this.handleInputChange}/>
-                            <MDBInput label="Quantity *" name="qtyValue" type="number" min="1" value={this.state.qtyValue} onChange={this.handleInputChange}/>
-                            <MDBInput label="Owner Name *" name="ownerValue" type="text" value={this.state.ownerValue} onChange={this.handleInputChange}/>
-                            <center><MDBBtn size="sm" color="primary" type="submit" >Add</MDBBtn></center>
-                        </form>
-                    </div>
+                <SlidingPane closeIcon={<div>[ X ]</div>} isOpen={this.state.isAssetPaneOpen} title='Add Asset' from='right' width='400px' onRequestClose={this.closeAssetPanel}>
+                    <form onSubmit={this.handleSubmit}>
+                        <Select placeholder="Asset Name *" value={this.state.nameValue} onChange={this.handleChange} options={assetNames}/>
+                        <MDBInput type="textarea" label="Description" rows="2" name="discriptionValue" value={this.state.discriptionValue} onChange={this.handleInputChange}/>
+                        <Select placeholder="Asset Type *" value={this.state.assetType} onChange={this.handleTypeChange} options={assetTypes}/>
+                        <MDBInput label="Price *" name="priceValue" type="number" min="1" value={this.state.priceValue} onChange={this.handleInputChange}/>
+                        <MDBInput label="Manufacture Date *" hint="mm/dd/yyyy" name="manufacDate" type="date" value={this.state.manufacDate} onChange={this.handleInputChange}/>
+                        <MDBInput label="Expiry Date *" hint="mm/dd/yyyy" name="expiryDate" type="date" value={this.state.expiryDate} onChange={this.handleInputChange}/>
+                        <MDBInput label="Quantity *" name="qtyValue" type="number" min="1" value={this.state.qtyValue} onChange={this.handleInputChange}/>
+                        <MDBInput label="Owner Name *" name="ownerValue" type="text" value={this.state.ownerValue} onChange={this.handleInputChange}/>
+                        <center><MDBBtn size="sm" color="primary" type="submit" >Add</MDBBtn></center>
+                    </form>
                 </SlidingPane>
 
                 {/* Add Distributor side pane */}
-                <SlidingPane closeIcon={<div>[ X ]</div>} isOpen={ this.state.isDistributorPaneOpen } title='Add Distributor'
-                from='right' width='400px' onRequestClose={ this.closeDistributorPanel }>
-                    <div>
-                        <form onSubmit={this.handleDistributorSubmit}>
-                            <MDBInput label="Name *" name="distNameValue" type="text" value={this.state.distNameValue} onChange={this.handleInputChange}/>
-                            <MDBInput label="Owner Name *" name="distOwnerValue" type="text" value={this.state.distOwnerValue} onChange={this.handleInputChange}/>
-                            <MDBInput label="Address *" name="distAddressValue" type="text" value={this.state.distAddressValue} onChange={this.handleInputChange}/>
-                            <center><MDBBtn size="sm" color="primary" type="submit" >Add</MDBBtn></center>
-                        </form>
-                    </div>
+                <SlidingPane isOpen={this.state.isDistributorPaneOpen} title='Add Distributor' closeIcon={<div>[ X ]</div>} from='right' width='400px' onRequestClose={this.closeDistributorPanel}>
+                    <form onSubmit={this.handleDistributorSubmit}>
+                        <MDBInput label="Name *" name="distNameValue" type="text" value={this.state.distNameValue} onChange={this.handleInputChange}/>
+                        <MDBInput label="Owner Name *" name="distOwnerValue" type="text" value={this.state.distOwnerValue} onChange={this.handleInputChange}/>
+                        <MDBInput label="Address *" name="distAddressValue" type="text" value={this.state.distAddressValue} onChange={this.handleInputChange}/>
+                        <center><MDBBtn size="sm" color="primary" type="submit" >Add</MDBBtn></center>
+                    </form>
                 </SlidingPane>
 
                 <Nav tabs pills>
@@ -473,7 +473,7 @@ class ManufacturerPanel extends Component {
                             <Col sm={12}>
                                 <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isAssetPaneOpen: true })} >Add Asset</MDBBtn>
 
-                                <BootstrapTable data={ this.state.assets } version='4' hover condensed pagination options={ options }>
+                                <BootstrapTable data={ this.state.assets } version='4' hover condensed pagination options={ options }  expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponent } >
                                     <TableHeaderColumn isKey dataField='#'>No.</TableHeaderColumn>
                                     <TableHeaderColumn dataField='Name' filter={{ type: 'TextFilter', delay: 100 }}>Asset Name</TableHeaderColumn>
                                     <TableHeaderColumn dataField='Owner' filter={{ type: 'TextFilter', delay: 100 }}>Owner</TableHeaderColumn>
@@ -486,15 +486,15 @@ class ManufacturerPanel extends Component {
                     <TabPane tabId="2">
                         <Row>
                             <Col sm={12}>
-                            <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isDistributorPaneOpen: true })} >Add Distributor</MDBBtn>
+                                <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isDistributorPaneOpen: true })} >Add Distributor</MDBBtn>
 
-                            <BootstrapTable data={ this.state.assets } version='4' hover condensed pagination expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponent } options={ options }>
-                                <TableHeaderColumn isKey dataField='#'>No.</TableHeaderColumn>
-                                <TableHeaderColumn dataField='Name' filter={{ type: 'TextFilter', delay: 100 }}>Asset Name</TableHeaderColumn>
-                                <TableHeaderColumn dataField='Owner' filter={{ type: 'TextFilter', delay: 100 }}>Owner</TableHeaderColumn>
-                                <TableHeaderColumn dataField='Quantity' >Quantity</TableHeaderColumn>
-                            </BootstrapTable>
-                            <br/><br/>
+                                <BootstrapTable data={ this.state.assets } version='4' hover condensed pagination options={ options }>
+                                    <TableHeaderColumn isKey dataField='#'>No.</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='Name' filter={{ type: 'TextFilter', delay: 100 }}>Asset Name</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='Owner' filter={{ type: 'TextFilter', delay: 100 }}>Owner</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='Quantity' >Quantity</TableHeaderColumn>
+                                </BootstrapTable>
+                                <br/><br/>
                             </Col>
                         </Row>
                     </TabPane>
