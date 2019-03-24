@@ -1,124 +1,51 @@
 import React, { Component } from 'react';
-import qrImg from '../images/qr.png';
-//import tickImg from './images/tick.png';
-//import alertImg from './images/alert.png';
-//import crossImg from './images/cross.png';
-import { MDBContainer, MDBRow, MDBCol, MDBJumbotron, MDBInput, MDBBtn } from "mdbreact";
-
-//<img src={tickImg} height="50px" width="50px"/><br />
-const OkModal = ({ handleClose, show, children }) => {
-    const showHideClassName = show ? "modal display-block" : "modal display-none";
-    return (
-        <div className={showHideClassName}>
-            <section className="modal-main">
-                <center>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <button class="modalCloseButton" onClick={handleClose}>[ X ]</button></center>
-               <center>
-
-                    <label class="custTitle">Status:</label><label class="custTitle2"> Verified</label><br /><br />
-                    <label class="custTitle">Manufacturer:</label><label class="custTitle2"> GlaxoSmithKline</label><br /><br />
-                    <label class="custTitle">Distributor:</label><label class="custTitle2"> Indus Distributor</label><br /><br />
-                    <label class="custTitle">Chemist:</label><label class="custTitle2"> Al-fatah Medical Store</label><br /><br />
-                    <label class="custTitle">Customer:</label><label class="custTitle2"> Muhammad Ali | 0300 11 11 111 </label><br /><br />
-                </center>
-                <br/><br/>
-            </section>
-        </div>
-    );
-};
-
-//<img src={alertImg} height="50px" width="50px"/><br />
-const NotOkModal = ({ handleClose, show, children }) => {
-    const showHideClassName = show ? "modal display-block" : "modal display-none";
-    return (
-        <div className={showHideClassName}>
-            <section className="modal-main">
-                <center>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <button class="modalCloseButton" onClick={handleClose}>[ X ]</button></center>
-                <center>
-                    <label class="custTitle">Status:</label><label class="custTitle2"> Customer Already Exist</label><br /><br />
-                    <label class="custTitle">Manufacturer:</label><label class="custTitle2"> Abbot</label><br /><br />
-                    <label class="custTitle">Distributor:</label><label class="custTitle2"> Kareem Distributor</label><br /><br />
-                    <label class="custTitle">Chemist:</label><label class="custTitle2"> Clinix Medical Store</label><br /><br />
-                    <label class="custTitle">Customer:</label><label class="custTitle2"> Furqan Ali | 0300 11 11 111 </label><br /><br />
-                    <a href="#">  <label style={{color:"red"}}>Not You? Report</label></a>
-                </center>
-                <br/><br/>
-            </section>
-        </div>
-    );
-};
-
-//<img src={crossImg} height="50px" width="50px"/><br />
-const TryAgainModal = ({ handleClose, show, children }) => {
-    const showHideClassName = show ? "modal display-block" : "modal display-none";
-    return (
-        <div className={showHideClassName}>
-            <section className="modal-main">
-                <center>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <button class="modalCloseButton" onClick={handleClose}>[ X ]</button></center>
-                <center>
-
-                    <label style={{color:"red", fontSize:"30px"}}>Invalid Code!</label><br /><br /><br />
-                    <label>Please try again</label>
-                    <br /><br />
-
-                </center>
-            </section>
-        </div>
-    );
-};
-
+import { MDBContainer, MDBRow, MDBCol, MDBJumbotron, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBListGroupItem, MDBListGroup, MDBInput } from "mdbreact";
+import QrReader from "react-qr-reader";
 
 //<img src={qrImg} alt="QR Code" height="50px" width="50px"/>
 class Verification extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            show1: false,
-            show2: false,
-            show3: false,
-            code:''
-        };
+        this.state={};
+        this.state.code="";
+        this.state.transactions = [];
+        this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleScan = this.handleScan.bind(this);
     }
 
-    verifyProduct = () =>{
-        if (Number(this.state.code)===12345){
-             this.showModal1();
-        }
-        else if (Number(this.state.code) === 54321){
-            this.showModal2();
-        }
-        else{
-            this.showModal3();
+    handleScan(data) {
+        if (data) {
+            this.setState({result: data});
         }
     }
-    showModal1 = () =>{
-        this.setState({ show1: true });
-    }
-    hideModal1 = () => {
-        this.setState({ show1: false, code:''});
-    };
 
-    showModal2 = () =>{
-        this.setState({ show2: true });
-    }
-    hideModal2 = () => {
-        this.setState({ show2: false, code:''});
-    };
-    showModal3 = () =>{
-        this.setState({ show3: true });
-    }
-    hideModal3 = () => {
-        this.setState({ show3: false,code:''});
-    };
-
-    handleSubmit = event => {
-        alert("MDBInput value: " + this.state.code);
-        event.preventDefault();
+    handleError(err) {
+        console.error(err);
     }
 
-    handleChange = event => this.setState({ code: event.target.value });
+    handleInputChange(event) {
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+        this.setState({
+            [name]: value
+        });
+    };
+
+    verify = () => {
+        this.getAllTransactions()
+        .then(res => this.setState({ transactions: res.express }))
+        .catch(err => console.log(err));
+    };
+
+    getAllTransactions = async () => {
+        var id=this.state.code;
+        console.log(id);
+        const response = await fetch('/get_asset_history/'+id);
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+        return body;
+    };
 
     render() {
         return (
@@ -127,31 +54,43 @@ class Verification extends Component {
                     <MDBCol md="8" className="mx-auto">
                         <MDBJumbotron className="mt-3">
                             <h1>Product Verification</h1>
-                            <br/><br/>
+                            <br/><br/><br/>
                             <form>
-                                <center>
-                                    <MDBCol md={4}>
-                                        <MDBInput label="QR Code" onChange={this.handleChange} value={this.state.code} />
-                                    </MDBCol>
-                                    <p>_____OR_____</p>
-                                    <img src={qrImg} alt="QR Code" height="50px" width="50px"/>
-                                    <br/><br/>
-                                    <label>Scan the QR code on your product</label>
-                                    <br/><br/>
-                                    <MDBBtn onClick={this.verifyProduct}>Verify</MDBBtn>
+                                <center><label class="fixTitle1">Product code :</label>
+                                <MDBInput label="Code *" name="code" type="number" value={this.state.code} onChange={this.handleInputChange}/>
+                                <br/><br/>
+                                <p>_____OR_____</p><br />
+                                {/* <QrReader delay={this.state.delay} onError={this.handleError} onScan={this.handleScan} style={{ width: "100%" }} />
+                            <br/><br/> */}
+                                <MDBBtn size="sm" color="primary" onClick={this.verify}>Verify</MDBBtn>
                                 </center>
                             </form>
                         </MDBJumbotron>
                     </MDBCol>
                 </MDBRow>
-                <OkModal show={this.state.show1} handleClose={this.hideModal1}></OkModal>
-                <NotOkModal show={this.state.show2} handleClose={this.hideModal2}></NotOkModal>
-                <TryAgainModal show={this.state.show3} handleClose={this.hideModal3}></TryAgainModal>
+
+                {/* Iterates */}
+                {this.state.transactions.map(function(transaction){
+                    return(
+                        <MDBCard border="info" className="m-3" style={{ width: "70rem" }} key={ transaction.txid }>
+                            <MDBCardHeader> Transaction Details</MDBCardHeader>
+                            <MDBCardBody className="text-info">
+                                <MDBRow className="justify-content-center">
+                                    <MDBListGroup className="my-4 mx-4" style={{ width: "66rem" }}>
+                                        <MDBListGroupItem color="primary">ID: {transaction.txid}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">Asset ID: {transaction.asset.id}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">Asset Owner: {transaction.asset.owner}</MDBListGroupItem>
+                                    </MDBListGroup>
+                                </MDBRow>
+                            </MDBCardBody>
+                        </MDBCard>
+                    );
+                })}
+                {/* Iterates */}
+                <p>{this.state.result}</p>
             </MDBContainer>
         );
     }
 }
 
 export default Verification;
-
-//<NavLink to="/" exact><input class="homeButton" value="Home" name="verificationButton" type="button"/></NavLink>
