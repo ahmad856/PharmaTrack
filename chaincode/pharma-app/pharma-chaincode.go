@@ -76,6 +76,12 @@ type TransactionHistory struct {
 	Asset   PharmaAsset `json:"asset"`
 }
 
+type StaticVariables struct {
+	ManufacturerCount int `json:"manufacturercount"`
+	DistributorCount  int `json:"distributorcount"`
+	ChemistCount      int `json:"chemistcount"`
+}
+
 /*
  * The Init method *
  called when the Smart Contract "asset-chaincode" is instantiated by the network
@@ -116,6 +122,10 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.makeTransaction(APIstub, args)
 	} else if function == "changeAssetOwner" {
 		return s.changeAssetOwner(APIstub, args)
+	} else if function == "initializeCounters" {
+		return s.initializeCounters(APIstub)
+	} else if function == "readAllUsers" {
+		return s.readAllUsers(APIstub)
 	}
 
 	return shim.Error("Invalid Smart Contract function name.")
@@ -136,31 +146,22 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 	}
 
 	manufacturers := []Manufacturer{
-		Manufacturer{ID: "manuf1", Name: "Ahmad", Address: "Islamabad", UserName: "manuf1", Password: "123"},
+		Manufacturer{ID: "0", Name: "Ahmad", Address: "Islamabad", UserName: "manuf1", Password: "123"},
 	}
 
 	distributors := []Distributor{
-		Distributor{ID: "dist1", Name: "Abdullah", Address: "Lahore", UserName: "dist1", Password: "456"},
+		Distributor{ID: "0", Name: "Abdullah", Address: "Lahore", UserName: "dist1", Password: "456"},
 	}
 
 	chemists := []Chemist{
-		Chemist{ID: "chem1", Name: "Usama", Address: "Lahore", UserName: "chem1", Password: "789"},
+		Chemist{ID: "0", Name: "Usama", Address: "Lahore", UserName: "chem1", Password: "789"},
 	}
 
 	i := 0
-	for i < len(chemists) {
-		fmt.Println("i is ", i)
-		ownerAsBytes, _ := json.Marshal(chemists[i])
-		APIstub.PutState("chem"+strconv.Itoa(i+1), ownerAsBytes)
-		fmt.Println("Added", chemists[i])
-		i = i + 1
-	}
-
-	i = 0
 	for i < len(manufacturers) {
 		fmt.Println("i is ", i)
 		ownerAsBytes, _ := json.Marshal(manufacturers[i])
-		APIstub.PutState("manuf"+strconv.Itoa(i+1), ownerAsBytes)
+		APIstub.PutState("manuf"+manufacturers[i].ID, ownerAsBytes)
 		fmt.Println("Added", manufacturers[i])
 		i = i + 1
 	}
@@ -169,8 +170,17 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 	for i < len(distributors) {
 		fmt.Println("i is ", i)
 		ownerAsBytes, _ := json.Marshal(distributors[i])
-		APIstub.PutState("dist"+strconv.Itoa(i+1), ownerAsBytes)
+		APIstub.PutState("dist"+distributors[i].ID, ownerAsBytes)
 		fmt.Println("Added", distributors[i])
+		i = i + 1
+	}
+
+	i = 0
+	for i < len(chemists) {
+		fmt.Println("i is ", i)
+		ownerAsBytes, _ := json.Marshal(chemists[i])
+		APIstub.PutState("chem"+chemists[i].ID, ownerAsBytes)
+		fmt.Println("Added", chemists[i])
 		i = i + 1
 	}
 
@@ -181,6 +191,14 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 		APIstub.PutState(strconv.Itoa(i+1), assetAsBytes)
 		fmt.Println("Added", assets[i])
 		i = i + 1
+	}
+
+	var statics = StaticVariables{ManufacturerCount: 1, DistributorCount: 1, ChemistCount: 1}
+
+	staticsAsBytes, _ := json.Marshal(statics)
+	error := APIstub.PutState("StaticVariables", staticsAsBytes)
+	if error != nil {
+		return shim.Error(fmt.Sprintf("Failed to initialize counters"))
 	}
 
 	return shim.Success(nil)

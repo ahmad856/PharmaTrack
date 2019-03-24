@@ -9,6 +9,19 @@ import (
 	sc "github.com/hyperledger/fabric/protos/peer"
 )
 
+func (s *SmartContract) initializeCounters(APIstub shim.ChaincodeStubInterface) sc.Response {
+
+	var statics = StaticVariables{ManufacturerCount: 0, DistributorCount: 0, ChemistCount: 0}
+
+	staticsAsBytes, _ := json.Marshal(statics)
+	error := APIstub.PutState("StaticVariables", staticsAsBytes)
+	if error != nil {
+		return shim.Error(fmt.Sprintf("Failed to initialize counters"))
+	}
+
+	return shim.Success(nil)
+}
+
 /*
  * The recordAsset method *
 Used to view the records of one particular asset
@@ -65,6 +78,54 @@ func (s *SmartContract) recordAsset(APIstub shim.ChaincodeStubInterface, args []
 }
 
 /*
+ * The recordManufacturer method *
+Used to view the records of one particular asset
+It takes 4 argument --
+ -> the key for the Manufacturer to be created
+ -> Name for the Manufacturer
+ -> Address of the Manufacturer
+ -> Timestamp the Manufacturer was recorded
+*/
+
+func (s *SmartContract) recordManufacturer(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 6 {
+		return shim.Error("Incorrect number of arguments. Expecting 6")
+	}
+
+	if checkOwner(APIstub, args[0]) == true {
+		return shim.Error("Manufacturer already exists")
+	}
+
+	var manufacturer = Manufacturer{ID: args[0], Name: args[1], Address: args[3], UserName: args[4], Password: args[5]}
+
+	manufacturerAsBytes, _ := json.Marshal(manufacturer)
+
+	error := APIstub.PutState(args[0], manufacturerAsBytes)
+	if error != nil {
+		return shim.Error(fmt.Sprintf("Failed to record manufacturer: %s", args[0]))
+	}
+
+	//update statics
+	var statics StaticVariables
+	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
+	if staticsAsBytes == nil {
+		return shim.Error("func: record Distributor... Could not get static variables")
+	}
+	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
+
+	statics.ManufacturerCount += 1
+
+	staticsAsBytes, _ = json.Marshal(statics)
+	error = APIstub.PutState("StaticVariables", staticsAsBytes)
+	if error != nil {
+		return shim.Error(fmt.Sprintf("func: Record Distrbutor... Failed to initialize counters"))
+	}
+
+	return shim.Success(nil)
+}
+
+/*
  * The recordDistributor method *
 Used to view the records of one particular asset
 It takes 4 argument --
@@ -92,36 +153,20 @@ func (s *SmartContract) recordDistributor(APIstub shim.ChaincodeStubInterface, a
 		return shim.Error(fmt.Sprintf("Failed to record distributor: %s", args[0]))
 	}
 
-	return shim.Success(nil)
-}
-
-/*
- * The recordManufacturer method *
-Used to view the records of one particular asset
-It takes 4 argument --
- -> the key for the Manufacturer to be created
- -> Name for the Manufacturer
- -> Address of the Manufacturer
- -> Timestamp the Manufacturer was recorded
-*/
-
-func (s *SmartContract) recordManufacturer(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-
-	if len(args) != 6 {
-		return shim.Error("Incorrect number of arguments. Expecting 6")
+	//update statics
+	var statics StaticVariables
+	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
+	if staticsAsBytes == nil {
+		return shim.Error("func: record Distributor... Could not get static variables")
 	}
+	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
 
-	if checkOwner(APIstub, args[0]) == true {
-		return shim.Error("Manufacturer already exists")
-	}
+	statics.DistributorCount += 1
 
-	var manufacturer = Manufacturer{ID: args[0], Name: args[1], Address: args[3], UserName: args[4], Password: args[5]}
-
-	manufacturerAsBytes, _ := json.Marshal(manufacturer)
-
-	error := APIstub.PutState(args[0], manufacturerAsBytes)
+	staticsAsBytes, _ = json.Marshal(statics)
+	error = APIstub.PutState("StaticVariables", staticsAsBytes)
 	if error != nil {
-		return shim.Error(fmt.Sprintf("Failed to record manufacturer: %s", args[0]))
+		return shim.Error(fmt.Sprintf("func: Record Distrbutor... Failed to initialize counters"))
 	}
 
 	return shim.Success(nil)
@@ -153,6 +198,22 @@ func (s *SmartContract) recordChemist(APIstub shim.ChaincodeStubInterface, args 
 	error := APIstub.PutState(args[0], chemistAsBytes)
 	if error != nil {
 		return shim.Error(fmt.Sprintf("Failed to record chemist: %s", args[0]))
+	}
+
+	//update statics
+	var statics StaticVariables
+	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
+	if staticsAsBytes == nil {
+		return shim.Error("func: record Distributor... Could not get static variables")
+	}
+	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
+
+	statics.ChemistCount += 1
+
+	staticsAsBytes, _ = json.Marshal(statics)
+	error = APIstub.PutState("StaticVariables", staticsAsBytes)
+	if error != nil {
+		return shim.Error(fmt.Sprintf("func: Record Distrbutor... Failed to initialize counters"))
 	}
 
 	return shim.Success(nil)

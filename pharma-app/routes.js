@@ -7,10 +7,14 @@ module.exports = function(app){
 
   app.get('/get_all_assets', function(req, res){
     controller.get_all_assets(req, res);
+    controller.init_statics(req, res);
+    controller.get_all_users(req, res);
+
   });
 
   app.get('/get_asset_history/:id', function(req, res){
     controller.get_history(req, res);
+
   });
 
   app.get('/get_asset', function(req, res){

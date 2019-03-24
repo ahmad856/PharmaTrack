@@ -1,20 +1,123 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"bytes"
+	"strconv"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	sc "github.com/hyperledger/fabric/protos/peer"
 )
 
+func (s *SmartContract) readAllUsers(APIstub shim.ChaincodeStubInterface) sc.Response {
+	type Users struct {
+		Manufacturers []Manufacturer `json:"manufacturers"`
+		Distributors  []Distributor  `json:"distributors"`
+		Chemists      []Chemist      `json:"chemists"`
+	}
+	var allUsers Users
+	var statics StaticVariables
+
+	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
+	if staticsAsBytes == nil {
+		return shim.Error("func: readAllUser... Could not get static variables")
+	}
+	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
+
+	if statics.ManufacturerCount > 0 {
+
+		// ---- Get All Manufacturers ---- //
+		resultsIterator, err := APIstub.GetStateByRange("manuf0", "manuf"+strconv.Itoa(statics.ManufacturerCount))
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		defer resultsIterator.Close()
+
+		for resultsIterator.HasNext() {
+			aKeyValue, err := resultsIterator.Next()
+			if err != nil {
+				return shim.Error(err.Error())
+			}
+			queryKeyAsStr := aKeyValue.Key
+			queryValAsBytes := aKeyValue.Value
+			fmt.Println("on manufacturer id - ", queryKeyAsStr)
+			var manuf Manufacturer
+			json.Unmarshal(queryValAsBytes, &manuf)                        //un stringify it aka JSON.parse()
+			allUsers.Manufacturers = append(allUsers.Manufacturers, manuf) //add this manuf to the list
+		}
+		fmt.Println("manufacturers array - ", allUsers.Manufacturers)
+
+	} else {
+		return shim.Error("func: readAllUser... no manufacturers")
+	}
+
+	if statics.DistributorCount > 0 {
+
+		// ---- Get All Distributors ---- //
+		resultsIterator, err := APIstub.GetStateByRange("dist0", "dist"+strconv.Itoa(statics.DistributorCount))
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		defer resultsIterator.Close()
+
+		for resultsIterator.HasNext() {
+			aKeyValue, err := resultsIterator.Next()
+			if err != nil {
+				return shim.Error(err.Error())
+			}
+			queryKeyAsStr := aKeyValue.Key
+			queryValAsBytes := aKeyValue.Value
+			fmt.Println("on distributor id - ", queryKeyAsStr)
+			var dist Distributor
+			json.Unmarshal(queryValAsBytes, &dist)                      //un stringify it aka JSON.parse()
+			allUsers.Distributors = append(allUsers.Distributors, dist) //add this dist to the list
+		}
+		fmt.Println("distributors array - ", allUsers.Distributors)
+
+	} else {
+		return shim.Error("func: readAllUser... no distributors")
+	}
+
+
+	if statics.ChemistCount > 0 {
+
+		// ---- Get All chemists ---- //
+		resultsIterator, err := APIstub.GetStateByRange("chem0", "chem"+strconv.Itoa(statics.ChemistCount))
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		defer resultsIterator.Close()
+
+		for resultsIterator.HasNext() {
+			aKeyValue, err := resultsIterator.Next()
+			if err != nil {
+				return shim.Error(err.Error())
+			}
+			queryKeyAsStr := aKeyValue.Key
+			queryValAsBytes := aKeyValue.Value
+			fmt.Println("on chemist id - ", queryKeyAsStr)
+			var chem Chemist
+			json.Unmarshal(queryValAsBytes, &chem)              //un stringify it aka JSON.parse()
+			allUsers.Chemists = append(allUsers.Chemists, chem) //add this chem to the list
+		}
+		fmt.Println("chemists array - ", allUsers.Chemists)
+
+	} else {
+		 return shim.Error("func: readAllUser... no chemists")
+	}
+
+
+	//change to array of bytes
+	usersAsBytes, _ := json.Marshal(allUsers) //convert to array of bytes
+	return shim.Success(usersAsBytes)
+}
 
 /*
  * The queryAsset method *
 Used to view the records of one particular asset
 It takes one argument -- the key for the Asset in question
- */
+*/
 
 func (s *SmartContract) queryAsset(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
@@ -33,7 +136,7 @@ func (s *SmartContract) queryAsset(APIstub shim.ChaincodeStubInterface, args []s
  * The queryOwner method *
 Used to view the records of one particular Asset
 It takes one argument -- the key for the owner in question
- */
+*/
 
 func (s *SmartContract) queryOwner(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
@@ -48,12 +151,11 @@ func (s *SmartContract) queryOwner(APIstub shim.ChaincodeStubInterface, args []s
 	return shim.Success(ownerAsBytes)
 }
 
-
 /*
  * The queryAllAssets method *
 allows for assessing all the records added to the ledger(all assets)
 This method does not take any arguments. Returns JSON string containing results.
- */
+*/
 
 func (s *SmartContract) queryAllAssets(APIstub shim.ChaincodeStubInterface) sc.Response {
 
@@ -98,11 +200,11 @@ func (s *SmartContract) queryAllAssets(APIstub shim.ChaincodeStubInterface) sc.R
 	return shim.Success(buffer.Bytes())
 }
 
-func (s *SmartContract) getTransactionHistory(APIstub shim.ChaincodeStubInterface, args[]string) sc.Response {
+func (s *SmartContract) getTransactionHistory(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
-	var history []TransactionHistory;
+	var history []TransactionHistory
 	var asset PharmaAsset
 
 	iterator, err := APIstub.GetHistoryForKey(args[0])

@@ -206,15 +206,15 @@ class ManufacturerPanel extends Component {
     }
 
     componentDidMount() {
-        this.callGetAllMedicines()
+        this.callGetAllAssets()
         .then(res => this.setState({ assets: this.flattenAssetData(res.express) }))
         .catch(err => console.log(err));
         console.log("Assets");
         console.log(this.state.assets);
     }
 
-    callGetAllMedicines = async () => {
-        const response = await fetch('/get_all_medicines');
+    callGetAllAssets = async () => {
+        const response = await fetch('/get_all_assets');
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
         console.log(body);
