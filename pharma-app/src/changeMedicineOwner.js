@@ -10,7 +10,7 @@ var path = require('path');
 var util = require('util');
 var os = require('os');
 
-console.log("changing holder of tuna catch: ");
+console.log("Changing holder of Asset: ");
 
 var array = req.params.holder.split("-");
 var key = array[0]

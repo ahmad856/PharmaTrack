@@ -1,28 +1,28 @@
 //SPDX-License-Identifier: Apache-2.0
 
 
-var medicine = require('./controller.js');
+var controller = require('./controller.js');
 
 module.exports = function(app){
 
-  app.get('/get_all_medicines', function(req, res){
-    //medicine.add_medicineDUMMY(req, res);
-    //medicine.get_medicineDUMMY(req, res);
-    //medicine.change_ownerDUMMY(req, res);
-    //medicine.get_all_medicines(req, res);
-    medicine.get_historyDUMMY(req, res);
-
+  app.get('/get_all_assets', function(req, res){
+    controller.get_all_assets(req, res);
   });
 
-  app.get('/get_medicine', function(req, res){
-    medicine.get_medicine(req, res);
+  app.get('/get_asset_history/:id', function(req, res){
+    controller.get_history(req, res);
   });
 
-  app.post('/add_medicine', function(req, res){
-    medicine.add_medicine(req, res);
+  app.get('/get_asset', function(req, res){
+    controller.get_asset(req, res);
   });
 
-  app.get('/change_owner/:owner', function(req, res){
-    medicine.change_owner(req, res);
+  app.post('/add_asset', function(req, res){
+    controller.add_asset(req, res);
+  });
+
+  app.post('/change_owner', function(req, res){
+    //controller.change_owner(req, res);
+    res.redirect('/login/manufac');
   });
 }
