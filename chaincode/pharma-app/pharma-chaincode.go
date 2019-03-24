@@ -144,7 +144,7 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 	}
 
 	chemists := []Chemist{
-		Distributor{ID: "chem1", Name: "Usama", Address: "Lahore", UserName:"chem1", Password:"789"},
+		Chemist{ID: "chem1", Name: "Usama", Address: "Lahore", UserName:"chem1", Password:"789"},
 	}
 
 	i := 0
