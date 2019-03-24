@@ -11,9 +11,9 @@ import (
 
 
 /*
- * The queryMedicine method *
+ * The queryAsset method *
 Used to view the records of one particular asset
-It takes one argument -- the key for the medicine in question
+It takes one argument -- the key for the Asset in question
  */
 
 func (s *SmartContract) queryAsset(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
@@ -31,7 +31,7 @@ func (s *SmartContract) queryAsset(APIstub shim.ChaincodeStubInterface, args []s
 
 /*
  * The queryOwner method *
-Used to view the records of one particular medicine
+Used to view the records of one particular Asset
 It takes one argument -- the key for the owner in question
  */
 
@@ -43,15 +43,15 @@ func (s *SmartContract) queryOwner(APIstub shim.ChaincodeStubInterface, args []s
 
 	ownerAsBytes, _ := APIstub.GetState(args[0])
 	if ownerAsBytes == nil {
-		return shim.Error("Could not locate medicine")
+		return shim.Error("Could not locate asset")
 	}
 	return shim.Success(ownerAsBytes)
 }
 
 
 /*
- * The queryAllMedicines method *
-allows for assessing all the records added to the ledger(all medicines)
+ * The queryAllAssets method *
+allows for assessing all the records added to the ledger(all assets)
 This method does not take any arguments. Returns JSON string containing results.
  */
 
@@ -93,7 +93,7 @@ func (s *SmartContract) queryAllAssets(APIstub shim.ChaincodeStubInterface) sc.R
 	}
 	buffer.WriteString("]")
 
-	fmt.Printf("- queryAllMedicines:\n%s\n", buffer.String())
+	fmt.Printf("- queryAllAssets:\n%s\n", buffer.String())
 
 	return shim.Success(buffer.Bytes())
 }

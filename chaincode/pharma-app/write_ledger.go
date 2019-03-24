@@ -11,19 +11,19 @@ import (
 
 /*
  * The recordAsset method *
-Used to view the records of one particular medicine
+Used to view the records of one particular asset
 It takes 11 argument --
  -> the key for the asset to be created 					[0]
- -> QR code for the asset 												[1]
- -> Name of the asset 														[2]
- -> Description of the asset 											[3]
- -> Owner ID 																			[4]
- -> Asset type of the asset like carton, pack 		[5]
- -> Price of single asset													[6]
- -> Manufacture date of the asset									[7]
- -> Expiry date of the asset											[8]
- -> Quantity in the packing unit 									[9]
- -> Timestamp for the creation of the asset				[10]
+ -> QR code for the asset 									[1]
+ -> Name of the asset 										[2]
+ -> Description of the asset 								[3]
+ -> Owner ID 												[4]
+ -> Asset type of the asset like carton, pack 				[5]
+ -> Price of single asset									[6]
+ -> Manufacture date of the asset							[7]
+ -> Expiry date of the asset								[8]
+ -> Quantity in the packing unit 							[9]
+ -> Timestamp for the creation of the asset					[10]
 */
 
 func (s *SmartContract) recordAsset(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
@@ -33,7 +33,7 @@ func (s *SmartContract) recordAsset(APIstub shim.ChaincodeStubInterface, args []
 	}
 
 	if checkAsset(APIstub, args[0]) == true {
-		return shim.Error("Medicine already exists")
+		return shim.Error("Asset already exists")
 	}
 
 	if checkOwner(APIstub, args[4]) != true {
@@ -53,12 +53,12 @@ func (s *SmartContract) recordAsset(APIstub shim.ChaincodeStubInterface, args []
 		fmt.Println(err2)
 	}
 
-	var medi = PharmaAsset{ID: args[0], QRCode: args[1], Name: args[2], Description: args[3], Owner: args[4], AssetType: args[5], Price: float32(price), ManufactureDate: args[7], ExpiryDate: args[8], Quantity: quantity, Timestamp: uint64(timestamp)}
+	var asseti = PharmaAsset{ID: args[0], QRCode: args[1], Name: args[2], Description: args[3], Owner: args[4], AssetType: args[5], Price: float32(price), ManufactureDate: args[7], ExpiryDate: args[8], Quantity: quantity, Timestamp: uint64(timestamp)}
 
-	medicineAsBytes, _ := json.Marshal(medi)
-	error := APIstub.PutState(args[0], medicineAsBytes)
+	assetAsBytes, _ := json.Marshal(asseti)
+	error := APIstub.PutState(args[0], assetAsBytes)
 	if error != nil {
-		return shim.Error(fmt.Sprintf("Failed to record medicine: %s", args[0]))
+		return shim.Error(fmt.Sprintf("Failed to record asset: %s", args[0]))
 	}
 
 	return shim.Success(nil)
@@ -66,7 +66,7 @@ func (s *SmartContract) recordAsset(APIstub shim.ChaincodeStubInterface, args []
 
 /*
  * The recordDistributor method *
-Used to view the records of one particular medicine
+Used to view the records of one particular asset
 It takes 4 argument --
  -> the key for the Distributor to be created
  -> Name for the Distributor
@@ -101,7 +101,7 @@ func (s *SmartContract) recordDistributor(APIstub shim.ChaincodeStubInterface, a
 
 /*
  * The recordManufacturer method *
-Used to view the records of one particular medicine
+Used to view the records of one particular asset
 It takes 4 argument --
  -> the key for the Manufacturer to be created
  -> Name for the Manufacturer
@@ -137,7 +137,7 @@ func (s *SmartContract) recordManufacturer(APIstub shim.ChaincodeStubInterface, 
 
 /*
  * The recordChemist method *
-Used to view the records of one particular medicine
+Used to view the records of one particular asset
 It takes 4 argument --
  -> the key for the Chemist to be created
  -> Name for the Chemist
@@ -171,31 +171,31 @@ func (s *SmartContract) recordChemist(APIstub shim.ChaincodeStubInterface, args 
 }
 
 /*
- * The changeMedicineOwner method *
+ * The changeAssetOwner method *
 The data in the world state can be updated with who has possession.
-This function takes in 2 arguments, medicine id and new owner name.
+This function takes in 2 arguments, asset id and new owner name.
 */
 
-func (s *SmartContract) changeMedicineOwner(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+func (s *SmartContract) changeAssetOwner(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 2 {
 		return shim.Error("Incorrect number of arguments. Expecting 2")
 	}
 
-	medicineAsBytes, _ := APIstub.GetState(args[0])
-	if medicineAsBytes == nil {
-		return shim.Error("Medicine does not exist")
+	assetAsBytes, _ := APIstub.GetState(args[0])
+	if assetAsBytes == nil {
+		return shim.Error("Asset does not exist")
 	}
-	medi := PharmaAsset{}
-	json.Unmarshal(medicineAsBytes, &medi)
+	asseti := PharmaAsset{}
+	json.Unmarshal(assetAsBytes, &asseti)
 
-	if medi.Owner == args[1] {
+	if asseti.Owner == args[1] {
 		return shim.Error("New owner is the old owner")
 	}
 
-	medi.Owner = args[1]
+	asseti.Owner = args[1]
 
-	assetAsBytes, _ := json.Marshal(medi)
+	assetAsBytes, _ := json.Marshal(asseti)
 	error := APIstub.PutState(args[0], assetAsBytes)
 	if error != nil {
 		return shim.Error(fmt.Sprintf("Failed to update asset owner: "))
