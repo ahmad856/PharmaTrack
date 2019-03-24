@@ -45,27 +45,27 @@ type PharmaAsset struct {
 }
 
 type Manufacturer struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Address   string `json:"address"`
-	UserName  string `json:"username"`
-	Password  string `json:"password"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Address  string `json:"address"`
+	UserName string `json:"username"`
+	Password string `json:"password"`
 }
 
 type Distributor struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Address   string `json:"address"`
-	UserName  string `json:"username"`
-	Password  string `json:"password"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Address  string `json:"address"`
+	UserName string `json:"username"`
+	Password string `json:"password"`
 }
 
 type Chemist struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Address   string `json:"address"`
-	UserName  string `json:"username"`
-	Password  string `json:"password"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Address  string `json:"address"`
+	UserName string `json:"username"`
+	Password string `json:"password"`
 }
 
 type Transaction struct {
@@ -136,15 +136,15 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 	}
 
 	manufacturers := []Manufacturer{
-		Manufacturer{ID: "manuf1", Name: "Ahmad", Address: "Islamabad", UserName:"manuf1", Password:"123"},
+		Manufacturer{ID: "manuf1", Name: "Ahmad", Address: "Islamabad", UserName: "manuf1", Password: "123"},
 	}
 
 	distributors := []Distributor{
-		Distributor{ID: "dist1", Name: "Abdullah", Address: "Lahore", UserName:"dist1", Password:"456"},
+		Distributor{ID: "dist1", Name: "Abdullah", Address: "Lahore", UserName: "dist1", Password: "456"},
 	}
 
 	chemists := []Chemist{
-		Chemist{ID: "chem1", Name: "Usama", Address: "Lahore", UserName:"chem1", Password:"789"},
+		Chemist{ID: "chem1", Name: "Usama", Address: "Lahore", UserName: "chem1", Password: "789"},
 	}
 
 	i := 0
@@ -156,7 +156,7 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 		i = i + 1
 	}
 
-	i := 0
+	i = 0
 	for i < len(manufacturers) {
 		fmt.Println("i is ", i)
 		ownerAsBytes, _ := json.Marshal(manufacturers[i])

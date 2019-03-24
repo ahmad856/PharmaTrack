@@ -76,19 +76,15 @@ It takes 4 argument --
 
 func (s *SmartContract) recordDistributor(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	if len(args) != 4 {
-		return shim.Error("Incorrect number of arguments. Expecting 4")
+	if len(args) != 6 {
+		return shim.Error("Incorrect number of arguments. Expecting 6")
 	}
 
 	if checkOwner(APIstub, args[0]) == true {
 		return shim.Error("Distributor already exists")
 	}
 
-	var timestamp, err = strconv.ParseUint(args[2], 10, 64)
-	if err != nil {
-		fmt.Println(err)
-	}
-	var distributor = Distributor{ID: args[0], Name: args[1], Timestamp: uint64(timestamp), Address: args[3]}
+	var distributor = Distributor{ID: args[0], Name: args[1], Address: args[3], UserName: args[4], Password: args[5]}
 
 	distributorAsBytes, _ := json.Marshal(distributor)
 	error := APIstub.PutState(args[0], distributorAsBytes)
@@ -111,19 +107,15 @@ It takes 4 argument --
 
 func (s *SmartContract) recordManufacturer(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	if len(args) != 4 {
-		return shim.Error("Incorrect number of arguments. Expecting 4")
+	if len(args) != 6 {
+		return shim.Error("Incorrect number of arguments. Expecting 6")
 	}
 
 	if checkOwner(APIstub, args[0]) == true {
 		return shim.Error("Manufacturer already exists")
 	}
 
-	var timestamp, err = strconv.ParseUint(args[2], 10, 64)
-	if err != nil {
-		fmt.Println(err)
-	}
-	var manufacturer = Manufacturer{ID: args[0], Name: args[1], Timestamp: uint64(timestamp), Address: args[3]}
+	var manufacturer = Manufacturer{ID: args[0], Name: args[1], Address: args[3], UserName: args[4], Password: args[5]}
 
 	manufacturerAsBytes, _ := json.Marshal(manufacturer)
 
@@ -147,19 +139,15 @@ It takes 4 argument --
 
 func (s *SmartContract) recordChemist(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	if len(args) != 4 {
-		return shim.Error("Incorrect number of arguments. Expecting 4")
+	if len(args) != 6 {
+		return shim.Error("Incorrect number of arguments. Expecting 6")
 	}
 
 	if checkOwner(APIstub, args[0]) == true {
 		return shim.Error("Chemist already exists")
 	}
 
-	var timestamp, err = strconv.ParseUint(args[2], 10, 64)
-	if err != nil {
-		fmt.Println(err)
-	}
-	var chemist = Chemist{ID: args[0], Name: args[1], Timestamp: uint64(timestamp), Address: args[3]}
+	var chemist = Chemist{ID: args[0], Name: args[1], Address: args[3], UserName: args[4], Password: args[5]}
 
 	chemistAsBytes, _ := json.Marshal(chemist)
 	error := APIstub.PutState(args[0], chemistAsBytes)
@@ -195,7 +183,7 @@ func (s *SmartContract) changeAssetOwner(APIstub shim.ChaincodeStubInterface, ar
 
 	asseti.Owner = args[1]
 
-	assetAsBytes, _ := json.Marshal(asseti)
+	assetAsBytes, _ = json.Marshal(asseti)
 	error := APIstub.PutState(args[0], assetAsBytes)
 	if error != nil {
 		return shim.Error(fmt.Sprintf("Failed to update asset owner: "))
