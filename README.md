@@ -23,8 +23,8 @@ $ docker rm -f $(docker ps -aq)
 $ ./startFabric.sh
 $ rm ~/.hfc-key-store/*
 $ node registerAdmin.js
-$ yarn dev
 $ node registerUser.js
+$ yarn dev
 
 
 Developer Options:
