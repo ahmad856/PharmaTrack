@@ -148,22 +148,22 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 	}
 
 	manufacturers := []Manufacturer{
-		Manufacturer{ID: "0", Name: "Ahmad", Address: "Islamabad", UserName: "manuf1", Password: "123"},
+		Manufacturer{ID: "manuf0", Name: "Ahmad", Address: "Islamabad", UserName: "manuf1", Password: "123"},
 	}
 
 	distributors := []Distributor{
-		Distributor{ID: "0", Name: "Abdullah", Address: "Lahore", UserName: "dist1", Password: "456"},
+		Distributor{ID: "dist0", Name: "Abdullah", Address: "Lahore", UserName: "dist1", Password: "456"},
 	}
 
 	chemists := []Chemist{
-		Chemist{ID: "0", Name: "Usama", Address: "Lahore", UserName: "chem1", Password: "789"},
+		Chemist{ID: "chem0", Name: "Usama", Address: "Lahore", UserName: "chem1", Password: "789"},
 	}
 
 	i := 0
 	for i < len(manufacturers) {
 		fmt.Println("i is ", i)
 		ownerAsBytes, _ := json.Marshal(manufacturers[i])
-		APIstub.PutState("manuf"+manufacturers[i].ID, ownerAsBytes)
+		APIstub.PutState(manufacturers[i].ID, ownerAsBytes)
 		fmt.Println("Added", manufacturers[i])
 		i = i + 1
 	}
@@ -172,7 +172,7 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 	for i < len(distributors) {
 		fmt.Println("i is ", i)
 		ownerAsBytes, _ := json.Marshal(distributors[i])
-		APIstub.PutState("dist"+distributors[i].ID, ownerAsBytes)
+		APIstub.PutState(distributors[i].ID, ownerAsBytes)
 		fmt.Println("Added", distributors[i])
 		i = i + 1
 	}
@@ -181,7 +181,7 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 	for i < len(chemists) {
 		fmt.Println("i is ", i)
 		ownerAsBytes, _ := json.Marshal(chemists[i])
-		APIstub.PutState("chem"+chemists[i].ID, ownerAsBytes)
+		APIstub.PutState(chemists[i].ID, ownerAsBytes)
 		fmt.Println("Added", chemists[i])
 		i = i + 1
 	}
