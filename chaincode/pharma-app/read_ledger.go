@@ -79,7 +79,6 @@ func (s *SmartContract) readAllUsers(APIstub shim.ChaincodeStubInterface) sc.Res
 		return shim.Error("func: readAllUser... no distributors")
 	}
 
-
 	if statics.ChemistCount > 0 {
 
 		// ---- Get All chemists ---- //
@@ -104,9 +103,8 @@ func (s *SmartContract) readAllUsers(APIstub shim.ChaincodeStubInterface) sc.Res
 		fmt.Println("chemists array - ", allUsers.Chemists)
 
 	} else {
-		 return shim.Error("func: readAllUser... no chemists")
+		return shim.Error("func: readAllUser... no chemists")
 	}
-
 
 	//change to array of bytes
 	usersAsBytes, _ := json.Marshal(allUsers) //convert to array of bytes
@@ -130,6 +128,25 @@ func (s *SmartContract) queryAsset(APIstub shim.ChaincodeStubInterface, args []s
 		return shim.Error("Could not locate asset")
 	}
 	return shim.Success(assetAsBytes)
+}
+
+/*
+ * The queryUser method *
+Used to view the records of one particular user
+It takes one argument -- the key for the User in question
+*/
+
+func (s *SmartContract) queryUser(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
+	}
+
+	userAsBytes, _ := APIstub.GetState(args[0])
+	if userAsBytes == nil {
+		return shim.Error("Could not locate user")
+	}
+	return shim.Success(userAsBytes)
 }
 
 /*

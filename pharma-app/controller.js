@@ -144,9 +144,7 @@ return{
 		            console.error("error from query = ", query_responses[0]);
 		        } else {
 		            console.log("Response is ", query_responses[0].toString());
-		              //res.json(JSON.parse(query_responses[0].toString()));
-		              //res.send({ express: 'Hello From Express' });
-				//res.send({ express: JSON.parse(query_responses[0].toString()) });
+					res.send({ express: JSON.parse(query_responses[0].toString()) });
 		        }
 		    } else {
 		        console.log("No payloads were returned from query");
@@ -215,7 +213,7 @@ return{
 		            console.log("Response is ", query_responses[0].toString());
 		              //res.json(JSON.parse(query_responses[0].toString()));
 		              //res.send({ express: 'Hello From Express' });
-				res.send({ express: JSON.parse(query_responses[0].toString()) });
+					  res.send({ express: JSON.parse(query_responses[0].toString()) });
 		        }
 		    } else {
 		        console.log("No payloads were returned from query");
@@ -467,14 +465,16 @@ return{
 	add_manufacturer: function(req, res){
 		console.log("submit recording of a manufacturer: ");
 
-		var array = req.params.asset.split("-");
+		var array = req.params.asset.split("~");
 		console.log(array);
 
-		var key = array[0]
-		var name = array[1]
-		var timestamp = array[2]
-		var address = array[3]
-
+		var id = array[0]
+		var comp = array[1]
+		var address = array[2]
+		var license = array[3]
+		var owner = array[4]
+		var cnic = array[5]
+		var ownerAddress = array[6]
 
 		var fabric_client = new Fabric_Client();
 
@@ -522,7 +522,7 @@ return{
 		        //targets : --- letting this default to the peers assigned to the channel
 		        chaincodeId: 'pharma-app',
 		        fcn: 'recordManufacturer',
-		        args: [key, name, timestamp, address],
+		        args: [id, comp, address, license, owner, cnic, ownerAddress],
 		        chainId: 'mychannel',
 		        txId: tx_id
 		    };
@@ -626,14 +626,16 @@ return{
 	add_distributor: function(req, res){
 		console.log("submit recording of a Distributor: ");
 
-		var array = req.params.asset.split("-");
+		var array = req.params.asset.split("~");
 		console.log(array);
 
-		var key = array[0]
-		var name = array[1]
-		var timestamp = array[2]
-		var address = array[3]
-
+		var id = array[0]
+		var comp = array[1]
+		var address = array[2]
+		var license = array[3]
+		var owner = array[4]
+		var cnic = array[5]
+		var ownerAddress = array[6]
 
 
 		var fabric_client = new Fabric_Client();
@@ -682,7 +684,7 @@ return{
 		        //targets : --- letting this default to the peers assigned to the channel
 		        chaincodeId: 'pharma-app',
 		        fcn: 'recordDistributor',
-		        args: [key, name, timestamp, address],
+		        args: [id, comp, address, license, owner, cnic, ownerAddress],
 		        chainId: 'mychannel',
 		        txId: tx_id
 		    };
@@ -786,13 +788,16 @@ return{
 	add_chemist: function(req, res){
 		console.log("submit recording of a Chemist: ");
 
-		var array = req.params.asset.split("-");
+		var array = req.params.asset.split("~");
 		console.log(array);
 
-		var key = array[0]
-		var name = array[1]
-		var timestamp = array[2]
-		var address = array[3]
+		var id = array[0]
+		var comp = array[1]
+		var address = array[2]
+		var license = array[3]
+		var owner = array[4]
+		var cnic = array[5]
+		var ownerAddress = array[6]
 
 
 		var fabric_client = new Fabric_Client();
@@ -841,7 +846,7 @@ return{
 		        //targets : --- letting this default to the peers assigned to the channel
 		        chaincodeId: 'pharma-app',
 		        fcn: 'recordChemist',
-		        args: [key, name, timestamp, address],
+		        args: [id, comp, address, license, owner, cnic, ownerAddress],
 		        chainId: 'mychannel',
 		        txId: tx_id
 		    };
@@ -1171,7 +1176,79 @@ return{
 		    console.error('Failed to query successfully :: ' + err);
 		    res.send("Could not locate asset");
 		});
-	}
+	},
+
+	///test
+	get_user: function(req, res){
+		console.log("get_user function called.");
+
+		var fabric_client = new Fabric_Client();
+		var key = req.params.id
+
+		// setup the fabric network
+		var channel = fabric_client.newChannel('mychannel');
+		var peer = fabric_client.newPeer('grpc://localhost:7051');
+		channel.addPeer(peer);
+
+		//
+		var member_user = null;
+		var store_path = path.join(os.homedir(), '.hfc-key-store');
+		console.log('Store path:'+store_path);
+		var tx_id = null;
+
+		// create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
+		Fabric_Client.newDefaultKeyValueStore({ path: store_path
+		}).then((state_store) => {
+		    // assign the store to the fabric client
+		    fabric_client.setStateStore(state_store);
+		    var crypto_suite = Fabric_Client.newCryptoSuite();
+		    // use the same location for the state store (where the users' certificate are kept)
+		    // and the crypto store (where the users' keys are kept)
+		    var crypto_store = Fabric_Client.newCryptoKeyStore({path: store_path});
+		    crypto_suite.setCryptoKeyStore(crypto_store);
+		    fabric_client.setCryptoSuite(crypto_suite);
+
+		    // get the enrolled user from persistence, this user will sign all requests
+		    return fabric_client.getUserContext('user1', true);
+		}).then((user_from_store) => {
+		    if (user_from_store && user_from_store.isEnrolled()) {
+		        console.log('Successfully loaded user1 from persistence');
+		        member_user = user_from_store;
+		    } else {
+		        throw new Error('Failed to get user1.... run registerUser.js');
+		    }
+
+		    // queryAsset - requires 1 argument, ex: args: ['4'],
+		    const request = {
+		        chaincodeId: 'pharma-app',
+		        txId: tx_id,
+		        fcn: 'queryUser',
+		        args: [key]
+		    };
+
+		    // send the query proposal to the peer
+		    return channel.queryByChaincode(request);
+		}).then((query_responses) => {
+		    console.log("Query has completed, checking results");
+		    // query_responses could have more than one  results if there multiple peers were used as targets
+		    if (query_responses && query_responses.length == 1) {
+		        if (query_responses[0] instanceof Error) {
+		            console.error("error from query = ", query_responses[0]);
+		            res.send("Could not locate user")
+
+		        } else {
+		            console.log("Response is ", query_responses[0].toString());
+		            res.send(query_responses[0].toString())
+		        }
+		    } else {
+		        console.log("No payloads were returned from query");
+		        res.send("Could not locate user")
+		    }
+		}).catch((err) => {
+		    console.error('Failed to query successfully :: ' + err);
+		    res.send("Could not locate user")
+		});
+	},
 
 }
 })();
