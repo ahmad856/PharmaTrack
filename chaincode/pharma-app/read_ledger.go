@@ -133,6 +133,25 @@ func (s *SmartContract) queryAsset(APIstub shim.ChaincodeStubInterface, args []s
 }
 
 /*
+ * The queryUser method *
+Used to view the records of one particular user
+It takes one argument -- the key for the User in question
+*/
+
+func (s *SmartContract) queryUser(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
+	}
+
+	userAsBytes, _ := APIstub.GetState(args[0])
+	if userAsBytes == nil {
+		return shim.Error("Could not locate user")
+	}
+	return shim.Success(userAsBytes)
+}
+
+/*
  * The queryOwner method *
 Used to view the records of one particular Asset
 It takes one argument -- the key for the owner in question

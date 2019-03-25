@@ -70,11 +70,11 @@ class PublicLayout extends Component {
                 <main style={{ marginTop: "4rem" }}>
                     <PublicRoutes />
                 </main>
-                <MDBFooter color="indigo">
+                <footer class="public-footer">
                     <p className="footer-copyright mb-0 py-3 text-center">
-                        &copy; {new Date().getFullYear()} Copyright: <a href="https://www.MDBootstrap.com"> MDBootstrap.com </a>
+                        &copy; {new Date().getFullYear()} Copyright: Pharma Track
                     </p>
-                </MDBFooter>
+                </footer>
             </div>
         );
     }

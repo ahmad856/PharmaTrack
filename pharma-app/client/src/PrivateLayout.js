@@ -53,11 +53,11 @@ class PrivateLayout extends Component {
                 <main style={{ marginTop: "4rem" }}>
                     <PrivateRoutes />
                 </main>
-                <MDBFooter color="info-color">
+                <footer class="private-footer" color="info-color">
                     <p className="footer-copyright mb-0 py-3 text-center">
-                        &copy; {new Date().getFullYear()} Copyright: <a href="https://www.MDBootstrap.com"> MDBootstrap.com </a>
+                        &copy; {new Date().getFullYear()} Copyright: Pharma Track
                     </p>
-                </MDBFooter>
+                </footer>
             </div>
         );
     }
