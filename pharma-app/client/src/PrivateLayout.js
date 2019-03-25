@@ -50,14 +50,14 @@ class PrivateLayout extends Component {
                     </MDBCollapse>
                 </MDBNavbar>
                 {collapseID && overlay}
-                <main style={{ marginTop: "4rem" }}>
+                <main class="wrapper" style={{ marginTop: "4rem" }}>
                     <PrivateRoutes />
                 </main>
-                <MDBFooter color="info-color">
+                <footer class="private-footer">
                     <p className="footer-copyright mb-0 py-3 text-center">
-                        &copy; {new Date().getFullYear()} Copyright: <a href="https://www.MDBootstrap.com"> MDBootstrap.com </a>
+                        &copy; {new Date().getFullYear()} Copyright: Pharma Track
                     </p>
-                </MDBFooter>
+                </footer>
             </div>
         );
     }

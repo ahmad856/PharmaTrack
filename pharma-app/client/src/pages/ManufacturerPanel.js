@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { MDBContainer, MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBInput, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBCardText, MDBListGroup, MDBListGroupItem, MDBRow } from "mdbreact";
+import { MDBContainer, MDBDropdown, MDBDropdownMenu, MDBDropdownItem, MDBDropdownToggle, MDBInput, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBCardText, MDBListGroup, MDBListGroupItem, MDBRow } from "mdbreact";
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import '../../node_modules/react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import classnames from 'classnames';
@@ -8,14 +8,16 @@ import { Row, Col } from 'react-bootstrap'
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import SlidingPane from 'react-sliding-pane';
 import 'react-sliding-pane/dist/react-sliding-pane.css';
+//import update from 'react-addons-update';
 import Select from 'react-select';
 
-class BSTable extends React.Component {
+class BSTable extends Component {
     constructor(props) {
         super(props);
         this.state={};
         this.state.isTransactionPaneOpen=false;
         this.state.distID="";
+        this.state.responseToPost="";
         this.state.transactions = [];
         this.handleInputChange = this.handleInputChange.bind(this);
     }
@@ -30,33 +32,72 @@ class BSTable extends React.Component {
     };
     //,()=>{this.validate(name,value)}
 
+    test=()=>{
+        this.props.onChangeOwner(1,"ahmad");
+    }
+
     closeTransactionPanel = () => {
         this.setState({ isTransactionPaneOpen: false });
     };
+
+    openTransactionPanel = () => {
+        this.setState({ isTransactionPaneOpen: true });
+        this.getAllTransactions()
+        .then(res => this.setState({ transactions: res.express }))
+        .catch(err => console.log(err));
+    };
+
+    getAllTransactions = async () => {
+        var id=this.props.data.Id;
+        const response = await fetch('/get_asset_history/'+id);
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+        return body;
+    };
+
+    tranactionSubmit = async e => {
+        var assetId=this.props.data.Id;
+        var distId=this.state.distID;
+        e.preventDefault();
+        const response = await fetch('/change_owner', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ post: assetId.concat('~',distId) })
+        });
+
+        const body = await response.text();
+        this.setState({ responseToPost: body });
+    };
+
 
     render() {
         if (this.props.data) {
             return (
                 <MDBContainer>
                     {/* Show Transactions side pane */}
+                    <MDBBtn size="sm" color="primary" onClick={this.test}>Test</MDBBtn>
                     <SlidingPane isOpen={this.state.isTransactionPaneOpen} title='Transactions History' closeIcon={<div>[ X ]</div>} from='left' width='400px' onRequestClose={this.closeTransactionPanel}>
-                        <MDBContainer>
+
                             {/* Iterates */}
-                            <MDBCard border="info" className="m-3" style={{ maxWidth: "35rem" }}>
-                                <MDBCardHeader> Transaction Details</MDBCardHeader>
-                                <MDBCardBody className="text-info">
-                                    <MDBRow className="justify-content-center">
-                                        <MDBListGroup className="my-4 mx-4" style={{ width: "25rem" }}>
-                                            <MDBListGroupItem color="primary">ID: {this.props.data.ID}</MDBListGroupItem>
-                                            <MDBListGroupItem color="primary">QRCode: {this.props.data.QRCode}</MDBListGroupItem>
-                                            <MDBListGroupItem color="primary">Description: {this.props.data.Description}</MDBListGroupItem>
-                                            <MDBListGroupItem color="primary">Type: {this.props.data.AssetType}</MDBListGroupItem>
-                                        </MDBListGroup>
-                                    </MDBRow>
-                                </MDBCardBody>
-                            </MDBCard>
+                            {this.state.transactions.map(function(transaction){
+                                return(
+                                    <MDBCard border="info" className="m-3" style={{ width: "20rem" }} key={ transaction.txid }>
+                                        <MDBCardHeader> Transaction Details</MDBCardHeader>
+                                        <MDBCardBody className="text-info">
+                                            <MDBRow className="justify-content-center">
+                                                <MDBListGroup className="my-4 mx-4" style={{ width: "18rem" }}>
+                                                    <MDBListGroupItem color="primary">ID: {transaction.txid}</MDBListGroupItem>
+                                                    <MDBListGroupItem color="primary">Asset ID: {transaction.asset.id}</MDBListGroupItem>
+                                                    <MDBListGroupItem color="primary">Asset Owner: {transaction.asset.owner}</MDBListGroupItem>
+                                                </MDBListGroup>
+                                            </MDBRow>
+                                        </MDBCardBody>
+                                    </MDBCard>
+                                );
+                            })}
                             {/* Iterates */}
-                        </MDBContainer>
                     </SlidingPane>
 
                     <MDBCard border="info" className="m-3" style={{ maxWidth: "70rem" }}>
@@ -64,7 +105,7 @@ class BSTable extends React.Component {
                         <MDBCardBody className="text-info">
                             <MDBRow className="justify-content-center">
                                 <MDBListGroup className="my-4 mx-4" style={{ width: "20rem" }}>
-                                    <MDBListGroupItem color="primary">ID: {this.props.data.ID}</MDBListGroupItem>
+                                    <MDBListGroupItem color="primary">ID: {this.props.data.Id}</MDBListGroupItem>
                                     <MDBListGroupItem color="primary">QRCode: {this.props.data.QRCode}</MDBListGroupItem>
                                     <MDBListGroupItem color="primary">Description: {this.props.data.Description}</MDBListGroupItem>
                                     <MDBListGroupItem color="primary">Type: {this.props.data.AssetType}</MDBListGroupItem>
@@ -76,19 +117,22 @@ class BSTable extends React.Component {
                                     <MDBListGroupItem color="primary">Price: {this.props.data.Price}</MDBListGroupItem>
                                 </MDBListGroup>
                             </MDBRow>
-                                <MDBRow className="justify-content-center">
+                            <MDBRow className="justify-content-center">
+                                <MDBBtn size="sm" color="primary" onClick={this.openTransactionPanel}>Show Details</MDBBtn>
+
                                 {/* <MDBBtn size="sm" color="primary">Transact Asset</MDBBtn> */}
                                 <MDBDropdown dropup size="sm">
                                     <MDBDropdownToggle caret color="primary">Transact Asset</MDBDropdownToggle>
                                     <MDBDropdownMenu basic>
-                                        <form>
-                                            <MDBInput label="Distributor ID *" name="distID" type="text" value={this.state.distID} onChange={this.handleInputChange}/>
-                                            <MDBBtn size="sm" color="primary">Transact</MDBBtn>
-                                        </form>
+                                        <div>
+                                            <form onSubmit={this.tranactionSubmit}>
+                                                <MDBInput label="Distributor ID *" name="distID" type="text" value={this.state.distID} onChange={this.handleInputChange}/>
+                                                <MDBBtn size="sm" color="primary" type="submit">Transact</MDBBtn>
+                                            </form>
+                                        </div>
                                     </MDBDropdownMenu>
                                 </MDBDropdown>
-                                <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isTransactionPaneOpen: true })}>Show Details</MDBBtn>
-                                </MDBRow>
+                            </MDBRow>
                         </MDBCardBody>
                     </MDBCard>
                 </MDBContainer>
@@ -179,12 +223,19 @@ class ManufacturerPanel extends Component {
         this.state.manufacDate="";
         this.state.expiryDate="";
         this.state.qtyValue="";
-        this.state.ownerValue="";
+        this.state.assetFormErrors={nameVal:'', discVal:'', typeVal:'', priceVal:'', mgfVal:'', expVal:'', qtyVal:''};
+        this.state.assetFormValid=false;
+        this.state.nameValid=false;
+        this.state.discValid=false;
+        this.state.typeValid=false;
+        this.state.priceValid=false;
+        this.state.mgfValid=false;
+        this.state.expValid=false;
+        this.state.qtyValid=false;
         ////////////////////////Distributor////////////////////
         this.state.distNameValue="";
         this.state.distOwnerValue="";
         this.state.distAddressValue="";
-
         // this.state.errors={nameVal:'',priceVal:'',typeVal:'',qtyVal:''};
         // this.state.nameValid=false;
         // this.state.priceValid=false;
@@ -196,28 +247,23 @@ class ManufacturerPanel extends Component {
     }
 
     handleChange = (selectedOption) => {
-        this.setState({ nameValue: selectedOption });
-        console.log(`Option selected:`, selectedOption);
+        this.setState({ nameValue: selectedOption, nameValid: true });
     }
 
     handleTypeChange = (selectedOption) => {
-        this.setState({ assetType: selectedOption });
-        console.log(`Option selected:`, selectedOption);
+        this.setState({ assetType: selectedOption, typeValid: true });
     }
 
     componentDidMount() {
         this.callGetAllAssets()
         .then(res => this.setState({ assets: this.flattenAssetData(res.express) }))
         .catch(err => console.log(err));
-        console.log("Assets");
-        console.log(this.state.assets);
     }
 
     callGetAllAssets = async () => {
         const response = await fetch('/get_all_assets');
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
-        console.log(body);
         return body;
     };
 
@@ -233,9 +279,17 @@ class ManufacturerPanel extends Component {
         return true;
     }
 
+    // updateOwner(id,name){
+    //     this.setState({
+    //         assets: update(this.state.assets, {id: {Owner: {$set: name}}})
+    //     })
+    // }
+
+    //() => this.setState({ isPaneOpenLeft: false })
     expandComponent(row) {
+        //console.log(this.updateOwner);
         return (
-            <BSTable data={ row } />
+            <BSTable data={ row }/>
         );
     }
 
@@ -249,13 +303,15 @@ class ManufacturerPanel extends Component {
             manufacDate:'',
             expiryDate:'',
             qtyValue:'',
-            ownerValue:'',
-            // errors:{nameVal:'',priceVal:'',typeVal:'',qtyVal:''},
-            // nameValid:false,
-            // priceValid:false,
-            // qtyValid:false,
-            // typeValid:false,
-            // formValid:false
+            assetFormErrors:{nameVal:'', discVal:'', typeVal:'', priceVal:'', mgfVal:'', expVal:'', qtyVal:''},
+            assetFormValid:false,
+            nameValid:false,
+            discValid:false,
+            typeValid:false,
+            priceValid:false,
+            mgfValid:false,
+            expValid:false,
+            qtyValid:false
         });
     };
 
@@ -274,121 +330,131 @@ class ManufacturerPanel extends Component {
         });
     };
 
+//id, qr, name, description, owner, type, price, mgfDate, expDate, qty, timestamp
     flattenAssetData (assets_array) {
         var temp_asset=[];
         for(let i=0;i<assets_array.length;i++){
             var temp={};
             temp['#'] = i+1;
-            temp['ID'] = assets_array[i].Record.id;
+            temp['Id'] = assets_array[i].Record.id;
             temp['QRCode'] = assets_array[i].Record.qr;
             temp['Name'] = assets_array[i].Record.name;
             temp['Description'] = assets_array[i].Record.description;
+            temp['Owner'] = assets_array[i].Record.owner;
             temp['AssetType'] = assets_array[i].Record.type;
             temp['Price'] = assets_array[i].Record.price;
             temp['ManufactureDate'] = assets_array[i].Record.manufactureDate;
             temp['ExpiryDate'] = assets_array[i].Record.expiryDate;
             temp['Quantity'] = assets_array[i].Record.quantity;
             temp['Timestamp'] = assets_array[i].Record.timestamp;
-            temp['Owner'] = assets_array[i].Record.owner;
             temp_asset.push(temp);
         }
         return temp_asset;
     }
     /////////////////////////////////////////////////////////////
+
     handleInputChange(event) {
         const target = event.target;
         const value = target.value;
         const name = target.name;
         this.setState({
             [name]: value
-        });
+        },()=>{this.validate(name,value)});
     };
-    //,()=>{this.validate(name,value)}
+
+    //disabled={!this.state.formValid}
+
+    isPositiveInteger(n) {
+        return parseFloat(n) === n >>> 0;
+    }
 
     validate(name,value){
-        var fieldErrors=this.state.errors;
-        var nameValid=this.state.nameValid;
-        var priceValid=this.state.priceValid;
-        var qtyValid=this.state.qtyValid;
-        var typeValid=this.state.typeValid;
+        var fieldErrors=this.state.assetFormErrors;
+        var length=null;
         switch(name){
-            case 'nameValue':
-                nameValid = value.length > 0;
-                fieldErrors.nameVal = nameValid ? '' : ' is Empty!!!';
+            case 'discriptionValue':
+                fieldErrors.discVal = value.length > 10 ? true : false;
+                this.setState({ discValid:fieldErrors.discVal });
                 break;
             case 'priceValue':
-                priceValid = value.length > 0;
-                fieldErrors.priceVal = priceValid ? '' : ' is Empty!!!';
+                length = value.length > 0 ? true : false;
+                fieldErrors.priceVal = length && this.isPositiveInteger(value);
+                this.setState({ priceValid:fieldErrors.priceVal });
                 break;
-            case 'typeValue':
-                typeValid = value.length > 0;
-                fieldErrors.typeVal = typeValid ? '' : ' is Empty!!!';
+            case 'manufacDate':
+                fieldErrors.mgfVal = value.length > 0 ? true : false;
+                this.setState({ mgfValid:fieldErrors.mgfVal });
+                break;
+            case 'expiryDate':
+                fieldErrors.expVal = value.length > 0 ? true : false;
+                this.setState({ expValid:fieldErrors.expVal });
                 break;
             case 'qtyValue':
-                qtyValid = value.length > 0;
-                fieldErrors.qtyVal = qtyValid ? '' : ' is Empty!!!';
+                length = value.length > 0 ? true : false;
+                fieldErrors.qtyVal = length && this.isPositiveInteger(value);
+                this.setState({ qtyValid:fieldErrors.qtyVal });
                 break;
         }
 
         this.setState({
             errors: fieldErrors,
-            nameValid: nameValid,
-            priceValid: priceValid,
-            typeValid: typeValid,
-            qtyValid: qtyValid,
-            }, this.validateF);
+            discValid:fieldErrors.discVal,
+            priceValid:fieldErrors.priceVal,
+            mgfValid:fieldErrors.mgfVal,
+            expValid:fieldErrors.expVal,
+            qtyValid:fieldErrors.qtyVal,
+        }, this.validateAssetForm());
     }
 
-    validateF() {
-        this.setState({formValid: this.state.nameValid && this.state.priceValid && this.state.qtyValid && this.state.typeValid});
+    validateAssetForm() {
+        console.log("validate asset form");
+        this.setState({assetFormValid: this.state.nameValid && this.state.discValid && this.state.typeValid && this.state.priceValid && this.state.mgfValid && this.state.expValid && this.state.qtyValid });
     }
 
-    handleAddAsset(id, qr, name, description, type, price, mgfDate, expDate, qty, owner, timestamp) {
+    handleAddAsset(id, qr, name, description, owner, type, price, mgfDate, expDate, qty, timestamp) {
         var asset = {
             '#': (this.state.assets.length+1),
             'ID': id,
             'QRCode':qr,
             'Name': name,
             'Description': description,
+            'Owner':owner,
             'AssetType':type,
             'Price': price,
             'ManufactureDate': mgfDate,
             'ExpiryDate':expDate,
             'Quantity': qty,
-            'Timestamp': owner,
-            'Owner':timestamp,
+            'Timestamp': timestamp,
         }
-        console.log(asset);
         this.state.assets.push(asset);
         this.setState(this.state.assets);
     };
 
     //tasks.map((task) => task.name )
+
     handleSubmit = async e => {
-        var id="asset"+(this.state.assets.length+1);
+        var id=""+(this.state.assets.length+1);
         var qr="abcdef";
         var name=this.state.nameValue.label;
         var description=this.state.discriptionValue;
-        var owner=this.state.ownerValue;
-        var type=this.state.typeValue.label;
+        /////////////////////////////////////////change owner as login
+        var owner="manuf0";
+        var type=this.state.assetType.label;
         var price=this.state.priceValue;
         var mgfDate=this.state.manufacDate;
         var expDate=this.state.expiryDate;
         var qty=this.state.qtyValue;
         var timestamp=Date.now();
-        this.handleAddAsset(id, qr, name, description, type, price, mgfDate, expDate, qty, owner, timestamp);
+        this.handleAddAsset(id, qr, name, description, owner, type, price, mgfDate, expDate, qty, timestamp);
         this.closeAssetPanel();
         e.preventDefault();
-        const response = await fetch('/add_medicine', {
+        const response = await fetch('/add_asset', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ post: id.concat('~',qr,'~',name,'~',description,'~',owner,'~',type,'~',price,'~',mgfDate,'~',expDate,'~',qty,'~',timestamp) })
         });
-        console.log("Assets");
-        console.log(this.state.assets);
-        console.log(response.text());
         const body = await response.text();
         this.setState({ responseToPost: body });
     };
@@ -408,21 +474,22 @@ class ManufacturerPanel extends Component {
         var address=this.state.distAddressValue;
         this.closeAssetPanel();
         e.preventDefault();
-        const response = await fetch('/add_medicine', {
+        const response = await fetch('/add_distributor', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             //body: JSON.stringify({ post: name.concat('~',price,'~',type,'~',qty) })
         });
-        console.log("Assets");
-        console.log(this.state.assets);
-        console.log(response.text());
         const body = await response.text();
         this.setState({ responseToPost: body });
     };
 
     //height='240' scrollTop={ 'Top' }
+
+    // this.setState({
+    //     items: update(this.state.items, {1: {name: {$set: 'updated field name'}}})
+    // })
 
     render() {
         const options = {
@@ -437,14 +504,13 @@ class ManufacturerPanel extends Component {
                 {/* Add asset side pane */}
                 <SlidingPane closeIcon={<div>[ X ]</div>} isOpen={this.state.isAssetPaneOpen} title='Add Asset' from='right' width='400px' onRequestClose={this.closeAssetPanel}>
                     <form onSubmit={this.handleSubmit}>
-                        <Select placeholder="Asset Name *" value={this.state.nameValue} onChange={this.handleChange} options={assetNames}/>
+                        <Select placeholder="Asset Name *" className="bMDBRowser-default" required value={this.state.nameValue} onChange={this.handleChange} options={assetNames}/>
                         <MDBInput type="textarea" label="Description" rows="2" name="discriptionValue" value={this.state.discriptionValue} onChange={this.handleInputChange}/>
                         <Select placeholder="Asset Type *" value={this.state.assetType} onChange={this.handleTypeChange} options={assetTypes}/>
                         <MDBInput label="Price *" name="priceValue" type="number" min="1" value={this.state.priceValue} onChange={this.handleInputChange}/>
                         <MDBInput label="Manufacture Date *" hint="mm/dd/yyyy" name="manufacDate" type="date" value={this.state.manufacDate} onChange={this.handleInputChange}/>
                         <MDBInput label="Expiry Date *" hint="mm/dd/yyyy" name="expiryDate" type="date" value={this.state.expiryDate} onChange={this.handleInputChange}/>
                         <MDBInput label="Quantity *" name="qtyValue" type="number" min="1" value={this.state.qtyValue} onChange={this.handleInputChange}/>
-                        <MDBInput label="Owner Name *" name="ownerValue" type="text" value={this.state.ownerValue} onChange={this.handleInputChange}/>
                         <center><MDBBtn size="sm" color="primary" type="submit" >Add</MDBBtn></center>
                     </form>
                 </SlidingPane>
@@ -458,7 +524,6 @@ class ManufacturerPanel extends Component {
                         <center><MDBBtn size="sm" color="primary" type="submit" >Add</MDBBtn></center>
                     </form>
                 </SlidingPane>
-
                 <Nav tabs pills>
                     <NavItem>
                         <NavLink className={classnames({ active: this.state.activeTab === '1' })} onClick={() => { this.toggle('1'); }}>Asset</NavLink>
