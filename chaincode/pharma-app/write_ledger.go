@@ -89,8 +89,8 @@ It takes 4 argument --
 
 func (s *SmartContract) recordManufacturer(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	if len(args) != 6 {
-		return shim.Error("Incorrect number of arguments. Expecting 6")
+	if len(args) != 7 {
+		return shim.Error("Incorrect number of arguments. Expecting 7")
 	}
 
 	var statics StaticVariables
@@ -106,7 +106,7 @@ func (s *SmartContract) recordManufacturer(APIstub shim.ChaincodeStubInterface, 
 		return shim.Error("Manufacturer already exists")
 	}
 
-	var manufacturer = Manufacturer{ID: nextId, Name: args[0], Address: args[1], LicenseNumber: args[2], OwnerName: args[3], OwnerCNIC: args[4], OwnerAddress: args[5]}
+	var manufacturer = Manufacturer{ID: nextId, Name: args[0], Address: args[1], LicenseNumber: args[2], OwnerName: args[3], OwnerCNIC: args[4], OwnerAddress: args[5], Password: args[6]}
 
 	manufacturerAsBytes, _ := json.Marshal(manufacturer)
 	error := APIstub.PutState(nextId, manufacturerAsBytes)
@@ -138,8 +138,8 @@ It takes 4 argument --
 
 func (s *SmartContract) recordDistributor(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	if len(args) != 6 {
-		return shim.Error("Incorrect number of arguments. Expecting 6")
+	if len(args) != 7 {
+		return shim.Error("Incorrect number of arguments. Expecting 7")
 	}
 
 	var statics StaticVariables
@@ -155,7 +155,7 @@ func (s *SmartContract) recordDistributor(APIstub shim.ChaincodeStubInterface, a
 		return shim.Error("Distributor already exists")
 	}
 
-	var distributor = Distributor{ID: nextId, Name: args[0], Address: args[1], LicenseNumber: args[2], OwnerName: args[3], OwnerCNIC: args[4], OwnerAddress: args[5]}
+	var distributor = Distributor{ID: nextId, Name: args[0], Address: args[1], LicenseNumber: args[2], OwnerName: args[3], OwnerCNIC: args[4], OwnerAddress: args[5], Password: args[6]}
 
 	distributorAsBytes, _ := json.Marshal(distributor)
 	error := APIstub.PutState(nextId, distributorAsBytes)
@@ -187,8 +187,8 @@ It takes 4 argument --
 
 func (s *SmartContract) recordChemist(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	if len(args) != 6 {
-		return shim.Error("Incorrect number of arguments. Expecting 6")
+	if len(args) != 7 {
+		return shim.Error("Incorrect number of arguments. Expecting 7")
 	}
 
 	var statics StaticVariables
@@ -204,7 +204,7 @@ func (s *SmartContract) recordChemist(APIstub shim.ChaincodeStubInterface, args 
 		return shim.Error("Chemist already exists")
 	}
 
-	var chemist = Chemist{ID: nextId, Name: args[0], Address: args[1], LicenseNumber: args[2], OwnerName: args[3], OwnerCNIC: args[4], OwnerAddress: args[5]}
+	var chemist = Chemist{ID: nextId, Name: args[0], Address: args[1], LicenseNumber: args[2], OwnerName: args[3], OwnerCNIC: args[4], OwnerAddress: args[5], Password: args[6]}
 
 	chemistAsBytes, _ := json.Marshal(chemist)
 	error := APIstub.PutState(nextId, chemistAsBytes)
