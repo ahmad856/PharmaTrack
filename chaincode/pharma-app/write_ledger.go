@@ -100,7 +100,7 @@ func (s *SmartContract) recordManufacturer(APIstub shim.ChaincodeStubInterface, 
 	}
 	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
 
-	nextId = strconv.Itoa(statics.ManufacturerCount)
+	nextId = "manuf" + strconv.Itoa(statics.ManufacturerCount)
 
 	if checkOwner(APIstub, nextId) == true {
 		return shim.Error("Manufacturer already exists")
@@ -149,7 +149,7 @@ func (s *SmartContract) recordDistributor(APIstub shim.ChaincodeStubInterface, a
 	}
 	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
 
-	nextId = strconv.Itoa(statics.DistributorCount)
+	nextId = "dist" + strconv.Itoa(statics.DistributorCount)
 
 	if checkOwner(APIstub, nextId) == true {
 		return shim.Error("Distributor already exists")
@@ -198,7 +198,7 @@ func (s *SmartContract) recordChemist(APIstub shim.ChaincodeStubInterface, args 
 	}
 	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
 
-	nextId = strconv.Itoa(statics.ChemistCount)
+	nextId = "chem" + strconv.Itoa(statics.ChemistCount)
 
 	if checkOwner(APIstub, nextId) == true {
 		return shim.Error("Chemist already exists")
