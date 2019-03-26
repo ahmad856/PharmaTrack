@@ -141,6 +141,8 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.initializeCounters(APIstub)
 	} else if function == "readAllUsers" {
 		return s.readAllUsers(APIstub)
+	} else if function == "getStaticVariables" {
+		return s.getStaticVariables(APIstub)
 	}
 
 	return shim.Error("Invalid Smart Contract function name.")

@@ -23,6 +23,10 @@ module.exports = function(app){
         controller.get_all_users(req, res);
     });
 
+    app.get('/get_statics', function(req, res){
+        controller.get_statics(req, res);
+    });
+
     app.get('/get_all_assets', function(req, res){
         controller.get_all_assets(req, res);
     });

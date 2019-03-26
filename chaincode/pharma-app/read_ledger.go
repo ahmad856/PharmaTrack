@@ -10,6 +10,15 @@ import (
 	sc "github.com/hyperledger/fabric/protos/peer"
 )
 
+func (s *SmartContract) getStaticVariables(APIstub shim.ChaincodeStubInterface) sc.Response {
+
+	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
+	if staticsAsBytes == nil {
+		return shim.Error("GetStaticVariables: Could not locate asset")
+	}
+	return shim.Success(staticsAsBytes)
+}
+
 func (s *SmartContract) readAllUsers(APIstub shim.ChaincodeStubInterface) sc.Response {
 	type Users struct {
 		Manufacturers []Manufacturer `json:"manufacturers"`
