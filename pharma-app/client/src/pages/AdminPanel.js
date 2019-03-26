@@ -25,15 +25,15 @@ class BSTable extends React.Component {
                             <MDBCardBody className="text-info">
                                 <MDBRow className="justify-content-center">
                                     <MDBListGroup className="my-4 mx-4" style={{ width: "20rem",wordwrap: "break-word"  }}>
-                                        <MDBListGroupItem color="primary">ID: {this.props.data.Id}</MDBListGroupItem>
-                                        <MDBListGroupItem color="primary">Company Name: {this.props.data.QRCode}</MDBListGroupItem>
-                                        <MDBListGroupItem color="primary">Company Address:<br/> {this.props.data.Description}</MDBListGroupItem>
-                                        <MDBListGroupItem color="primary">License Number: {this.props.data.AssetType}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">ID: {this.props.data.id}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">Company Name: {this.props.data.name}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">Company Address:<br/> {this.props.data.address}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">License Number: {this.props.data.license}</MDBListGroupItem>
                                     </MDBListGroup>
                                     <MDBListGroup className="my-4 mx-4" style={{ width: "20rem",wordwrap: "break-word" }}>
-                                        <MDBListGroupItem color="primary">Owner Name: {this.props.data.ManufactureDate}</MDBListGroupItem>
-                                        <MDBListGroupItem color="primary">Owner CNIC: {this.props.data.ExpiryDate}</MDBListGroupItem>
-                                        <MDBListGroupItem color="primary">Owner Address:<br/> {this.props.data.Timestamp}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">Owner Name: {this.props.data.ownername}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">Owner CNIC: {this.props.data.ownercnic}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">Owner Address:<br/> {this.props.data.owneraddress}</MDBListGroupItem>
                                     </MDBListGroup>
                                 </MDBRow>
                             </MDBCardBody>
@@ -69,6 +69,8 @@ class AdminPanel extends Component {
         this.state.response="";
         this.state.responseToPost="";
         this.state.post="";
+        this.state.count="";
+        this.state.id="";
         this.state.users = { manufacturers:[], distributors:[], chemists:[]};
         ////////////////////////User////////////////////
         this.state.typeValue="";
@@ -78,12 +80,26 @@ class AdminPanel extends Component {
         this.state.ownerName="";
         this.state.ownerCnic="";
         this.state.ownerAddress="";
+        this.state.password="";
         this.handleInputChange = this.handleInputChange.bind(this);
         this.toggle = this.toggle.bind(this);
     }
 
     handleChange = (selectedOption) => {
         this.setState({ typeValue: selectedOption });
+        console.log(this.state.typeValue);
+        if(this.state.typeValue.value===0){
+            console.log("type value not set.....");
+        } else if(this.state.typeValue.value===1){
+            this.setState({id:"manuf"+this.state.count.manufacturercount});
+            console.log("manuf"+this.state.count.manufacturercount);
+        } else if(this.state.typeValue.value===2){
+            this.setState({id:"manuf"+this.state.count.distributorcount});
+            console.log("dist"+this.state.count.distributorcount);
+        } else if(this.state.typeValue.value===3){
+            this.setState({id:"manuf"+this.state.count.chemistcount});
+            console.log("chem"+this.state.count.chemistcount);
+        }
     }
 
     componentDidMount() {
@@ -127,6 +143,7 @@ class AdminPanel extends Component {
             ownerName:'',
             ownerCnic:'',
             ownerAddress:'',
+            password:'',
             // errors:{nameVal:'',priceVal:'',typeVal:'',qtyVal:''},
             // nameValid:false,
             // priceValid:false,
@@ -195,10 +212,10 @@ class AdminPanel extends Component {
         var owner=this.state.ownerName;
         var cnic=this.state.ownerCnic;
         var ownerAddress=this.state.ownerAddress;
-        const body = null;
+        var password=this.state.password;
         if(type===1){
             console.log('Manufac');
-            var id="manuf"+(this.state.users.manufacturers.length+1);
+            var id="manuf"+(this.state.users.manufacturers.length);
             this.handleAddManufacturer(id, comp, address, license, owner, cnic, ownerAddress);
             this.closeUserPanel();
             e.preventDefault();
@@ -207,13 +224,14 @@ class AdminPanel extends Component {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ post: id.concat('~',comp,'~',address,'~',license,'~',owner,'~',cnic,'~',ownerAddress) })
+                body: JSON.stringify({ post: id.concat('~',comp,'~',address,'~',license,'~',owner,'~',cnic,'~',ownerAddress,'~',password) })
             });
-            body = await response.text();
+            const body = await response.text();
+            this.setState({ responseToPost: body });
         }
         else if(type===2){
             console.log('dist');
-            var id="dist"+(this.state.users.distributors.length+1);
+            var id="dist"+(this.state.users.distributors.length);
             this.handleAddDistributor(id, comp, address, license, owner, cnic, ownerAddress);
             this.closeUserPanel();
             e.preventDefault();
@@ -222,13 +240,14 @@ class AdminPanel extends Component {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ post: id.concat('~',comp,'~',address,'~',license,'~',owner,'~',cnic,'~',ownerAddress) })
+                body: JSON.stringify({ post: id.concat('~',comp,'~',address,'~',license,'~',owner,'~',cnic,'~',ownerAddress,'~',password) })
             });
-            body = await response.text();
+            const body = await response.text();
+            this.setState({ responseToPost: body });
         }
         else if(type===3){
             console.log('chem');
-            var id="chem"+(this.state.users.chemist.length+1);
+            var id="chem"+(this.state.users.chemists.length);
             this.handleAddChemist(id, comp, address, license, owner, cnic, ownerAddress);
             this.closeUserPanel();
             e.preventDefault();
@@ -237,13 +256,73 @@ class AdminPanel extends Component {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ post: id.concat('~',comp,'~',address,'~',license,'~',owner,'~',cnic,'~',ownerAddress) })
+                body: JSON.stringify({ post: id.concat('~',comp,'~',address,'~',license,'~',owner,'~',cnic,'~',ownerAddress,'~',password) })
             });
-            body = await response.text();
+            const body = await response.text();
+            this.setState({ responseToPost: body });
         }
-
-        this.setState({ responseToPost: body });
     };
+
+    handleAddManufacturer(id, comp, address, license, owner, cnic, ownerAddress) {
+        var asset = {
+            'id': id,
+            'name':comp,
+            'address': address,
+            'licence': license,
+            'owner':owner,
+            'cnic':cnic,
+            'ownerAddress': ownerAddress,
+        }
+        this.state.users.manufacturers.push(asset);
+        this.setState(this.state.users);
+    };
+
+    handleAddDistributor(id, comp, address, license, owner, cnic, ownerAddress) {
+        var asset = {
+            'id': id,
+            'name':comp,
+            'address': address,
+            'licence': license,
+            'owner':owner,
+            'cnic':cnic,
+            'ownerAddress': ownerAddress,
+        }
+        this.state.users.distributors.push(asset);
+        this.setState(this.state.users);
+    };
+
+    onAddUser=()=>{
+        this.setState({ isUserPaneOpen: true });
+        this.getAllCounts()
+        .then(res => this.setState({ count: res.express }))
+        .catch(err => console.log(err));
+    }
+
+    getAllCounts = async () => {
+        const response = await fetch('/get_statics');
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+        console.log(body);
+        return body;
+    };
+
+    handleAddChemist(id, comp, address, license, owner, cnic, ownerAddress) {
+        var asset = {
+            'id': id,
+            'name':comp,
+            'address': address,
+            'licence': license,
+            'owner':owner,
+            'cnic':cnic,
+            'ownerAddress': ownerAddress,
+        }
+        this.state.users.chemists.push(asset);
+        this.setState(this.state.users);
+    };
+
+    // this.setState({
+    //     items: update(this.state.items, {1: {name: {$set: 'updated field name'}}})
+    // })
 
     //height='240' scrollTop={ 'Top' }
 
@@ -272,12 +351,14 @@ class AdminPanel extends Component {
                 <SlidingPane closeIcon={<div style={{color:"red"}}>[ X ]</div>} isOpen={this.state.isUserPaneOpen} title='Add User' from='right' width='400px' onRequestClose={this.closeUserPanel}>
                     <form onSubmit={this.handleSubmit}>
                         <Select  placeholder="User Type" options={userTypes} value={this.state.typeValue} onChange={this.handleChange}></Select>
+                        <MDBInput disabled label="User ID" name="id" value={this.state.id}/>
                         <MDBInput label="Company Name" name="compNameValue" value={this.state.compNameValue} onChange={this.handleInputChange}/>
                         <MDBInput type="textarea" rows="2" label="Company Address" name="addressValue" value={this.state.addressValue} onChange={this.handleInputChange}/>
                         <MDBInput label="License Number" name="licenseValue" type="number" min="1" value={this.state.licenseValue} onChange={this.handleInputChange}/>
                         <MDBInput label="Owner Name"  name="ownerName" type="text" value={this.state.ownerName} onChange={this.handleInputChange}/>
                         <MDBInput label="Owner CNIC"  name="ownerCnic" type="tel" pattern="^\d{5}-\d{7}-\d{1}$" value={this.state.ownerCnic} onChange={this.handleInputChange}/>
                         <MDBInput type="textarea" rows="2" label="Owner Address" name="ownerAddress" value={this.state.ownerAddress} onChange={this.handleInputChange}/>
+                        <MDBInput type="password" label="Password" name="password" value={this.state.password} onChange={this.handleInputChange}/>
                         <center><MDBBtn size="sm" color="primary" type="submit" >Add</MDBBtn></center>
                     </form>
                 </SlidingPane>
@@ -294,10 +375,10 @@ class AdminPanel extends Component {
                         <NavLink className={classnames({ active: this.state.activeTab === '3' })} onClick={() => { this.toggle('3'); }}>Chemist</NavLink>
                     </NavItem>
                     <NavItem>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     </NavItem>
                     <NavItem>
-                        <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isUserPaneOpen: true })} >Add User</MDBBtn>
+                        <MDBBtn size="sm" color="primary" onClick={this.onAddUser} >Create User</MDBBtn>
                     </NavItem>
                 </Nav>
                 <TabContent activeTab={this.state.activeTab}>
@@ -319,7 +400,7 @@ class AdminPanel extends Component {
                         <Animation  type="fadeIn">
                             <Row>
                                 <Col sm={12}>
-                                    <BootstrapTable data={ this.state.users.distributors } version='4' hover condensed pagination options={ distOptions }>
+                                    <BootstrapTable data={ this.state.users.distributors } version='4' hover condensed pagination options={ distOptions } expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponent } >
                                         <TableHeaderColumn isKey dataField='id'>No.</TableHeaderColumn>
                                         <TableHeaderColumn dataField='name' filter={{ type: 'TextFilter', delay: 100 }}>Company Name</TableHeaderColumn>
                                         <TableHeaderColumn dataField='address' filter={{ type: 'TextFilter', delay: 100 }}>Company Owner</TableHeaderColumn>
@@ -333,7 +414,7 @@ class AdminPanel extends Component {
                         <Animation  type="fadeIn">
                             <Row>
                                 <Col sm={12}>
-                                    <BootstrapTable data={ this.state.users.chemists } version='4' hover condensed pagination options={ chemOptions }>
+                                    <BootstrapTable data={ this.state.users.chemists } version='4' hover condensed pagination options={ chemOptions } expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponent }>
                                         <TableHeaderColumn isKey dataField='id'>No.</TableHeaderColumn>
                                         <TableHeaderColumn dataField='name' filter={{ type: 'TextFilter', delay: 100 }}>Company Name</TableHeaderColumn>
                                         <TableHeaderColumn dataField='address' filter={{ type: 'TextFilter', delay: 100 }}>Company Owner</TableHeaderColumn>

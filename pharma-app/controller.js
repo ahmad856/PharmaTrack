@@ -536,8 +536,8 @@ return{
 
 	add_manufacturer: function(req, res){
 		console.log("submit recording of a manufacturer: ");
-
-		var array = req.params.asset.split("~");
+		console.log(req.body.post);
+		var array = req.body.post.split("~");
 		console.log(array);
 
 		var id = array[0]
@@ -697,8 +697,8 @@ return{
 
 	add_distributor: function(req, res){
 		console.log("submit recording of a Distributor: ");
-
-		var array = req.params.asset.split("~");
+		console.log(req.body.post);
+		var array = req.body.post.split("~");
 		console.log(array);
 
 		var id = array[0]
@@ -859,8 +859,8 @@ return{
 
 	add_chemist: function(req, res){
 		console.log("submit recording of a Chemist: ");
-
-		var array = req.params.asset.split("~");
+		console.log(req.body.post);
+		var array = req.body.post.split("~");
 		console.log(array);
 
 		var id = array[0]

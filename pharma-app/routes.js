@@ -8,16 +8,16 @@ module.exports = function(app){
     // controller.init_statics(req, res);
     //
 
-    app.get('/login', function (req, res) {
-        console.log("login function in routes");
-		//req.session.user = { username: 'Admin' };
-		res.redirect('/login/admin');
-	});
-
-    app.get('/logout', function (req, res) {
-		req.session.destroy();
-		res.redirect('/');
-	});
+    // app.get('/login', function (req, res) {
+    //     console.log("login function in routes");
+	// 	//req.session.user = { username: 'Admin' };
+	// 	res.redirect('/login/admin');
+	// });
+    //
+    // app.get('/logout', function (req, res) {
+	// 	req.session.destroy();
+	// 	res.redirect('/');
+	// });
 
     app.get('/get_all_users', function(req, res){
         controller.get_all_users(req, res);
