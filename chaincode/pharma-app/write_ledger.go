@@ -247,6 +247,12 @@ func (s *SmartContract) changeAssetOwner(APIstub shim.ChaincodeStubInterface, ar
 		return shim.Error("New owner is the old owner")
 	}
 
+	if !((strings.HasPrefix(asseti.Owner, "manuf") && strings.HasPrefix(args[1], "dist"))
+	|| (strings.HasPrefix(asseti.Owner, "dist") && strings.HasPrefix(args[1], "chem")))
+	{
+		return shim.Error("Transaction not possible: Please follow basic supply chain flow for pharma industry (Manufacturer->Distributor->Chemist)")
+	}
+
 	asseti.Owner = args[1]
 
 	assetAsBytes, _ = json.Marshal(asseti)
