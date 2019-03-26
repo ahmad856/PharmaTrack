@@ -5,10 +5,92 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	
+
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	sc "github.com/hyperledger/fabric/protos/peer"
 )
+
+func (s *SmartContract) enrollDistributor(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 2 {
+		return shim.Error("Incorrect number of arguments. Expecting 2")
+	}
+
+	manufAsBytes, _ := APIstub.GetState(args[0])
+	if manufAsBytes == nil {
+		return shim.Error("addDist: Manuf does not exist")
+	}
+
+	current := Manufacturer{}
+	json.Unmarshal(manufAsBytes, &current)
+
+	if !strings.HasPrefix(current.ID, "manuf") {
+		return shim.Error("addDist: current is not a manufacturer")
+	}
+
+	distAsBytes, _ := APIstub.GetState(args[1])
+	if distAsBytes == nil {
+		return shim.Error("addDist: Dist does not exist")
+	}
+
+	newdist := Distributor{}
+	json.Unmarshal(distAsBytes, &newdist)
+
+	if !strings.HasPrefix(newdist.ID, "dist") {
+		return shim.Error("addDist: user to be added is not a Distributor")
+	}
+
+	current.Distributors = append(current.Distributors, newdist)
+
+	manufAsBytes, _ = json.Marshal(current)
+	error := APIstub.PutState(args[0], manufAsBytes)
+	if error != nil {
+		return shim.Error(fmt.Sprintf("Failed to add distributor "))
+	}
+
+	return shim.Success(nil)
+}
+
+func (s *SmartContract) enrollChemist(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 2 {
+		return shim.Error("Incorrect number of arguments. Expecting 2")
+	}
+
+	distAsBytes, _ := APIstub.GetState(args[0])
+	if distAsBytes == nil {
+		return shim.Error("addChem: Dist does not exist")
+	}
+
+	current := Distributor{}
+	json.Unmarshal(distAsBytes, &current)
+
+	if !strings.HasPrefix(current.ID, "dist") {
+		return shim.Error("addChem: current is not a Distributor")
+	}
+
+	chemAsBytes, _ := APIstub.GetState(args[1])
+	if chemAsBytes == nil {
+		return shim.Error("addChem: Chem does not exist")
+	}
+
+	newchem := Chemist{}
+	json.Unmarshal(chemAsBytes, &newchem)
+
+	if !strings.HasPrefix(newchem.ID, "chem") {
+		return shim.Error("addChem: user to be added is not a Chemist")
+	}
+
+	current.Chemists = append(current.Chemists, newchem)
+
+	distAsBytes, _ = json.Marshal(current)
+	error := APIstub.PutState(args[0], distAsBytes)
+	if error != nil {
+		return shim.Error(fmt.Sprintf("Failed to add chemist "))
+	}
+
+	return shim.Success(nil)
+}
 
 func (s *SmartContract) initializeCounters(APIstub shim.ChaincodeStubInterface) sc.Response {
 

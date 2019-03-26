@@ -60,4 +60,13 @@ module.exports = function(app){
     app.post('/change_owner', function(req, res){
         controller.change_owner(req, res);
     });
+
+    app.post('/enroll_distributor', function(req, res){
+        controller.enroll_distributor(req, res);
+    });
+
+    app.post('/enroll_chemist', function(req, res){
+        controller.enroll_chemist(req, res);
+    });
+
 }

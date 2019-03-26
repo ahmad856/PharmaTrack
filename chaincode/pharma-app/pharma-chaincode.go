@@ -54,7 +54,7 @@ type Manufacturer struct {
 	OwnerCNIC     string `json:"ownercnic"`
 	OwnerAddress  string `json:"owneraddress"`
 
-	Distributors []string `json:"distributors"`
+	Distributors []Distributor `json:"distributors"`
 }
 
 type Distributor struct {
@@ -67,7 +67,7 @@ type Distributor struct {
 	OwnerCNIC     string `json:"ownercnic"`
 	OwnerAddress  string `json:"owneraddress"`
 
-	Chemists []string `json:"chemists"`
+	Chemists []Chemist `json:"chemists"`
 }
 
 type Chemist struct {
@@ -143,6 +143,10 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.readAllUsers(APIstub)
 	} else if function == "getStaticVariables" {
 		return s.getStaticVariables(APIstub)
+	} else if function == "enrollDistributor" {
+		return s.enrollDistributor(APIstub, args)
+	} else if function == "enrollChemist" {
+		return s.enrollChemist(APIstub, args)
 	}
 
 	return shim.Error("Invalid Smart Contract function name.")
@@ -216,6 +220,19 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 	error := APIstub.PutState("StaticVariables", staticsAsBytes)
 	if error != nil {
 		return shim.Error(fmt.Sprintf("Failed to initialize counters"))
+	}
+
+	type Admin struct {
+		ID       string `json:"id"`
+		Password string `json:"password"`
+	}
+
+	var admin = Admin{ID: "admin", Password: "admin"}
+
+	adminAsBytes, _ := json.Marshal(admin)
+	error = APIstub.PutState("admin", adminAsBytes)
+	if error != nil {
+		return shim.Error(fmt.Sprintf("Failed to initialize admin"))
 	}
 
 	return shim.Success(nil)
