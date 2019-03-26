@@ -45,27 +45,40 @@ type PharmaAsset struct {
 }
 
 type Manufacturer struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Address  string `json:"address"`
-	UserName string `json:"username"`
-	Password string `json:"password"`
+	ID            string `json:"id"`
+	Name          string `json:"name"`
+	Address       string `json:"address"`
+	LicenseNumber string `json:"license"`
+	Password      string `json:"password"`
+	OwnerName     string `json:"ownername"`
+	OwnerCNIC     string `json:"ownercnic"`
+	OwnerAddress  string `json:"owneraddress"`
+
+	Distributors []string `json:"distributors"`
 }
 
 type Distributor struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Address  string `json:"address"`
-	UserName string `json:"username"`
-	Password string `json:"password"`
+	ID            string `json:"id"`
+	Name          string `json:"name"`
+	Address       string `json:"address"`
+	LicenseNumber string `json:"license"`
+	Password      string `json:"password"`
+	OwnerName     string `json:"ownername"`
+	OwnerCNIC     string `json:"ownercnic"`
+	OwnerAddress  string `json:"owneraddress"`
+
+	Chemists []string `json:"chemists"`
 }
 
 type Chemist struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Address  string `json:"address"`
-	UserName string `json:"username"`
-	Password string `json:"password"`
+	ID            string `json:"id"`
+	Name          string `json:"name"`
+	Address       string `json:"address"`
+	LicenseNumber string `json:"license"`
+	Password      string `json:"password"`
+	OwnerName     string `json:"ownername"`
+	OwnerCNIC     string `json:"ownercnic"`
+	OwnerAddress  string `json:"owneraddress"`
 }
 
 type Transaction struct {
@@ -148,15 +161,15 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 	}
 
 	manufacturers := []Manufacturer{
-		Manufacturer{ID: "manuf0", Name: "Ahmad", Address: "Islamabad", UserName: "manuf1", Password: "123"},
+		Manufacturer{ID: "manuf0", Name: "Super Manufacturer", Address: "Islamabad", LicenseNumber: "isb123", Password: "123", OwnerName: "Ahmad", OwnerCNIC: "35201-111111-1", OwnerAddress: "3-B wapda town"},
 	}
 
 	distributors := []Distributor{
-		Distributor{ID: "dist0", Name: "Abdullah", Address: "Lahore", UserName: "dist1", Password: "456"},
+		Distributor{ID: "dist0", Name: "Excellent Distributor", Address: "Lahore", LicenseNumber: "lhe345", Password: "456", OwnerName: "Abdullah", OwnerCNIC: "35201-222222-2", OwnerAddress: "3-C angoori bagh"},
 	}
 
 	chemists := []Chemist{
-		Chemist{ID: "chem0", Name: "Usama", Address: "Lahore", UserName: "chem1", Password: "789"},
+		Chemist{ID: "chem0", Name: "Sasta Chemist", Address: "Lahore", LicenseNumber: "lea898", Password: "789", OwnerName: "Usama", OwnerCNIC: "35201-333333-3", OwnerAddress: "2-K sabzazar"},
 	}
 
 	i := 0

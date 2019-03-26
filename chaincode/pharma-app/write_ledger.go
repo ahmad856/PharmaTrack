@@ -93,33 +93,34 @@ func (s *SmartContract) recordManufacturer(APIstub shim.ChaincodeStubInterface, 
 		return shim.Error("Incorrect number of arguments. Expecting 6")
 	}
 
-	if checkOwner(APIstub, args[0]) == true {
+	var statics StaticVariables
+	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
+	if staticsAsBytes == nil {
+		return shim.Error("func: record Manufacturer... Could not get static variables")
+	}
+	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
+
+	nextId = strconv.Itoa(statics.ManufacturerCount)
+
+	if checkOwner(APIstub, nextId) == true {
 		return shim.Error("Manufacturer already exists")
 	}
 
-	var manufacturer = Manufacturer{ID: args[0], Name: args[1], Address: args[3], UserName: args[4], Password: args[5]}
+	var manufacturer = Manufacturer{ID: nextId, Name: args[0], Address: args[1], LicenseNumber: args[2], OwnerName: args[3], OwnerCNIC: args[4], OwnerName: args[5]}
 
 	manufacturerAsBytes, _ := json.Marshal(manufacturer)
-
-	error := APIstub.PutState(args[0], manufacturerAsBytes)
+	error := APIstub.PutState(nextId, manufacturerAsBytes)
 	if error != nil {
 		return shim.Error(fmt.Sprintf("Failed to record manufacturer: %s", args[0]))
 	}
 
 	//update statics
-	var statics StaticVariables
-	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
-	if staticsAsBytes == nil {
-		return shim.Error("func: record Distributor... Could not get static variables")
-	}
-	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
-
 	statics.ManufacturerCount += 1
 
 	staticsAsBytes, _ = json.Marshal(statics)
 	error = APIstub.PutState("StaticVariables", staticsAsBytes)
 	if error != nil {
-		return shim.Error(fmt.Sprintf("func: Record Distrbutor... Failed to initialize counters"))
+		return shim.Error(fmt.Sprintf("func: Record Manufacturer... Failed to increment counter"))
 	}
 
 	return shim.Success(nil)
@@ -141,19 +142,6 @@ func (s *SmartContract) recordDistributor(APIstub shim.ChaincodeStubInterface, a
 		return shim.Error("Incorrect number of arguments. Expecting 6")
 	}
 
-	if checkOwner(APIstub, args[0]) == true {
-		return shim.Error("Distributor already exists")
-	}
-
-	var distributor = Distributor{ID: args[0], Name: args[1], Address: args[3], UserName: args[4], Password: args[5]}
-
-	distributorAsBytes, _ := json.Marshal(distributor)
-	error := APIstub.PutState(args[0], distributorAsBytes)
-	if error != nil {
-		return shim.Error(fmt.Sprintf("Failed to record distributor: %s", args[0]))
-	}
-
-	//update statics
 	var statics StaticVariables
 	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
 	if staticsAsBytes == nil {
@@ -161,12 +149,27 @@ func (s *SmartContract) recordDistributor(APIstub shim.ChaincodeStubInterface, a
 	}
 	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
 
+	nextId = strconv.Itoa(statics.DistributorCount)
+
+	if checkOwner(APIstub, nextId) == true {
+		return shim.Error("Distributor already exists")
+	}
+
+	var distributor = Distributor{ID: nextId, Name: args[0], Address: args[1], LicenseNumber: args[2], OwnerName: args[3], OwnerCNIC: args[4], OwnerName: args[5]}
+
+	distributorAsBytes, _ := json.Marshal(distributor)
+	error := APIstub.PutState(nextId, distributorAsBytes)
+	if error != nil {
+		return shim.Error(fmt.Sprintf("Failed to record distributor: %s", args[0]))
+	}
+
+	//update statics
 	statics.DistributorCount += 1
 
 	staticsAsBytes, _ = json.Marshal(statics)
 	error = APIstub.PutState("StaticVariables", staticsAsBytes)
 	if error != nil {
-		return shim.Error(fmt.Sprintf("func: Record Distrbutor... Failed to initialize counters"))
+		return shim.Error(fmt.Sprintf("func: Record Distributor... Failed to increment counter"))
 	}
 
 	return shim.Success(nil)
@@ -188,32 +191,34 @@ func (s *SmartContract) recordChemist(APIstub shim.ChaincodeStubInterface, args 
 		return shim.Error("Incorrect number of arguments. Expecting 6")
 	}
 
-	if checkOwner(APIstub, args[0]) == true {
+	var statics StaticVariables
+	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
+	if staticsAsBytes == nil {
+		return shim.Error("func: record Chemist... Could not get static variables")
+	}
+	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
+
+	nextId = strconv.Itoa(statics.ChemistCount)
+
+	if checkOwner(APIstub, nextId) == true {
 		return shim.Error("Chemist already exists")
 	}
 
-	var chemist = Chemist{ID: args[0], Name: args[1], Address: args[3], UserName: args[4], Password: args[5]}
+	var chemist = Chemist{ID: nextId, Name: args[0], Address: args[1], LicenseNumber: args[2], OwnerName: args[3], OwnerCNIC: args[4], OwnerName: args[5]}
 
 	chemistAsBytes, _ := json.Marshal(chemist)
-	error := APIstub.PutState(args[0], chemistAsBytes)
+	error := APIstub.PutState(nextId, chemistAsBytes)
 	if error != nil {
 		return shim.Error(fmt.Sprintf("Failed to record chemist: %s", args[0]))
 	}
 
 	//update statics
-	var statics StaticVariables
-	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
-	if staticsAsBytes == nil {
-		return shim.Error("func: record Distributor... Could not get static variables")
-	}
-	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
-
 	statics.ChemistCount += 1
 
 	staticsAsBytes, _ = json.Marshal(statics)
 	error = APIstub.PutState("StaticVariables", staticsAsBytes)
 	if error != nil {
-		return shim.Error(fmt.Sprintf("func: Record Distrbutor... Failed to initialize counters"))
+		return shim.Error(fmt.Sprintf("func: Record Chemist... Failed to increment counter"))
 	}
 
 	return shim.Success(nil)
