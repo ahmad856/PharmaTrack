@@ -202,7 +202,7 @@ const assetNames = [
     { label: "Shoe Covering", value: 22 },
 ];
 
-class ManufacturerPanel extends Component {
+class DistributorPanel extends Component {
     constructor(props) {
         super(props);
         this.state={};
@@ -232,8 +232,6 @@ class ManufacturerPanel extends Component {
         this.state.mgfValid=false;
         this.state.expValid=false;
         this.state.qtyValid=false;
-        this.state.userID="";
-        this.state.user="";
         ////////////////////////Distributor////////////////////
         this.state.distNameValue="";
         this.state.distOwnerValue="";
@@ -257,29 +255,10 @@ class ManufacturerPanel extends Component {
     }
 
     componentDidMount() {
-        const user = null;
-        if(sessionStorage.getItem("user")){
-            user = sessionStorage.getItem("user");
-            console.log(user);
-            this.setState({userID:user});
-        }
-
-        // this.callGetAllAssets()
-        // .then(res => this.setState({ assets: this.flattenAssetData(res.express) }))
-        // .catch(err => console.log(err));
-
-        this.getUser()
-        .then(res => this.setState({ user: res.express }))
+        this.callGetAllAssets()
+        .then(res => this.setState({ assets: this.flattenAssetData(res.express) }))
         .catch(err => console.log(err));
     }
-
-    getUser = async () => {
-        var id=this.state.userID;
-        const response = await fetch('/user_login/'+id);
-        const body = await response.json();
-        if (response.status !== 200) throw Error(body.message);
-        return body;
-    };
 
     callGetAllAssets = async () => {
         const response = await fetch('/get_all_assets');
@@ -459,7 +438,7 @@ class ManufacturerPanel extends Component {
         var name=this.state.nameValue.label;
         var description=this.state.discriptionValue;
         /////////////////////////////////////////change owner as login
-        var owner="manuf0";
+        var owner="manuf1";
         var type=this.state.assetType.label;
         var price=this.state.priceValue;
         var mgfDate=this.state.manufacDate;
@@ -521,7 +500,7 @@ class ManufacturerPanel extends Component {
 
         return (
             <MDBContainer>
-                <PanelHeading title="Manufacturer Panel"/>
+                <PanelHeading title="Distributor Panel"/>
                 {/* Add asset side pane */}
                 <SlidingPane closeIcon={<div>[ X ]</div>} isOpen={this.state.isAssetPaneOpen} title='Add Asset' from='right' width='400px' onRequestClose={this.closeAssetPanel}>
                     <form onSubmit={this.handleSubmit}>
@@ -532,7 +511,7 @@ class ManufacturerPanel extends Component {
                         <MDBInput label="Manufacture Date *" hint="mm/dd/yyyy" name="manufacDate" type="date" value={this.state.manufacDate} onChange={this.handleInputChange}/>
                         <MDBInput label="Expiry Date *" hint="mm/dd/yyyy" name="expiryDate" type="date" value={this.state.expiryDate} onChange={this.handleInputChange}/>
                         <MDBInput label="Quantity *" name="qtyValue" type="number" min="1" value={this.state.qtyValue} onChange={this.handleInputChange}/>
-                        <center><MDBBtn size="sm" color="primary" type="submit" >Add</MDBBtn></center>
+                        <center><MDBBtn size="sm" color="primary" type="submit" disabled={!this.state.assetFormValid} >Add</MDBBtn></center>
                     </form>
                 </SlidingPane>
 
@@ -591,4 +570,4 @@ class ManufacturerPanel extends Component {
     }
 }
 
-export default ManufacturerPanel;
+export default DistributorPanel;

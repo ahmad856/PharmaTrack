@@ -8,9 +8,22 @@ class PublicLayout extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            collapseID:""
+            collapseID:"",
+            id:"",
+            password:"",
+            user:""
         };
+        this.handleInputChange = this.handleInputChange.bind(this);
     }
+
+    handleInputChange(event) {
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+        this.setState({
+            [name]: value
+        });
+    };
 
     toggleCollapse = collapseID => () =>
         this.setState(prevState => ({
@@ -20,6 +33,41 @@ class PublicLayout extends Component {
 
     closeCollapse = collapseID => () =>
         this.state.collapseID === collapseID && this.setState({ collapseID: "" });
+
+    handleLoginSubmit = () =>{
+        this.loginfunc()
+        .then(res => this.setState({ user: res.express }))
+        .catch(err => console.log(err));
+        //this.redirect();
+    }
+
+    redirectUser = (path) => {
+        this.props.history.push(path);
+    }
+
+    loginfunc = async () => {
+        var id=this.state.id;
+        const response = await fetch('/user_login/'+id);
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+        console.log(body);
+        if(body.id===this.state.id && body.password===this.state.password){
+            sessionStorage.setItem("user",body.id);
+            if(this.state.id.substring(0,4)==="dist"){
+                this.redirectUser('/login/dist');
+            } else if(this.state.id.substring(0,4)==="chem"){
+                this.redirectUser('/login/chem');
+            } else if(this.state.id.substring(0,4)==="manu"){
+                this.redirectUser('/login/manufac');
+            } else if(this.state.id.substring(0,4)==="admi"){
+                this.redirectUser('/login/admin');
+            }
+        }
+        else{
+            console.log("user not found");
+        }
+        return body;
+    };
 
     render() {
         const overlay = (
@@ -45,20 +93,18 @@ class PublicLayout extends Component {
                             </MDBNavItem>
                             <MDBNavItem>
                                 <MDBDropdown>
-                                    <MDBDropdownToggle nav caret>
-                                        <MDBIcon icon="user" />
-                                    </MDBDropdownToggle>
-                                    <MDBDropdownMenu className="dropdown-default" right>
-                                        <form>
-                                            <p className="h5 text-center mb-4">Sign in</p>
-                                            <div className="grey-text">
-                                                <MDBInput label="Type your ID" icon="envelope" group type="text"/>
-                                                <MDBInput label="Type your password" icon="lock" group type="password" validate/>
-                                            </div>
-                                            <div className="text-center">
-                                                <NavLink to="/login/manufac" exact><MDBBtn size="sm">Login</MDBBtn></NavLink>
-                                            </div>
-                                        </form>
+                                    <MDBDropdownToggle nav caret><MDBIcon icon="user" /></MDBDropdownToggle>
+                                    <MDBDropdownMenu basic>
+                                        <div>
+                                            <form>
+                                                <p className="h5 text-center mb-4">Sign in</p>
+                                                <MDBInput style={{color:"black"}} label="ID" type="text" name="id" value={this.state.id} onChange={this.handleInputChange}/>
+                                                <MDBInput label="Password" style={{color:"black"}} type="password" name="password" value={this.state.password} onChange={this.handleInputChange}/>
+                                                <div className="text-center">
+                                                    <MDBBtn size="sm" onClick={this.handleLoginSubmit}>Login</MDBBtn>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </MDBDropdownMenu>
                                 </MDBDropdown>
                             </MDBNavItem>
@@ -67,7 +113,7 @@ class PublicLayout extends Component {
                     </MDBCollapse>
                 </MDBNavbar>
                 {collapseID && overlay}
-                <main style={{ marginTop: "4rem" }}>
+                <main class="wrapper" style={{ marginTop: "4rem" }}>
                     <PublicRoutes />
                 </main>
                 <footer class="public-footer">

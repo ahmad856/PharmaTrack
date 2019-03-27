@@ -1,6 +1,6 @@
 //SPDX-License-Identifier: Apache-2.0
 
-// nodejs server setup 
+// nodejs server setup
 
 // call the packages we need
 var express       = require('express');        // call express
@@ -33,10 +33,7 @@ require('./routes.js')(app);
 app.use(express.static(path.join(__dirname, './client')));
 
 
-// Start the server and listen on port 
+// Start the server and listen on port
 app.listen(port,function(){
   console.log("Live on port: " + port);
 });
-
-
-

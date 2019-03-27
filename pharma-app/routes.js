@@ -3,16 +3,16 @@
 
 var controller  = require('./controller.js');
 var express     = require('express');
+var app         = express.Router();
 
 module.exports = function(app){
     // controller.init_statics(req, res);
     //
 
-    // app.get('/login', function (req, res) {
-    //     console.log("login function in routes");
-	// 	//req.session.user = { username: 'Admin' };
-	// 	res.redirect('/login/admin');
-	// });
+    app.get('/user_login/:id', function (req, res) {
+        console.log("login function in routes");
+		controller.get_user(req, res);
+	});
     //
     // app.get('/logout', function (req, res) {
 	// 	req.session.destroy();
@@ -68,5 +68,4 @@ module.exports = function(app){
     app.post('/enroll_chemist', function(req, res){
         controller.enroll_chemist(req, res);
     });
-
 }

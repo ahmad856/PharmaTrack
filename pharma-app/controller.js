@@ -60,7 +60,7 @@ return{
 
 		    // queryAllAssets - requires no arguments , ex: args: [''],
 		    const request = {
-		        chaincodeId: 'pharma-app',
+		        chaincodeId: 'pharmaapp',
 		        txId: tx_id,
 		        fcn: 'initializeCounters',
 		        args: ['']
@@ -128,7 +128,7 @@ return{
 
 		    // queryAllAssets - requires no arguments , ex: args: [''],
 		    const request = {
-		        chaincodeId: 'pharma-app',
+		        chaincodeId: 'pharmaapp',
 		        txId: tx_id,
 		        fcn: 'readAllUsers',
 		        args: ['']
@@ -195,7 +195,7 @@ return{
 
 		    // queryAllAssets - requires no arguments , ex: args: [''],
 		    const request = {
-		        chaincodeId: 'pharma-app',
+		        chaincodeId: 'pharmaapp',
 		        txId: tx_id,
 		        fcn: 'queryAllAssets',
 		        args: ['']
@@ -265,7 +265,7 @@ return{
 
 				// queryAsset - requires 1 argument, ex: args: ['4'],
 				const request = {
-						chaincodeId: 'pharma-app',
+						chaincodeId: 'pharmaapp',
 						txId: tx_id,
 						fcn: 'getStaticVariables',
 						args: ['']
@@ -337,7 +337,7 @@ return{
 
 		    // queryAsset - requires 1 argument, ex: args: ['4'],
 		    const request = {
-		        chaincodeId: 'pharma-app',
+		        chaincodeId: 'pharmaapp',
 		        txId: tx_id,
 		        fcn: 'queryAsset',
 		        args: [key]
@@ -431,7 +431,7 @@ return{
 		    // send proposal to endorser
 		    const request = {
 		        //targets : --- letting this default to the peers assigned to the channel
-		        chaincodeId: 'pharma-app',
+		        chaincodeId: 'pharmaapp',
 		        fcn: 'recordAsset',
 		        args: [id, qr, name, description, owner, type, price, mgfDate, expDate, qty, timestamp],
 		        chainId: 'mychannel',
@@ -592,7 +592,7 @@ return{
 		    // send proposal to endorser
 		    const request = {
 		        //targets : --- letting this default to the peers assigned to the channel
-		        chaincodeId: 'pharma-app',
+		        chaincodeId: 'pharmaapp',
 		        fcn: 'recordManufacturer',
 		        args: [id, comp, address, license, owner, cnic, ownerAddress],
 		        chainId: 'mychannel',
@@ -754,7 +754,7 @@ return{
 		    // send proposal to endorser
 		    const request = {
 		        //targets : --- letting this default to the peers assigned to the channel
-		        chaincodeId: 'pharma-app',
+		        chaincodeId: 'pharmaapp',
 		        fcn: 'recordDistributor',
 		        args: [id, comp, address, license, owner, cnic, ownerAddress],
 		        chainId: 'mychannel',
@@ -916,7 +916,7 @@ return{
 		    // send proposal to endorser
 		    const request = {
 		        //targets : --- letting this default to the peers assigned to the channel
-		        chaincodeId: 'pharma-app',
+		        chaincodeId: 'pharmaapp',
 		        fcn: 'recordChemist',
 		        args: [id, comp, address, license, owner, cnic, ownerAddress],
 		        chainId: 'mychannel',
@@ -1071,7 +1071,7 @@ return{
 		    // send proposal to endorser
 		    var request = {
 		        //targets : --- letting this default to the peers assigned to the channel
-		        chaincodeId: 'pharma-app',
+		        chaincodeId: 'pharmaapp',
 		        fcn: 'changeAssetOwner',
 		        args: [key, owner],
 		        chainId: 'mychannel',
@@ -1230,7 +1230,7 @@ return{
 			    // send proposal to endorser
 			    var request = {
 			        //targets : --- letting this default to the peers assigned to the channel
-			        chaincodeId: 'pharma-app',
+			        chaincodeId: 'pharmaapp',
 			        fcn: 'enrollDistributor',
 			        args: [key, dist],
 			        chainId: 'mychannel',
@@ -1389,7 +1389,7 @@ return{
 			    // send proposal to endorser
 			    var request = {
 			        //targets : --- letting this default to the peers assigned to the channel
-			        chaincodeId: 'pharma-app',
+			        chaincodeId: 'pharmaapp',
 			        fcn: 'enrollChemist',
 			        args: [key, chem],
 			        chainId: 'mychannel',
@@ -1539,7 +1539,7 @@ return{
 
 		    // getTransactionHistory - requires 1 argument, ex: args: ['4'],
 		    const request = {
-		        chaincodeId: 'pharma-app',
+		        chaincodeId: 'pharmaapp',
 		        txId: tx_id,
 		        fcn: 'getTransactionHistory',
 		        args: [key]
@@ -1611,7 +1611,7 @@ return{
 
 		    // queryAsset - requires 1 argument, ex: args: ['4'],
 		    const request = {
-		        chaincodeId: 'pharma-app',
+		        chaincodeId: 'pharmaapp',
 		        txId: tx_id,
 		        fcn: 'queryUser',
 		        args: [key]
