@@ -334,13 +334,46 @@ func (s *SmartContract) changeAssetOwner(APIstub shim.ChaincodeStubInterface, ar
 		return shim.Error("Transaction not possible: Please follow basic supply chain flow for pharma industry (Manufacturer->Distributor->Chemist)")
 	}
 
+	newOwnerAsBytes, _ := APIstub.GetState(args[1])
+	if newOwnerAsBytes == nil {
+		return shim.Error("New owner does not exist")
+	}
+
+	type User struct {
+		ID            string `json:"id"`
+		Name          string `json:"name"`
+		Address       string `json:"address"`
+		LicenseNumber string `json:"license"`
+		Password      string `json:"password"`
+		OwnerName     string `json:"ownername"`
+		OwnerCNIC     string `json:"ownercnic"`
+		OwnerAddress  string `json:"owneraddress"`
+
+		Distributors []Distributor `json:"distributors"`
+		Chemists     []Chemist     `json:"chemists"`
+
+		Assets []PharmaAsset `json:"assets"`
+	}
+
+	newOwner := User{}
+	json.Unmarshal(newOwnerAsBytes, &newOwner)
+
 	asseti.Owner = args[1]
+
+	newOwner.Assets = append(newOwner.Assets, asseti)
 
 	assetAsBytes, _ = json.Marshal(asseti)
 	error := APIstub.PutState(args[0], assetAsBytes)
 	if error != nil {
-		return shim.Error(fmt.Sprintf("Failed to update asset owner: "))
+		return shim.Error(fmt.Sprintf("Failed to update asset owner in asset"))
 	}
+
+	newOwnerAsBytes, _ = json.Marshal(newOwner)
+	error = APIstub.PutState(args[0], newOwnerAsBytes)
+	if error != nil {
+		return shim.Error(fmt.Sprintf("Failed to add asset in user"))
+	}
+
 	return shim.Success(nil)
 }
 

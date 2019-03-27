@@ -55,6 +55,8 @@ type Manufacturer struct {
 	OwnerAddress  string `json:"owneraddress"`
 
 	Distributors []Distributor `json:"distributors"`
+
+	Assets []PharmaAsset `json:"assets"`
 }
 
 type Distributor struct {
@@ -68,6 +70,8 @@ type Distributor struct {
 	OwnerAddress  string `json:"owneraddress"`
 
 	Chemists []Chemist `json:"chemists"`
+
+	Assets []PharmaAsset `json:"assets"`
 }
 
 type Chemist struct {
@@ -79,6 +83,8 @@ type Chemist struct {
 	OwnerName     string `json:"ownername"`
 	OwnerCNIC     string `json:"ownercnic"`
 	OwnerAddress  string `json:"owneraddress"`
+
+	Assets []PharmaAsset `json:"assets"`
 }
 
 type Transaction struct {
@@ -177,6 +183,8 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 	chemists := []Chemist{
 		Chemist{ID: "chem0", Name: "Sasta Chemist", Address: "Lahore", LicenseNumber: "lea898", Password: "789", OwnerName: "Usama", OwnerCNIC: "35201-333333-3", OwnerAddress: "2-K sabzazar"},
 	}
+
+	manufacturers[0].Assets = append(manufacturers[0].Assets, assets[2], assets[3], assets[4], assets[5])
 
 	i := 0
 	for i < len(manufacturers) {
