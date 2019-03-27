@@ -233,7 +233,7 @@ class ManufacturerPanel extends Component {
         this.state.expValid=false;
         this.state.qtyValid=false;
         this.state.userID="";
-        this.state.user="";
+        this.state.user={};
         ////////////////////////Distributor////////////////////
         this.state.distNameValue="";
         this.state.distOwnerValue="";
@@ -257,11 +257,11 @@ class ManufacturerPanel extends Component {
     }
 
     componentDidMount() {
-        const user = null;
+        var userid = null;
         if(sessionStorage.getItem("user")){
-            user = sessionStorage.getItem("user");
-            console.log(user);
-            this.setState({userID:user});
+            userid = sessionStorage.getItem("user");
+            console.log(userid);
+            this.state.userID=userid;
         }
 
         // this.callGetAllAssets()
@@ -275,11 +275,17 @@ class ManufacturerPanel extends Component {
 
     getUser = async () => {
         var id=this.state.userID;
+        console.log(id);
         const response = await fetch('/user_login/'+id);
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
+        console.log(body);
         return body;
     };
+
+    test=()=>{
+      console.log(this.state.user);
+    }
 
     callGetAllAssets = async () => {
         const response = await fetch('/get_all_assets');
@@ -557,9 +563,9 @@ class ManufacturerPanel extends Component {
                     <TabPane tabId="1">
                         <Row>
                             <Col sm={12}>
-                                <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isAssetPaneOpen: true })} >Add Asset</MDBBtn>
+                                <MDBBtn size="sm" color="primary" onClick={this.test} >Add Asset</MDBBtn>
 
-                                <BootstrapTable data={ this.state.assets } version='4' hover condensed pagination options={ options }  expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponent } >
+                                <BootstrapTable data={ this.state.userID.assets } version='4' hover condensed pagination options={ options }  expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponent } >
                                     <TableHeaderColumn isKey dataField='#'>No.</TableHeaderColumn>
                                     <TableHeaderColumn dataField='Name' filter={{ type: 'TextFilter', delay: 100 }}>Asset Name</TableHeaderColumn>
                                     <TableHeaderColumn dataField='Owner' filter={{ type: 'TextFilter', delay: 100 }}>Owner</TableHeaderColumn>
