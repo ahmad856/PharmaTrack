@@ -2,22 +2,18 @@
 
 
 var controller  = require('./controller.js');
-var express     = require('express');
-var app         = express.Router();
 
 module.exports = function(app){
     // controller.init_statics(req, res);
     //
 
-    app.get('/user_login/:id', function (req, res) {
-        console.log("login function in routes");
+    app.get('/get_user/:id', function (req, res) {
 		controller.get_user(req, res);
 	});
-    //
-    // app.get('/logout', function (req, res) {
-	// 	req.session.destroy();
-	// 	res.redirect('/');
-	// });
+
+    app.get('/logout', function (req, res) {
+		res.redirect('/');
+	});
 
     app.get('/get_all_users', function(req, res){
         controller.get_all_users(req, res);
@@ -37,10 +33,6 @@ module.exports = function(app){
 
     app.get('/get_asset', function(req, res){
         controller.get_asset(req, res);
-    });
-
-    app.get('/get_user/:id', function(req, res){
-        controller.get_user(req, res);
     });
 
     app.post('/add_asset', function(req, res){
