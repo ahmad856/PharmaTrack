@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import 'mdbreact/dist/css/mdb.css';
 import PublicRoutes from "./PublicRoutes";
-import { NavLink } from 'react-router-dom';
-import { MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavbarToggler, MDBCollapse,   MDBNavItem, MDBFooter, MDBNavLink, MDBDropdown, MDBDropdownToggle, MDBIcon, MDBDropdownMenu, MDBBtn, MDBInput } from "mdbreact";
+import { MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavbarToggler, MDBCollapse,   MDBNavItem, MDBNavLink, MDBDropdown, MDBDropdownToggle, MDBIcon, MDBDropdownMenu, MDBBtn, MDBInput } from "mdbreact";
 
 class PublicLayout extends Component {
     constructor(props) {
@@ -38,7 +37,6 @@ class PublicLayout extends Component {
         this.loginfunc()
         .then(res => this.setState({ user: res.express }))
         .catch(err => console.log(err));
-        //this.redirect();
     }
 
     redirectUser = (path) => {
@@ -47,10 +45,10 @@ class PublicLayout extends Component {
 
     loginfunc = async () => {
         var id=this.state.id;
-        const response = await fetch('/user_login/'+id);
-        const body = await response.json();
+        const response = await fetch('/get_user/'+id);
+        const express = await response.json();
         if (response.status !== 200) throw Error(body.message);
-        console.log(body);
+        var body=express.express;
         if(body.id===this.state.id && body.password===this.state.password){
             sessionStorage.setItem("user",body.id);
             if(this.state.id.substring(0,4)==="dist"){

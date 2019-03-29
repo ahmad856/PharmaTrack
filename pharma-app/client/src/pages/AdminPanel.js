@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Animation, MDBContainer, MDBDropdown, MDBDropdownMenu, MDBDropdownItem, MDBDropdownToggle, MDBInput, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBCardText, MDBListGroup, MDBListGroupItem, MDBRow } from "mdbreact";
+import { Animation, MDBContainer, MDBInput, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBCardText, MDBListGroup, MDBListGroupItem, MDBRow } from "mdbreact";
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import '../../node_modules/react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import classnames from 'classnames';
@@ -11,10 +11,6 @@ import 'react-sliding-pane/dist/react-sliding-pane.css';
 import Select from 'react-select';
 
 class BSTable extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         if (this.props.data) {
             return (
@@ -187,6 +183,8 @@ class AdminPanel extends Component {
                 qtyValid = value.length > 0;
                 fieldErrors.qtyVal = qtyValid ? '' : ' is Empty!!!';
                 break;
+            default:
+                console.log("Invalid Feild");
         }
 
         this.setState({
@@ -213,9 +211,10 @@ class AdminPanel extends Component {
         var cnic=this.state.ownerCnic;
         var ownerAddress=this.state.ownerAddress;
         var password=this.state.password;
+        var id = null;
         if(type===1){
             console.log('Manufac');
-            var id="manuf"+(this.state.users.manufacturers.length);
+            id="manuf"+(this.state.users.manufacturers.length);
             this.handleAddManufacturer(id, comp, address, license, owner, cnic, ownerAddress);
             this.closeUserPanel();
             e.preventDefault();
@@ -231,7 +230,7 @@ class AdminPanel extends Component {
         }
         else if(type===2){
             console.log('dist');
-            var id="dist"+(this.state.users.distributors.length);
+            id="dist"+(this.state.users.distributors.length);
             this.handleAddDistributor(id, comp, address, license, owner, cnic, ownerAddress);
             this.closeUserPanel();
             e.preventDefault();
@@ -247,7 +246,7 @@ class AdminPanel extends Component {
         }
         else if(type===3){
             console.log('chem');
-            var id="chem"+(this.state.users.chemists.length);
+            id="chem"+(this.state.users.chemists.length);
             this.handleAddChemist(id, comp, address, license, owner, cnic, ownerAddress);
             this.closeUserPanel();
             e.preventDefault();

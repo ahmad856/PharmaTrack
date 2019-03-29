@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import 'mdbreact/dist/css/mdb.css';
 import PrivateRoutes from "./PrivateRoutes";
-import { MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavbarToggler, MDBCollapse, MDBDropdown, MDBDropdownToggle, MDBDropdownMenu,  MDBDropdownItem, MDBIcon, MDBFooter } from "mdbreact";
+import { MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavbarToggler, MDBCollapse, MDBDropdown, MDBDropdownToggle, MDBDropdownMenu,  MDBDropdownItem, MDBIcon } from "mdbreact";
 
 class PrivateLayout extends Component {
     constructor(props) {
