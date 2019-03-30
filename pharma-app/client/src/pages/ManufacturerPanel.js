@@ -149,6 +149,46 @@ class BSTable extends Component {
     }
 }
 
+class BSTableDist extends Component {
+    render() {
+        if (this.props.data) {
+            return (
+                <MDBContainer>
+                    <MDBCard border="info" className="m-3" style={{ maxWidth: "70rem" }}>
+
+                            <MDBCardHeader> User Details</MDBCardHeader>
+                            <MDBCardBody className="text-info">
+                                <MDBRow className="justify-content-center">
+                                    <MDBListGroup className="my-4 mx-4" style={{ width: "20rem",wordwrap: "break-word"  }}>
+                                        <MDBListGroupItem color="primary">ID: {this.props.data.id}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">Company Name: {this.props.data.name}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">Company Address:<br/> {this.props.data.address}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">License Number: {this.props.data.license}</MDBListGroupItem>
+                                    </MDBListGroup>
+                                    <MDBListGroup className="my-4 mx-4" style={{ width: "20rem",wordwrap: "break-word" }}>
+                                        <MDBListGroupItem color="primary">Owner Name: {this.props.data.ownername}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">Owner CNIC: {this.props.data.ownercnic}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">Owner Address:<br/> {this.props.data.owneraddress}</MDBListGroupItem>
+                                    </MDBListGroup>
+                                </MDBRow>
+                            </MDBCardBody>
+
+                    </MDBCard>
+                </MDBContainer>
+            );
+        } else {
+            return (
+                <MDBCard border="info" className="m-3" style={{ maxWidth: "70rem" }}>
+                    <MDBCardHeader>User Details</MDBCardHeader>
+                    <MDBCardBody className="text-info">
+                        <center><MDBCardText>Details not found!!!</MDBCardText></center>
+                    </MDBCardBody>
+                </MDBCard>
+            );
+        }
+    }
+}
+
 ///////////////////////////////ASSET//////////////////////
 // ID string `json:"id"`
 // QRCode string `json:"qr"`
@@ -206,7 +246,7 @@ class ManufacturerPanel extends Component {
         this.state.post = "";
 
         this.state.userID = "";
-        //////////////////////////////USER//////////////////////
+        //////////////////////////////USER/////////////////////
         this.state.user = {};
         this.state.user.address="";
         this.state.user.id="";
@@ -238,6 +278,19 @@ class ManufacturerPanel extends Component {
 
         ////////////////////////Distributor////////////////////
         this.state.distId = "";
+        this.state.dist = {};
+        this.state.dist.address="";
+        this.state.dist.assets=[];
+        this.state.dist.chemists=[];
+        this.state.dist.id="";
+        this.state.dist.license="";
+        this.state.dist.name="";
+        this.state.dist.owneraddress="";
+        this.state.dist.ownercnic="";
+        this.state.dist.ownername="";
+        this.state.dist.password="";
+
+        /////////////////////////Bind Functions////////////////
         this.handleInputChange = this.handleInputChange.bind(this);
         this.toggle = this.toggle.bind(this);
     }
@@ -305,6 +358,12 @@ class ManufacturerPanel extends Component {
         //console.log(this.updateOwner);
         return (
             <BSTable data={ row }/>
+        );
+    }
+
+    expandComponentDist(row) {
+        return (
+            <BSTableDist data={ row }/>
         );
     }
 
@@ -424,6 +483,43 @@ class ManufacturerPanel extends Component {
 
     //tasks.map((task) => task.name )
 
+    enrollDistributor = async e => {
+        var distId=this.state.distId;
+        var manufId=this.state.userID;
+        e.preventDefault();
+        const response = await fetch('/enroll_distributor', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ post: manufId.concat('~',distId) })
+        });
+        const body = await response.json();
+        if(body.express.status==1){
+            this.getDist()
+            .then(res => this.setState({ dist: res.express }))
+            .catch(err => console.log(err));
+        }else{
+            console.log("transaction error");
+        }
+
+
+    }
+
+    getDist = async () => {
+        var id = this.state.distId;
+        const response = await fetch('/get_user/'+id);
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+        //var express = body.express;
+        // this.state.user.distributors.push(express);
+        // this.setState(this.state.user);
+        console.log(body.express);
+        this.state.user.distributors.push(body.express);
+        this.setState(this.state.user);
+        return body;
+    };
+
     handleSubmit = async e => {
         var id=""+(this.state.user.assets.length+1);
         var qr="abcdef";
@@ -452,7 +548,6 @@ class ManufacturerPanel extends Component {
     };
 
     //height='240' scrollTop={ 'Top' }
-
     // this.setState({
     //     items: update(this.state.items, {1: {name: {$set: 'updated field name'}}})
     // })
@@ -487,15 +582,18 @@ class ManufacturerPanel extends Component {
                     </form>
                 </SlidingPane>
 
-                {/* Add Distributor side pane */}
-                <SlidingPane isOpen={this.state.isDistributorPaneOpen} title='Add Distributor' closeIcon={<div>[ X ]</div>} from='right' width='400px' onRequestClose={this.closeDistributorPanel}>
-                    <form onSubmit={this.handleDistributorSubmit}>
-                        <MDBInput label="Name *" name="distNameValue" type="text" value={this.state.distNameValue} onChange={this.handleInputChange}/>
-                        <MDBInput label="Owner Name *" name="distOwnerValue" type="text" value={this.state.distOwnerValue} onChange={this.handleInputChange}/>
-                        <MDBInput label="Address *" name="distAddressValue" type="text" value={this.state.distAddressValue} onChange={this.handleInputChange}/>
-                        <center><MDBBtn size="sm" color="primary" type="submit" >Add</MDBBtn></center>
-                    </form>
-                </SlidingPane>
+
+                {/* Add Distributor side pane
+                    <SlidingPane isOpen={this.state.isDistributorPaneOpen} title='Add Distributor' closeIcon={<div>[ X ]</div>} from='right' width='400px' onRequestClose={this.closeDistributorPanel}>
+                        <form onSubmit={this.handleDistributorSubmit}>
+                            <MDBInput label="Name *" name="distNameValue" type="text" value={this.state.distNameValue} onChange={this.handleInputChange}/>
+                            <MDBInput label="Owner Name *" name="distOwnerValue" type="text" value={this.state.distOwnerValue} onChange={this.handleInputChange}/>
+                            <MDBInput label="Address *" name="distAddressValue" type="text" value={this.state.distAddressValue} onChange={this.handleInputChange}/>
+                            <center><MDBBtn size="sm" color="primary" type="submit" >Add</MDBBtn></center>
+                        </form>
+                    </SlidingPane>
+                */}
+
                 <Nav tabs pills>
                     <NavItem>
                         <NavLink className={classnames({ active: this.state.activeTab === '1' })} onClick={() => { this.toggle('1'); }}>Asset</NavLink>
@@ -523,13 +621,26 @@ class ManufacturerPanel extends Component {
                     <TabPane tabId="2">
                         <Row>
                             <Col sm={12}>
-                                <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isDistributorPaneOpen: true })} >Add Distributor</MDBBtn>
+                                <div class="dropright">
+                                    <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add Distributor</button>
 
-                                <BootstrapTable data={ this.state.user.distributors } version='4' hover condensed pagination options={ distOptions }>
+                                    <form class="dropdown-menu p-4">
+                                        <div class="form-group">
+                                            <MDBInput label="Name *" name="distId" type="text" value={this.state.distId} onChange={this.handleInputChange}/>
+                                        </div>
+                                        <MDBBtn size="sm" color="primary"  onClick={this.enrollDistributor}>Enroll</MDBBtn>
+                                    </form>
+                                </div>
+
+                                {/*
+                                    <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isDistributorPaneOpen: true })} >Add Distributor</MDBBtn>
+                                */}
+
+                                <BootstrapTable data={ this.state.user.distributors } version='4' hover condensed pagination options={ distOptions } expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponentDist } >
                                     <TableHeaderColumn isKey dataField='#'>No.</TableHeaderColumn>
-                                    <TableHeaderColumn dataField='Name' filter={{ type: 'TextFilter', delay: 100 }}>Asset Name</TableHeaderColumn>
-                                    <TableHeaderColumn dataField='Owner' filter={{ type: 'TextFilter', delay: 100 }}>Owner</TableHeaderColumn>
-                                    <TableHeaderColumn dataField='Quantity' >Quantity</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='name' filter={{ type: 'TextFilter', delay: 100 }}>Distributor Name</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='owneraddress' filter={{ type: 'TextFilter', delay: 100 }}>Owner</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='ownercnic' >Owner CNIC</TableHeaderColumn>
                                 </BootstrapTable>
                                 <br/><br/>
                             </Col>

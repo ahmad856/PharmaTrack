@@ -1309,7 +1309,8 @@ module.exports = (function() {
 			        return Promise.all(promises);
 			    } else {
 			        console.error('Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...');
-			        res.send("Error: no asset found");
+					res.send({ express: {status:"-1", txd:"-1"} });
+					//res.send("Error: no asset found");
 			        // throw new Error('Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...');
 			    }
 			}).then((results) => {
@@ -1317,10 +1318,12 @@ module.exports = (function() {
 			    // check the results in the order the promises were added to the promise all list
 			    if (results && results[0] && results[0].status === 'SUCCESS') {
 			        console.log('Successfully sent transaction to the orderer.');
-			        res.json(tx_id.getTransactionID())
+					res.send({ express: {status:"1", txd:tx_id.getTransactionID()}});
+			        //res.json(tx_id.getTransactionID())
 			    } else {
 			        console.error('Failed to order the transaction. Error code: ' + response.status);
-			        res.send("Error: no asset found");
+					res.send({ express: {status:"-1", txd:"-1"} });
+			        //res.send("Error: no asset found");
 			    }
 
 			    if(results && results[1] && results[1].event_status === 'VALID') {
@@ -1331,7 +1334,8 @@ module.exports = (function() {
 			    }
 			}).catch((err) => {
 			    console.error('Failed to invoke successfully :: ' + err);
-			    res.send("Error: no asset found");
+				res.send({ express: {status:"-1", txd:"-1"} });
+			    //res.send("Error: no asset found");
 			});
 		},
 
@@ -1568,9 +1572,11 @@ module.exports = (function() {
 
 		get_user: function(req, res){
 			console.log("get_user function called.");
+			console.log('\n\n');
 
 			var fabric_client = new Fabric_Client();
 			var key = req.params.id
+			console.log(key);
 
 			// setup the fabric network
 			var channel = fabric_client.newChannel('mychannel');
@@ -1627,14 +1633,14 @@ module.exports = (function() {
 			            console.log("Response is ", query_responses[0].toString());
 						var temp=JSON.parse(query_responses[0].toString());
 						if(temp.id.substring(0,5)!="admin"){
-							if(temp.id.substring(0,5)=="manuf"){
+							if(temp.id.substring(0,4)=="manu"){
 								if(temp.distributors==null){
 									temp.distributors=[];
 								}else {
 
 								}
 							}
-							if(temp.id.substring(0,5)=="distr"){
+							if(temp.id.substring(0,4)=="dist"){
 								if(temp.chemists==null){
 									temp.chemists=[];
 								}else {
