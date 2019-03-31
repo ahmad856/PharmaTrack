@@ -445,6 +445,8 @@ class ManufacturerPanel extends Component {
                 fieldErrors.qtyVal = length && this.isPositiveInteger(value);
                 this.setState({ qtyValid:fieldErrors.qtyVal });
                 break;
+            default:
+                console.log("Invalid Feild");
         }
 
         this.setState({
@@ -495,15 +497,13 @@ class ManufacturerPanel extends Component {
             body: JSON.stringify({ post: manufId.concat('~',distId) })
         });
         const body = await response.json();
-        if(body.express.status==1){
+        if(body.express.status===1){
             this.getDist()
             .then(res => this.setState({ dist: res.express }))
             .catch(err => console.log(err));
         }else{
             console.log("transaction error");
         }
-
-
     }
 
     getDist = async () => {
