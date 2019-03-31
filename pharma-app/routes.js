@@ -7,6 +7,10 @@ module.exports = function(app){
     // controller.init_statics(req, res);
     //
 
+    app.get('/sign_in/:id/:password', function (req, res) {
+		controller.sign_in(req, res);
+	});
+
     app.get('/get_user/:id', function (req, res) {
 		controller.get_user(req, res);
 	});

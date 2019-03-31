@@ -1309,7 +1309,7 @@ module.exports = (function() {
 			        return Promise.all(promises);
 			    } else {
 			        console.error('Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...');
-					res.send({ express: {status:"-1", txd:"-1"} });
+					res.send({ express: {status:-1, txd:-1} });
 					//res.send("Error: no asset found");
 			        // throw new Error('Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...');
 			    }
@@ -1318,11 +1318,11 @@ module.exports = (function() {
 			    // check the results in the order the promises were added to the promise all list
 			    if (results && results[0] && results[0].status === 'SUCCESS') {
 			        console.log('Successfully sent transaction to the orderer.');
-					res.send({ express: {status:"1", txd:tx_id.getTransactionID()}});
+					res.send({ express: {status:1, txd:tx_id.getTransactionID()}});
 			        //res.json(tx_id.getTransactionID())
 			    } else {
 			        console.error('Failed to order the transaction. Error code: ' + response.status);
-					res.send({ express: {status:"-1", txd:"-1"} });
+					res.send({ express: {status:-1, txd:-1} });
 			        //res.send("Error: no asset found");
 			    }
 
@@ -1334,7 +1334,7 @@ module.exports = (function() {
 			    }
 			}).catch((err) => {
 			    console.error('Failed to invoke successfully :: ' + err);
-				res.send({ express: {status:"-1", txd:"-1"} });
+				res.send({ express: {status:-1, txd:-1} });
 			    //res.send("Error: no asset found");
 			});
 		},
@@ -1678,6 +1678,143 @@ module.exports = (function() {
 			}).catch((err) => {
 			    console.error('Failed to query successfully :: ' + err);
 			    res.send("Could not locate user")
+			});
+		},
+
+		sign_in: function(req, res){
+			console.log('\n\n');
+			console.log("sign in function called.");
+			console.log('\n\n');
+
+			var fabric_client = new Fabric_Client();
+			var id = req.params.id;
+			var password = req.params.password;
+			console.log(id);
+			console.log(password);
+
+			// setup the fabric network
+			var channel = fabric_client.newChannel('mychannel');
+			var peer = fabric_client.newPeer('grpc://localhost:7051');
+			channel.addPeer(peer);
+
+			var member_user = null;
+			var store_path = path.join(os.homedir(), '.hfc-key-store');
+			console.log('Store path:'+store_path);
+			var tx_id = null;
+
+			// create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
+			Fabric_Client.newDefaultKeyValueStore({ path: store_path
+			}).then((state_store) => {
+			    // assign the store to the fabric client
+			    fabric_client.setStateStore(state_store);
+			    var crypto_suite = Fabric_Client.newCryptoSuite();
+			    // use the same location for the state store (where the users' certificate are kept)
+			    // and the crypto store (where the users' keys are kept)
+			    var crypto_store = Fabric_Client.newCryptoKeyStore({path: store_path});
+			    crypto_suite.setCryptoKeyStore(crypto_store);
+			    fabric_client.setCryptoSuite(crypto_suite);
+
+			    // get the enrolled user from persistence, this user will sign all requests
+			    return fabric_client.getUserContext('user1', true);
+			}).then((user_from_store) => {
+			    if (user_from_store && user_from_store.isEnrolled()) {
+			        console.log('Successfully loaded user1 from persistence');
+			        member_user = user_from_store;
+			    } else {
+			        throw new Error('Failed to get user1.... run registerUser.js');
+			    }
+
+			    // queryAsset - requires 1 argument, ex: args: ['4'],
+			    const request = {
+			        chaincodeId: 'pharma-app',
+			        txId: tx_id,
+			        fcn: 'queryUser',
+			        args: [id]
+			    };
+
+			    // send the query proposal to the peer
+			    return channel.queryByChaincode(request);
+			}).then((query_responses) => {
+			    console.log("Query has completed, checking results");
+			    // query_responses could have more than one  results if there multiple peers were used as targets
+			    if (query_responses && query_responses.length == 1) {
+			        if (query_responses[0] instanceof Error) {
+			            console.error("error from query = ", query_responses[0]);
+			            //res.send("Could not locate user");
+						res.send({ express: {status:-1, userSighnedIn:-1} });
+			        } else {
+			            console.log("Response is ", query_responses[0].toString());
+						var temp=JSON.parse(query_responses[0].toString());
+						if(temp.id.substring(0,5)=="admin"){
+							if(temp.id==id){
+								if(temp.password==password){
+									////////////////////////id and password ok
+									///////////////////////////////1 for admin
+									res.send({ express: {status:1, userSighnedIn:1} });
+								}else{
+									//////////wrong password
+									res.send({ express: {status:-2, userSighnedIn:-1} });
+								}
+							}else{
+								/////////////wrong id
+								res.send({ express: {status:-1, userSighnedIn:-1} });
+							}
+						}else if(temp.id.substring(0,4)=="manu"){
+							if(temp.id==id){
+								if(temp.password==password){
+									////////////////////////id and password ok
+									////////////////////////2 for manufacturer
+									res.send({ express: {status:1, userSighnedIn:2} });
+								}else{
+									//////////wrong password
+									res.send({ express: {status:-2, userSighnedIn:-1} });
+								}
+							}else{
+								/////////////wrong id
+								res.send({ express: {status:-1, userSighnedIn:-1} });
+							}
+						}else if(temp.id.substring(0,4)=="dist"){
+							if(temp.id==id){
+								if(temp.password==password){
+									////////////////////////id and password ok
+									/////////////////////////3 for distributor
+									res.send({ express: {status:1, userSighnedIn:3} });
+								}else{
+									//////////wrong password
+									res.send({ express: {status:-2, userSighnedIn:-1} });
+								}
+							}else{
+								/////////////wrong id
+								res.send({ express: {status:-1, userSighnedIn:-1} });
+							}
+						}else if(temp.id.substring(0,4)=="chem"){
+							if(temp.id==id){
+								if(temp.password==password){
+									////////////////////////id and password ok
+									/////////////////////////////4 for chemist
+									res.send({ express: {status:1, userSighnedIn:4} });
+								}else{
+									//////////wrong password
+									res.send({ express: {status:-2, userSighnedIn:-1} });
+								}
+							}else{
+								/////////////wrong id
+								res.send({ express: {status:-1, userSighnedIn:-1} });
+							}
+						}else{
+							////////no user found
+							res.send({ express: {status:-1, userSighnedIn:-1} });
+						}
+			        }
+			    } else {
+			        console.log("No payloads were returned from query");
+			        //res.send("Could not locate user")
+					res.send({ express: {status:-1, userSighnedIn:-1} });
+			    }
+			}).catch((err) => {
+			    console.error('Failed to query successfully :: ' + err);
+			    // res.send("Could not locate user")
+				res.send({ express: {status:-1, userSighnedIn:-1} });
 			});
 		},
 	}
