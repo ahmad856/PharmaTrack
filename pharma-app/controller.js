@@ -367,8 +367,6 @@ module.exports = (function() {
 			});
 		},
 
-		//check below funcs
-		//modify it according to new chaincode
 		add_asset: function(req, res){
 			console.log("submit recording of a asset: ");
 			console.log(req.body.post);
@@ -1571,6 +1569,7 @@ module.exports = (function() {
 		},
 
 		get_user: function(req, res){
+			console.log('\n\n');
 			console.log("get_user function called.");
 			console.log('\n\n');
 
@@ -1637,7 +1636,18 @@ module.exports = (function() {
 								if(temp.distributors==null){
 									temp.distributors=[];
 								}else {
-
+									var newDistributors=temp.distributors.map( (distributor, index)=>({
+										index: index+1,
+										address: distributor.address,
+										id: distributor.id,
+										license: distributor.license,
+										name: distributor.name,
+										owneraddress: distributor.owneraddress,
+										ownercnic: distributor.ownercnic,
+										ownername: distributor.ownername,
+										password: distributor.password
+									}));
+									temp.distributors=newDistributors;
 								}
 							}
 							if(temp.id.substring(0,4)=="dist"){

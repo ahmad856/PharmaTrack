@@ -159,16 +159,13 @@ class BSTableDist extends Component {
                             <MDBCardHeader> User Details</MDBCardHeader>
                             <MDBCardBody className="text-info">
                                 <MDBRow className="justify-content-center">
-                                    <MDBListGroup className="my-4 mx-4" style={{ width: "20rem",wordwrap: "break-word"  }}>
+                                    <MDBListGroup className="my-4 mx-4" style={{ width: "25rem",wordwrap: "break-word"  }}>
                                         <MDBListGroupItem color="primary">ID: {this.props.data.id}</MDBListGroupItem>
-                                        <MDBListGroupItem color="primary">Company Name: {this.props.data.name}</MDBListGroupItem>
-                                        <MDBListGroupItem color="primary">Company Address:<br/> {this.props.data.address}</MDBListGroupItem>
-                                        <MDBListGroupItem color="primary">License Number: {this.props.data.license}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">Company Address: {this.props.data.address}</MDBListGroupItem>
                                     </MDBListGroup>
-                                    <MDBListGroup className="my-4 mx-4" style={{ width: "20rem",wordwrap: "break-word" }}>
+                                    <MDBListGroup className="my-4 mx-4" style={{ width: "25rem",wordwrap: "break-word" }}>
                                         <MDBListGroupItem color="primary">Owner Name: {this.props.data.ownername}</MDBListGroupItem>
-                                        <MDBListGroupItem color="primary">Owner CNIC: {this.props.data.ownercnic}</MDBListGroupItem>
-                                        <MDBListGroupItem color="primary">Owner Address:<br/> {this.props.data.owneraddress}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">License Number: {this.props.data.license}</MDBListGroupItem>
                                     </MDBListGroup>
                                 </MDBRow>
                             </MDBCardBody>
@@ -637,7 +634,7 @@ class ManufacturerPanel extends Component {
                                 */}
 
                                 <BootstrapTable data={ this.state.user.distributors } version='4' hover condensed pagination options={ distOptions } expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponentDist } >
-                                    <TableHeaderColumn isKey dataField='#'>No.</TableHeaderColumn>
+                                    <TableHeaderColumn isKey dataField='index'>No.</TableHeaderColumn>
                                     <TableHeaderColumn dataField='name' filter={{ type: 'TextFilter', delay: 100 }}>Distributor Name</TableHeaderColumn>
                                     <TableHeaderColumn dataField='owneraddress' filter={{ type: 'TextFilter', delay: 100 }}>Owner</TableHeaderColumn>
                                     <TableHeaderColumn dataField='ownercnic' >Owner CNIC</TableHeaderColumn>
