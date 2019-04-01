@@ -1025,6 +1025,9 @@ module.exports = (function() {
 			var key = array[0]
 			var owner = array[1];
 
+			console.log(key);
+			console.log(owner);
+
 			var fabric_client = new Fabric_Client();
 
 			// setup the fabric network

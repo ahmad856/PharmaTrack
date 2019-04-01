@@ -11,11 +11,7 @@ class HomePage extends Component {
                         <MDBCol md="10" className="mx-auto float-none white z-depth-1 py-2 px-2">
                             <MDBCardBody>
                                 <h2 className="h2-responsive mb-4"><strong>Pharma Track</strong></h2>
-                                <p>React Bootstrap with Material Design</p>
-                                <p className="pb-4">
-                                  This application shows the actual use of MDB React components
-                                  in the application.
-                                </p>
+                                <p>Highest possible transparency in pharmaceutical packaging process to protect the patience safety, due to traceability of each single unit.</p>
                             </MDBCardBody>
                         </MDBCol>
                     </MDBRow>

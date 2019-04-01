@@ -56,7 +56,7 @@ class BSTable extends Component {
     };
 
     tranactionSubmit = async e => {
-        var assetId=this.props.data.id;
+        var id=this.props.data.id;
         var distId=this.state.distID;
         e.preventDefault();
         const response = await fetch('/change_owner', {
@@ -64,7 +64,7 @@ class BSTable extends Component {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ post: assetId.concat('~',distId) })
+            body: JSON.stringify({ post: id.concat('~',distId) })
         });
 
         const body = await response.text();
