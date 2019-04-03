@@ -181,7 +181,7 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 	}
 
 	chemists := []Chemist{
-		Chemist{ID: "chem0", Name: "Sasta Chemist", Address: "Lahore", LicenseNumber: "lea898", Password: "789", OwnerName: "Usama", OwnerCNIC: "35201-333333-3", OwnerAddress: "2-K sabzazar"},
+		Chemist{ID: "chem0", Name: "Aziz Pharmacy", Address: "Lahore", LicenseNumber: "lea898", Password: "789", OwnerName: "Aziz", OwnerCNIC: "35201-333333-3", OwnerAddress: "2-K sabzazar"},
 	}
 
 	manufacturers[0].Assets = append(manufacturers[0].Assets, assets[2], assets[3], assets[4], assets[5])

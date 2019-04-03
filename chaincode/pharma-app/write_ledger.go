@@ -151,10 +151,26 @@ func (s *SmartContract) recordAsset(APIstub shim.ChaincodeStubInterface, args []
 
 	var asseti = PharmaAsset{ID: args[0], QRCode: args[1], Name: args[2], Description: args[3], Owner: args[4], AssetType: args[5], Price: float32(price), ManufactureDate: args[7], ExpiryDate: args[8], Quantity: quantity, Timestamp: uint64(timestamp)}
 
+	newOwnerAsBytes, _ := APIstub.GetState(args[4])
+	if newOwnerAsBytes == nil {
+		return shim.Error("New owner does not exist")
+	}
+
 	assetAsBytes, _ := json.Marshal(asseti)
 	error := APIstub.PutState(args[0], assetAsBytes)
 	if error != nil {
 		return shim.Error(fmt.Sprintf("Failed to record asset: %s", args[0]))
+	}
+
+	newOwner := Manufacturer{}
+	json.Unmarshal(newOwnerAsBytes, &newOwner)
+
+	newOwner.Assets = append(newOwner.Assets, asseti)
+
+	newOwnerAsBytes, _ = json.Marshal(newOwner)
+	error = APIstub.PutState(args[4], newOwnerAsBytes)
+	if error != nil {
+		return shim.Error(fmt.Sprintf("Failed to add asset in user"))
 	}
 
 	return shim.Success(nil)
