@@ -17,6 +17,21 @@ class PrivateLayout extends Component {
         })
     );
 
+    logout=()=>{
+        console.log("logout");
+        if(sessionStorage.getItem("user")){
+            sessionStorage.removeItem("user");
+            this.redirectUser('/');
+        }
+    }
+    profile=()=>{
+        this.redirectUser('/login/profile');
+    }
+
+    redirectUser = (path) => {
+        this.props.history.push(path);
+    }
+
     closeCollapse = collapseID => () =>
         this.state.collapseID === collapseID && this.setState({ collapseID: "" });
 
@@ -39,10 +54,11 @@ class PrivateLayout extends Component {
                             <MDBNavItem>
                                 <MDBDropdown>
                                     <MDBDropdownToggle nav caret>
-                                        <MDBIcon icon="user" className="mr-1" />Profile
+                                        <MDBIcon icon="user" className="mr-1" />
                                     </MDBDropdownToggle>
                                     <MDBDropdownMenu className="dropdown-default" right>
-                                        <MDBDropdownItem href="/">Log out</MDBDropdownItem>
+                                        <MDBDropdownItem onClick={this.profile}>Profile</MDBDropdownItem>
+                                        <MDBDropdownItem onClick={this.logout}>Log out</MDBDropdownItem>
                                     </MDBDropdownMenu>
                                 </MDBDropdown>
                             </MDBNavItem>

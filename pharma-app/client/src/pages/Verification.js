@@ -13,9 +13,30 @@ class Verification extends Component {
         this.handleScan = this.handleScan.bind(this);
     }
 
+    redirectUser = (path) => {
+        this.props.history.push(path);
+    }
+
+    componentDidMount() {
+        var user = null;
+        if(sessionStorage.getItem("user")){
+            user = sessionStorage.getItem("user");
+            if(user.substring(0,5)==="admin"){
+                this.redirectUser('/login/admin');
+            }else if(user.substring(0,4)==="manu"){
+                this.redirectUser('/login/manufac');
+            }else if(user.substring(0,4)==="dist"){
+                this.redirectUser('/login/dist');
+            }else{
+                this.redirectUser('/login/chem');
+            }
+        }
+    }
+
     handleScan(data) {
         if (data) {
-            this.setState({result: data});
+            this.setState({code: data});
+            this.verify();
         }
     }
 
@@ -46,7 +67,8 @@ class Verification extends Component {
         if (response.status !== 200) throw Error(body.message);
         return body;
     };
-
+    // <MDBInput label="Code *" name="code" type="number" value={this.state.code} onChange={this.handleInputChange}/>
+    // <p>_____OR_____</p>
     render() {
         return (
             <MDBContainer>
@@ -54,14 +76,10 @@ class Verification extends Component {
                     <MDBCol md="8" className="mx-auto">
                         <MDBJumbotron className="mt-3">
                             <h1>Product Verification</h1>
-                            <br/><br/><br/>
+                            <br/>
                             <form>
-                                <center><label class="fixTitle1">Product code :</label>
-                                <MDBInput label="Code *" name="code" type="number" value={this.state.code} onChange={this.handleInputChange}/>
-                                <br/><br/>
-                                <p>_____OR_____</p><br />
-                                {/* <QrReader delay={this.state.delay} onError={this.handleError} onScan={this.handleScan} style={{ width: "100%" }} />
-                            <br/><br/> */}
+                                <center><label class="fixTitle1">Scan Code :</label>
+                                <QrReader delay={500} onError={this.handleError} onScan={this.handleScan} style={{ width: "50%" }} />
                                 <MDBBtn size="sm" color="primary" onClick={this.verify}>Verify</MDBBtn>
                                 </center>
                             </form>

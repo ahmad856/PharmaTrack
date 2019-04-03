@@ -15,6 +15,26 @@ class PublicLayout extends Component {
         this.handleInputChange = this.handleInputChange.bind(this);
     }
 
+    redirectUser = (path) => {
+        this.props.history.push(path);
+    }
+
+    componentDidMount(){
+        var user = null;
+        if(sessionStorage.getItem("user")){
+            user = sessionStorage.getItem("user");
+            if(user.substring(0,5)==="admin"){
+                this.redirectUser('/login/admin');
+            }else if(user.substring(0,4)==="chem"){
+                this.redirectUser('/login/chem');
+            }else if(user.substring(0,4)==="dist"){
+                this.redirectUser('/login/dist');
+            }else{
+                this.setState({userID:user});
+            }
+        }
+    }
+
     handleInputChange(event) {
         const target = event.target;
         const value = target.value;

@@ -2,6 +2,25 @@ import React, { Component } from 'react';
 import { MDBEdgeHeader, MDBFreeBird, MDBContainer, MDBCol, MDBRow, MDBCardBody } from "mdbreact";
 
 class HomePage extends Component {
+    redirectUser = (path) => {
+        this.props.history.push(path);
+    }
+
+    componentDidMount() {
+        var user = null;
+        if(sessionStorage.getItem("user")){
+            user = sessionStorage.getItem("user");
+            if(user.substring(0,5)==="admin"){
+                this.redirectUser('/login/admin');
+            }else if(user.substring(0,4)==="manu"){
+                this.redirectUser('/login/manufac');
+            }else if(user.substring(0,4)==="dist"){
+                this.redirectUser('/login/dist');
+            }else{
+                this.redirectUser('/login/chem');
+            }
+        }
+    }
     render() {
         return (
             <div>
@@ -39,7 +58,7 @@ class HomePage extends Component {
                                     <MDBCol size="10" md="8" lg="10" className="float-right">
                                         <h4 className="font-weight-bold">Abdullah Kamran</h4>
                                         <p className="grey-text">
-                                          Shokha programmer, abbu ji ko office la ke couses utha leta apni marzi ke
+                                          Blockchain/Controller guy!!!
                                         </p>
                                     </MDBCol>
                                 </MDBCol>
@@ -47,7 +66,7 @@ class HomePage extends Component {
                                     <MDBCol size="10" md="8" lg="10" className="float-right">
                                         <h4 className="font-weight-bold">M. Ahmad Shahid</h4>
                                         <p className="grey-text">
-                                          Team Lead
+                                          Team Lead/Front End/controller!!!
                                         </p>
                                     </MDBCol>
                                 </MDBCol>
@@ -57,7 +76,7 @@ class HomePage extends Component {
                                     <MDBCol size="10" md="8" lg="10" className="float-right">
                                         <h4 className="font-weight-bold">Rehan Ahmad</h4>
                                         <p className="grey-text">
-                                            75% budget
+                                            Networking guy!!!!
                                         </p>
                                     </MDBCol>
                                 </MDBCol>
@@ -65,7 +84,7 @@ class HomePage extends Component {
                                     <MDBCol size="10" md="8" lg="10" className="float-right">
                                         <h4 className="font-weight-bold">Muhammad Usama Saqib</h4>
                                         <p className="grey-text">
-                                            sawa 2 gpa, old keh ke shart har gaya!!!!!!!
+                                            vela ti chod!!!
                                         </p>
                                     </MDBCol>
                                 </MDBCol>
