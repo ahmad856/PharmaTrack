@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import 'mdbreact/dist/css/mdb.css';
 import PublicRoutes from "./PublicRoutes";
-import { NavLink } from 'react-router-dom';
-import { MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavbarToggler, MDBCollapse,   MDBNavItem, MDBFooter, MDBNavLink, MDBDropdown, MDBDropdownToggle, MDBIcon, MDBDropdownMenu, MDBBtn, MDBInput } from "mdbreact";
+import { MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavbarToggler, MDBCollapse,   MDBNavItem, MDBNavLink, MDBDropdown, MDBDropdownToggle, MDBIcon, MDBDropdownMenu, MDBBtn, MDBInput } from "mdbreact";
 
 class PublicLayout extends Component {
     constructor(props) {
@@ -14,6 +13,26 @@ class PublicLayout extends Component {
             user:""
         };
         this.handleInputChange = this.handleInputChange.bind(this);
+    }
+
+    redirectUser = (path) => {
+        this.props.history.push(path);
+    }
+
+    componentDidMount(){
+        var user = null;
+        if(sessionStorage.getItem("user")){
+            user = sessionStorage.getItem("user");
+            if(user.substring(0,5)==="admin"){
+                this.redirectUser('/login/admin');
+            }else if(user.substring(0,4)==="chem"){
+                this.redirectUser('/login/chem');
+            }else if(user.substring(0,4)==="dist"){
+                this.redirectUser('/login/dist');
+            }else{
+                this.setState({userID:user});
+            }
+        }
     }
 
     handleInputChange(event) {
@@ -36,9 +55,8 @@ class PublicLayout extends Component {
 
     handleLoginSubmit = () =>{
         this.loginfunc()
-        .then(res => this.setState({ user: res.express }))
+        .then()
         .catch(err => console.log(err));
-        //this.redirect();
     }
 
     redirectUser = (path) => {
@@ -47,24 +65,27 @@ class PublicLayout extends Component {
 
     loginfunc = async () => {
         var id=this.state.id;
-        const response = await fetch('/user_login/'+id);
+        var password=this.state.password;
+        const response = await fetch('/sign_in/'+id+'/'+password);
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
-        console.log(body);
-        if(body.id===this.state.id && body.password===this.state.password){
-            sessionStorage.setItem("user",body.id);
-            if(this.state.id.substring(0,4)==="dist"){
-                this.redirectUser('/login/dist');
-            } else if(this.state.id.substring(0,4)==="chem"){
-                this.redirectUser('/login/chem');
-            } else if(this.state.id.substring(0,4)==="manu"){
-                this.redirectUser('/login/manufac');
-            } else if(this.state.id.substring(0,4)==="admi"){
+        if(body.express.status===1){
+             sessionStorage.setItem("user",id);
+            if(body.express.userSighnedIn===1){
                 this.redirectUser('/login/admin');
+            }else if(body.express.userSighnedIn===2){
+                this.redirectUser('/login/manufac');
+            }else if(body.express.userSighnedIn===3){
+                this.redirectUser('/login/dist');
+            }else if(body.express.userSighnedIn===4){
+                this.redirectUser('/login/chem');
+            }else{
+                console.log("user not valid");
             }
-        }
-        else{
-            console.log("user not found");
+        }else if(body.express.status===-2){
+            console.log("user password not valid!!!");
+        }else{
+            console.log("user not found!!!");
         }
         return body;
     };
