@@ -42,6 +42,14 @@ type PharmaAsset struct {
 	Quantity        int     `json:"quantity"`
 	Timestamp       uint64  `json:"timestamp"`
 	Owner           string  `json:"owner"`
+
+	Customer CustomerRelation `json:"customer"`
+}
+
+type CustomerRelation struct {
+	Name        string `json:"name"`
+	PhoneNumber string `json:"phone"`
+	Timestamp   string `json:"timestamp"`
 }
 
 type Manufacturer struct {

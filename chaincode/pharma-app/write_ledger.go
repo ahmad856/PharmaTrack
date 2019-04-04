@@ -384,3 +384,45 @@ func (s *SmartContract) makeTransaction(APIstub shim.ChaincodeStubInterface, arg
 	// }
 	return shim.Success(nil)
 }
+
+func (s *SmartContract) sellAsset(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 4 {
+		return shim.Error("Incorrect number of arguments. Expecting 4")
+	}
+
+	assetAsBytes, _ := APIstub.GetState(args[0])
+	if assetAsBytes == nil {
+		return shim.Error("Asset does not exist")
+	}
+	asseti := PharmaAsset{}
+	json.Unmarshal(assetAsBytes, &asseti)
+
+	if asseti.Customer != nil {
+		return shim.Error("Asset already sold.")
+	}
+
+	asseti.Customer = CustomerRelation{Name: args[1], PhoneNumber: args[2], Timestamp: args[3]}
+
+	assetAsBytes, _ = json.Marshal(asseti)
+	error := APIstub.PutState(args[0], assetAsBytes)
+	if error != nil {
+		return shim.Error(fmt.Sprintf("Failed to update asset owner in asset"))
+	}
+
+	newOwnerAsBytes, _ = json.Marshal(newOwner)
+	error = APIstub.PutState(args[0], newOwnerAsBytes)
+	if error != nil {
+		return shim.Error(fmt.Sprintf("Failed to add asset in user"))
+	}
+
+	return shim.Success(nil)
+}
+
+func (s *SmartContract) makeTransaction(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	// if len(args) !=  {
+	// 	return shim.Error("Incorrect number of arguments. Expecting ")
+	// }
+	return shim.Success(nil)
+}
