@@ -263,3 +263,93 @@ func (s *SmartContract) getTransactionHistory(APIstub shim.ChaincodeStubInterfac
 	historyAsBytes, _ := json.Marshal(history)
 	return shim.Success(historyAsBytes)
 }
+
+////////////////////////////////////////read Distributors
+func (s *SmartContract) readAllDistributors(APIstub shim.ChaincodeStubInterface) sc.Response {
+	type Users struct {
+		Distributors  []Distributor  `json:"distributors"`
+	}
+	var allDist Users
+	var statics StaticVariables
+
+	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
+	if staticsAsBytes == nil {
+		return shim.Error("func: readAllUser... Could not get static variables")
+	}
+	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
+
+	if statics.DistributorCount > 0 {
+		// ---- Get All Distributors ---- //
+		resultsIterator, err := APIstub.GetStateByRange("dist0", "dist"+strconv.Itoa(statics.DistributorCount))
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		defer resultsIterator.Close()
+
+		for resultsIterator.HasNext() {
+			aKeyValue, err := resultsIterator.Next()
+			if err != nil {
+				return shim.Error(err.Error())
+			}
+			queryKeyAsStr := aKeyValue.Key
+			queryValAsBytes := aKeyValue.Value
+			fmt.Println("on distributor id - ", queryKeyAsStr)
+			var dist Distributor
+			json.Unmarshal(queryValAsBytes, &dist)                      //un stringify it aka JSON.parse()
+			allDist.Distributors = append(allDist.Distributors, dist) //add this dist to the list
+		}
+		fmt.Println("distributors array - ", allDist.Distributors)
+
+	} else {
+		return shim.Error("func: readAllDistributors... no distributors")
+	}
+
+	//change to array of bytes
+	usersAsBytes, _ := json.Marshal(allDist) //convert to array of bytes
+	return shim.Success(usersAsBytes)
+}
+
+////////////////////////////////////////read Chemist
+func (s *SmartContract) readAllChemists(APIstub shim.ChaincodeStubInterface) sc.Response {
+	type Users struct {
+		Chemists  []Chemist  `json:"chemists"`
+	}
+	var allChem Users
+	var statics StaticVariables
+
+	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
+	if staticsAsBytes == nil {
+		return shim.Error("func: readAllUser... Could not get static variables")
+	}
+	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
+
+	if statics.ChemistCount > 0 {
+		// ---- Get All Chemist ---- //
+		resultsIterator, err := APIstub.GetStateByRange("chem0", "chem"+strconv.Itoa(statics.ChemistCount))
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		defer resultsIterator.Close()
+
+		for resultsIterator.HasNext() {
+			aKeyValue, err := resultsIterator.Next()
+			if err != nil {
+				return shim.Error(err.Error())
+			}
+			queryKeyAsStr := aKeyValue.Key
+			queryValAsBytes := aKeyValue.Value
+			fmt.Println("on chemist id - ", queryKeyAsStr)
+			var chem Chemist
+			json.Unmarshal(queryValAsBytes, &chem)                      //un stringify it aka JSON.parse()
+			allChem.Chemists = append(allChem.Chemists, chem) //add this chem to the list
+		}
+		fmt.Println("chemists array - ", allChem.Chemists)
+
+	} else {
+		return shim.Error("func: readAllChemists... no Chemist")
+	}
+
+	//change to array of bytes
+	usersAsBytes, _ := json.Marshal(allChem) //convert to array of bytes
+	return shim.Success(usersAsBytes)
+}

@@ -155,12 +155,18 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.initializeCounters(APIstub)
 	} else if function == "readAllUsers" {
 		return s.readAllUsers(APIstub)
+	} else if function == "readAllDistributors" {
+		return s.readAllDistributors(APIstub)
+	} else if function == "readAllChemists" {
+		return s.readAllChemists(APIstub)
 	} else if function == "getStaticVariables" {
 		return s.getStaticVariables(APIstub)
 	} else if function == "enrollDistributor" {
 		return s.enrollDistributor(APIstub, args)
 	} else if function == "enrollChemist" {
 		return s.enrollChemist(APIstub, args)
+	} else if function == "sellAsset" {
+		return s.sellAsset(APIstub, args)
 	}
 
 	return shim.Error("Invalid Smart Contract function name.")
