@@ -20,16 +20,13 @@ class BSTable extends React.Component {
                             <MDBCardHeader> User Details</MDBCardHeader>
                             <MDBCardBody className="text-info">
                                 <MDBRow className="justify-content-center">
-                                    <MDBListGroup className="my-4 mx-4" style={{ width: "20rem",wordwrap: "break-word"  }}>
-                                        <MDBListGroupItem color="primary">ID: {this.props.data.id}</MDBListGroupItem>
-                                        <MDBListGroupItem color="primary">Company Name: {this.props.data.name}</MDBListGroupItem>
-                                        <MDBListGroupItem color="primary">Company Address:<br/> {this.props.data.address}</MDBListGroupItem>
+                                    <MDBListGroup className="my-4 mx-4" style={{ width: "25rem",wordwrap: "break-word"  }}>
                                         <MDBListGroupItem color="primary">License Number: {this.props.data.license}</MDBListGroupItem>
+                                        <MDBListGroupItem color="primary">Owner Address:<br/> {this.props.data.owneraddress}</MDBListGroupItem>
                                     </MDBListGroup>
-                                    <MDBListGroup className="my-4 mx-4" style={{ width: "20rem",wordwrap: "break-word" }}>
+                                    <MDBListGroup className="my-4 mx-4" style={{ width: "25rem",wordwrap: "break-word" }}>
                                         <MDBListGroupItem color="primary">Owner Name: {this.props.data.ownername}</MDBListGroupItem>
                                         <MDBListGroupItem color="primary">Owner CNIC: {this.props.data.ownercnic}</MDBListGroupItem>
-                                        <MDBListGroupItem color="primary">Owner Address:<br/> {this.props.data.owneraddress}</MDBListGroupItem>
                                     </MDBListGroup>
                                 </MDBRow>
                             </MDBCardBody>
@@ -63,7 +60,7 @@ class AdminPanel extends Component {
         this.state.activeTab="1";
         this.state.isUserPaneOpen=false;
         this.state.response="";
-        this.state.responseToPost="";
+        this.state.responseToPost={};
         this.state.post="";
         this.state.count="";
         this.state.id="";
@@ -76,23 +73,29 @@ class AdminPanel extends Component {
         this.state.ownerName="";
         this.state.ownerCnic="";
         this.state.ownerAddress="";
-        this.state.password="";
+        this.state.formErrors={typeVal:'', nameVal:'', addVal:'', licVal:'', ownerVal:'', cnicVal:'', ownerAddVal:''};
+        this.state.formValid=false;
+        this.state.typeValid=false;
+        this.state.nameValid=false;
+        this.state.addressValid=false;
+        this.state.licenseValid=false;
+        this.state.ownerNameValid=false;
+        this.state.ownerCnicValid=false;
+        this.state.ownerAddValid=false;
         this.handleInputChange = this.handleInputChange.bind(this);
         this.toggle = this.toggle.bind(this);
     }
 
     handleChange = (selectedOption) => {
-        this.setState({ typeValue: selectedOption });
-        console.log(this.state.typeValue);
-        if(this.state.typeValue.value===0){
-            console.log("type value not set.....");
-        } else if(this.state.typeValue.value===1){
+        this.setState({ typeValue: selectedOption, typeValid:true });
+        console.log(selectedOption.value);
+        if(selectedOption.value===1){
             this.setState({id:"manuf"+this.state.count.manufacturercount});
             console.log("manuf"+this.state.count.manufacturercount);
-        } else if(this.state.typeValue.value===2){
+        } else if(selectedOption.value===2){
             this.setState({id:"manuf"+this.state.count.distributorcount});
             console.log("dist"+this.state.count.distributorcount);
-        } else if(this.state.typeValue.value===3){
+        } else if(selectedOption.value===3){
             this.setState({id:"manuf"+this.state.count.chemistcount});
             console.log("chem"+this.state.count.chemistcount);
         }
@@ -158,15 +161,21 @@ class AdminPanel extends Component {
             ownerName:'',
             ownerCnic:'',
             ownerAddress:'',
-            password:'',
-            // errors:{nameVal:'',priceVal:'',typeVal:'',qtyVal:''},
-            // nameValid:false,
-            // priceValid:false,
-            // qtyValid:false,
-            // typeValid:false,
-            // formValid:false
+            formErrors:{typeVal:'', nameVal:'', addVal:'', licVal:'', ownerVal:'', cnicVal:'', ownerAddVal:''},
+            formValid:false,
+            typeValid:false,
+            nameValid:false,
+            addressValid:false,
+            licenseValid:false,
+            ownerNameValid:false,
+            ownerCnicValid:false,
+            ownerAddValid:false,
         });
     };
+
+    isPositiveInteger(n) {
+        return parseFloat(n) === n >>> 0;
+    }
 
     /////////////////////////////////////////////////////////////
     handleInputChange(event) {
@@ -175,48 +184,55 @@ class AdminPanel extends Component {
         const name = target.name;
         this.setState({
             [name]: value
-        });
+        },()=>{this.validate(name,value)});
     };
-    //,()=>{this.validate(name,value)}
 
     validate(name,value){
-        var fieldErrors=this.state.errors;
-        var nameValid=this.state.nameValid;
-        var priceValid=this.state.priceValid;
-        var qtyValid=this.state.qtyValid;
-        var typeValid=this.state.typeValid;
+        var fieldErrors=this.state.formErrors;
+        var length=null;
         switch(name){
-            case 'nameValue':
-                nameValid = value.length > 0;
-                fieldErrors.nameVal = nameValid ? '' : ' is Empty!!!';
+            case 'compNameValue':
+                fieldErrors.nameVal = value.length > 0 ? true : false;
+                this.setState({ nameValid:fieldErrors.nameVal });
                 break;
-            case 'priceValue':
-                priceValid = value.length > 0;
-                fieldErrors.priceVal = priceValid ? '' : ' is Empty!!!';
+            case 'addressValue':
+                fieldErrors.addVal = value.length > 0 ? true : false;
+                this.setState({ addressValid:fieldErrors.addVal });
                 break;
-            case 'typeValue':
-                typeValid = value.length > 0;
-                fieldErrors.typeVal = typeValid ? '' : ' is Empty!!!';
+            case 'licenseValue':
+                length = value.length > 0 ? true : false;
+                fieldErrors.licVal = length && this.isPositiveInteger(value);
+                this.setState({ licenseValid:fieldErrors.licVal });
                 break;
-            case 'qtyValue':
-                qtyValid = value.length > 0;
-                fieldErrors.qtyVal = qtyValid ? '' : ' is Empty!!!';
+            case 'ownerName':
+                fieldErrors.ownerVal = value.length > 0 ? true : false;
+                this.setState({ ownerNameValid:fieldErrors.ownerVal });
+                break;
+            case 'ownerCnic':
+                fieldErrors.cnicVal = /^\d{5}-\d{7}-\d{1}$/.test(value) ? true : false;
+                this.setState({ ownerCnicValid:fieldErrors.cnicVal });
+                break;
+            case 'ownerAddress':
+                fieldErrors.ownerAddVal = value.length > 0 ? true : false;
+                this.setState({ ownerAddValid:fieldErrors.ownerAddVal });
                 break;
             default:
                 console.log("Invalid Feild");
         }
 
         this.setState({
-            errors: fieldErrors,
-            nameValid: nameValid,
-            priceValid: priceValid,
-            typeValid: typeValid,
-            qtyValid: qtyValid,
-            }, this.validateF);
+            formErrors: fieldErrors,
+            nameValid:fieldErrors.nameVal,
+            addressValid:fieldErrors.addVal,
+            licenseValid:fieldErrors.licVal,
+            ownerNameValid:fieldErrors.ownerVal,
+            ownerCnicValid:fieldErrors.cnicVal,
+            ownerAddValid:fieldErrors.ownerAddVal,
+        }, this.validateForm );
     }
 
-    validateF() {
-        this.setState({formValid: this.state.nameValid && this.state.priceValid && this.state.qtyValid && this.state.typeValid});
+    validateForm() {
+        this.setState({formValid: this.state.nameValid && this.state.addressValid && this.state.licenseValid && this.state.ownerNameValid && this.state.ownerCnicValid && this.state.ownerAddValid && this.state.typeValid });
     }
     //tasks.map((task) => task.name )
 
@@ -229,12 +245,12 @@ class AdminPanel extends Component {
         var owner=this.state.ownerName;
         var cnic=this.state.ownerCnic;
         var ownerAddress=this.state.ownerAddress;
-        var password=this.state.password;
+        var password=null;
         var id = null;
         if(type===1){
             console.log('Manufac');
             id="manuf"+(this.state.users.manufacturers.length);
-            this.handleAddManufacturer(id, comp, address, license, owner, cnic, ownerAddress);
+            password="123";
             this.closeUserPanel();
             e.preventDefault();
             const response = await fetch('/add_manufacturer', {
@@ -242,15 +258,21 @@ class AdminPanel extends Component {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ post: id.concat('~',comp,'~',address,'~',license,'~',owner,'~',cnic,'~',ownerAddress,'~',password) })
+                body: JSON.stringify({ post: comp.concat('~',address,'~',license,'~',owner,'~',cnic,'~',ownerAddress,'~',password) })
             });
-            const body = await response.text();
-            this.setState({ responseToPost: body });
+            const body = await response.json();
+            if(body.express.status===1){
+                this.handleAddManufacturer(id, comp, address, license, owner, cnic, ownerAddress, password);
+                this.setState({ responseToPost: body });
+                document.getElementById("addError").style.display = 'none';
+            }else{
+                document.getElementById("addError").style.display = 'block';
+            }
         }
         else if(type===2){
             console.log('dist');
             id="dist"+(this.state.users.distributors.length);
-            this.handleAddDistributor(id, comp, address, license, owner, cnic, ownerAddress);
+            password="456";
             this.closeUserPanel();
             e.preventDefault();
             const response = await fetch('/add_distributor', {
@@ -258,15 +280,21 @@ class AdminPanel extends Component {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ post: id.concat('~',comp,'~',address,'~',license,'~',owner,'~',cnic,'~',ownerAddress,'~',password) })
+                body: JSON.stringify({ post: comp.concat('~',address,'~',license,'~',owner,'~',cnic,'~',ownerAddress,'~',password) })
             });
-            const body = await response.text();
-            this.setState({ responseToPost: body });
+            const body = await response.json();
+            if(body.express.status===1){
+                this.handleAddDistributor(id, comp, address, license, owner, cnic, ownerAddress, password);
+                this.setState({ responseToPost: body });
+                document.getElementById("addError").style.display = 'none';
+            }else{
+                document.getElementById("addError").style.display = 'block';
+            }
         }
         else if(type===3){
             console.log('chem');
             id="chem"+(this.state.users.chemists.length);
-            this.handleAddChemist(id, comp, address, license, owner, cnic, ownerAddress);
+            password="789";
             this.closeUserPanel();
             e.preventDefault();
             const response = await fetch('/add_chemist', {
@@ -274,36 +302,44 @@ class AdminPanel extends Component {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ post: id.concat('~',comp,'~',address,'~',license,'~',owner,'~',cnic,'~',ownerAddress,'~',password) })
+                body: JSON.stringify({ post: comp.concat('~',address,'~',license,'~',owner,'~',cnic,'~',ownerAddress,'~',password) })
             });
-            const body = await response.text();
-            this.setState({ responseToPost: body });
+            const body = await response.json();
+            if(body.express.status===1){
+                this.handleAddChemist(id, comp, address, license, owner, cnic, ownerAddress, password);
+                this.setState({ responseToPost: body });
+                document.getElementById("addError").style.display = 'none';
+            }else{
+                document.getElementById("addError").style.display = 'block';
+            }
         }
     };
 
-    handleAddManufacturer(id, comp, address, license, owner, cnic, ownerAddress) {
+    handleAddManufacturer(id, comp, address, license, owner, cnic, ownerAddress,password) {
         var asset = {
             'id': id,
             'name':comp,
             'address': address,
             'licence': license,
-            'owner':owner,
-            'cnic':cnic,
-            'ownerAddress': ownerAddress,
+            'ownername':owner,
+            'ownercnic':cnic,
+            'owneraddress': ownerAddress,
+            'password':password
         }
         this.state.users.manufacturers.push(asset);
         this.setState(this.state.users);
     };
 
-    handleAddDistributor(id, comp, address, license, owner, cnic, ownerAddress) {
+    handleAddDistributor(id, comp, address, license, owner, cnic, ownerAddress,password) {
         var asset = {
             'id': id,
             'name':comp,
             'address': address,
             'licence': license,
-            'owner':owner,
-            'cnic':cnic,
-            'ownerAddress': ownerAddress,
+            'ownername':owner,
+            'ownercnic':cnic,
+            'owneraddress': ownerAddress,
+            'password':password
         }
         this.state.users.distributors.push(asset);
         this.setState(this.state.users);
@@ -324,15 +360,16 @@ class AdminPanel extends Component {
         return body;
     };
 
-    handleAddChemist(id, comp, address, license, owner, cnic, ownerAddress) {
+    handleAddChemist(id, comp, address, license, owner, cnic, ownerAddress,password) {
         var asset = {
             'id': id,
             'name':comp,
             'address': address,
             'licence': license,
-            'owner':owner,
-            'cnic':cnic,
-            'ownerAddress': ownerAddress,
+            'ownername':owner,
+            'ownercnic':cnic,
+            'owneraddress': ownerAddress,
+            'password':password
         }
         this.state.users.chemists.push(asset);
         this.setState(this.state.users);
@@ -364,20 +401,18 @@ class AdminPanel extends Component {
         return (
             <MDBContainer>
                 <PanelHeading title="Super Admin Panel"/>
+                <label id="addError" style={{display:"none", color:"red"}}>Error: Couldnot add user. Serverside Error!!!</label>
                 {/* Add UuserTSer side pane */}
-
                 <SlidingPane closeIcon={<div style={{color:"red"}}>[ X ]</div>} isOpen={this.state.isUserPaneOpen} title='Add User' from='right' width='400px' onRequestClose={this.closeUserPanel}>
                     <form onSubmit={this.handleSubmit}>
-                        <Select  placeholder="User Type" options={userTypes} value={this.state.typeValue} onChange={this.handleChange}></Select>
-                        <MDBInput disabled label="User ID" name="id" value={this.state.id}/>
-                        <MDBInput label="Company Name" name="compNameValue" value={this.state.compNameValue} onChange={this.handleInputChange}/>
-                        <MDBInput type="textarea" rows="2" label="Company Address" name="addressValue" value={this.state.addressValue} onChange={this.handleInputChange}/>
-                        <MDBInput label="License Number" name="licenseValue" type="number" min="1" value={this.state.licenseValue} onChange={this.handleInputChange}/>
-                        <MDBInput label="Owner Name"  name="ownerName" type="text" value={this.state.ownerName} onChange={this.handleInputChange}/>
-                        <MDBInput label="Owner CNIC"  name="ownerCnic" type="tel" pattern="^\d{5}-\d{7}-\d{1}$" value={this.state.ownerCnic} onChange={this.handleInputChange}/>
-                        <MDBInput type="textarea" rows="2" label="Owner Address" name="ownerAddress" value={this.state.ownerAddress} onChange={this.handleInputChange}/>
-                        <MDBInput type="password" label="Password" name="password" value={this.state.password} onChange={this.handleInputChange}/>
-                        <center><MDBBtn size="sm" color="primary" type="submit" >Add</MDBBtn></center>
+                        <Select required className={this.state.typeValid ? "success" : "error"} placeholder="User Type" options={userTypes} value={this.state.typeValue} onChange={this.handleChange}></Select>
+                        <MDBInput required id={this.state.nameValid ? "success" : "error"} label="Company Name" name="compNameValue" value={this.state.compNameValue} onChange={this.handleInputChange}/>
+                        <MDBInput required id={this.state.addressValid ? "success" : "error"} type="textarea" rows="2" label="Company Address" name="addressValue" value={this.state.addressValue} onChange={this.handleInputChange}/>
+                        <MDBInput required id={this.state.licenseValid ? "success" : "error"} label="License Number" name="licenseValue" type="number" min="1" value={this.state.licenseValue} onChange={this.handleInputChange}/>
+                        <MDBInput required id={this.state.ownerNameValid ? "success" : "error"} label="Owner Name"  name="ownerName" type="text" value={this.state.ownerName} onChange={this.handleInputChange}/>
+                        <MDBInput required id={this.state.ownerCnicValid ? "success" : "error"} label="Owner CNIC"  name="ownerCnic" type="tel" value={this.state.ownerCnic} onChange={this.handleInputChange}/>
+                        <MDBInput required id={this.state.ownerAddValid ? "success" : "error"} type="textarea" rows="2" label="Owner Address" name="ownerAddress" value={this.state.ownerAddress} onChange={this.handleInputChange}/>
+                        <center><MDBBtn size="sm" color="primary" type="submit" disabled={!this.state.formValid} >Add</MDBBtn></center>
                     </form>
                 </SlidingPane>
 
@@ -421,7 +456,7 @@ class AdminPanel extends Component {
                                     <BootstrapTable data={ this.state.users.distributors } version='4' hover condensed pagination options={ distOptions } expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponent } >
                                         <TableHeaderColumn isKey dataField='id'>No.</TableHeaderColumn>
                                         <TableHeaderColumn dataField='name' filter={{ type: 'TextFilter', delay: 100 }}>Company Name</TableHeaderColumn>
-                                        <TableHeaderColumn dataField='address' filter={{ type: 'TextFilter', delay: 100 }}>Company Owner</TableHeaderColumn>
+                                        <TableHeaderColumn dataField='address' filter={{ type: 'TextFilter', delay: 100 }}>Company Address</TableHeaderColumn>
                                     </BootstrapTable>
                                     <br/><br/>
                                 </Col>
@@ -435,7 +470,7 @@ class AdminPanel extends Component {
                                     <BootstrapTable data={ this.state.users.chemists } version='4' hover condensed pagination options={ chemOptions } expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponent }>
                                         <TableHeaderColumn isKey dataField='id'>No.</TableHeaderColumn>
                                         <TableHeaderColumn dataField='name' filter={{ type: 'TextFilter', delay: 100 }}>Company Name</TableHeaderColumn>
-                                        <TableHeaderColumn dataField='address' filter={{ type: 'TextFilter', delay: 100 }}>Company Owner</TableHeaderColumn>
+                                        <TableHeaderColumn dataField='address' filter={{ type: 'TextFilter', delay: 100 }}>Company Address</TableHeaderColumn>
                                     </BootstrapTable>
                                     <br/><br/>
                                 </Col>

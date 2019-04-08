@@ -27,3 +27,23 @@ code {
     background: #3f51b5;
     flex: 1;
 }
+
+#error{
+    border-bottom: 1.5px solid red;
+    box-shadow: 0 1px 0 0 red;
+}
+
+#success{
+    border-bottom: 1.5px solid green;
+    box-shadow: 0 1px 0 0 green;
+}
+
+.error{
+    border-bottom: 1.5px solid red;
+    box-shadow: 0 1px 0 0 red;
+}
+
+.success{
+    border-bottom: 1.5px solid green;
+    box-shadow: 0 1px 0 0 green;
+}
