@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { MDBContainer, MDBRow, MDBCol, MDBJumbotron, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBListGroupItem, MDBListGroup, MDBInput } from "mdbreact";
+import {MDBInput, MDBIcon, MDBContainer, MDBRow, MDBCol, MDBJumbotron, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBListGroupItem, MDBListGroup } from "mdbreact";
 import QrReader from "react-qr-reader";
 
 //<img src={qrImg} alt="QR Code" height="50px" width="50px"/>
@@ -9,6 +9,7 @@ class Verification extends Component {
         this.state={};
         this.state.code="";
         this.state.transactions = [];
+        this.state.custExArr=[];
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleScan = this.handleScan.bind(this);
     }
@@ -55,7 +56,7 @@ class Verification extends Component {
 
     verify = () => {
         this.getAllTransactions()
-        .then(res => this.setState({ transactions: res.express }))
+        .then()
         .catch(err => console.log(err));
     };
 
@@ -64,23 +65,32 @@ class Verification extends Component {
         console.log(id);
         const response = await fetch('/get_asset_history/'+id);
         const body = await response.json();
+        if(body.express===null){
+            this.setState({ transactions: [] });
+            console.log("asset doesnot exist");
+            document.getElementById("addError").style.display = 'block';
+        }else{
+            this.setState({ transactions: body.express });
+            document.getElementById("addError").style.display = 'none';
+        }
         if (response.status !== 200) throw Error(body.message);
         return body;
     };
-    // <MDBInput label="Code *" name="code" type="number" value={this.state.code} onChange={this.handleInputChange}/>
     // <p>_____OR_____</p>
     render() {
+        var custEx='false';
         return (
             <MDBContainer>
                 <MDBRow>
                     <MDBCol md="8" className="mx-auto">
                         <MDBJumbotron className="mt-3">
+                            <label id="addError" style={{display:"none", color:"red"}}>Error: Could Not find asset. Please Scan again!!!</label>
                             <h1>Product Verification</h1>
-                            <br/>
+                            <br />
                             <form>
                                 <center><label class="fixTitle1">Scan Code :</label>
-                                <QrReader delay={500} onError={this.handleError} onScan={this.handleScan} style={{ width: "50%" }} />
-                                <MDBBtn size="sm" color="primary" onClick={this.verify}>Verify</MDBBtn>
+                                    <QrReader delay={500} onError={this.handleError} onScan={this.handleScan} style={{ width: "50%" }} />
+                                    <MDBBtn size="sm" color="primary" onClick={this.verify}>Verify</MDBBtn>
                                 </center>
                             </form>
                         </MDBJumbotron>
@@ -88,24 +98,62 @@ class Verification extends Component {
                 </MDBRow>
 
                 {/* Iterates */}
-                {this.state.transactions.map(function(transaction){
-                    return(
-                        <MDBCard border="info" className="m-3" style={{ width: "70rem" }} key={ transaction.txid }>
-                            <MDBCardHeader> Transaction Details</MDBCardHeader>
-                            <MDBCardBody className="text-info">
-                                <MDBRow className="justify-content-center">
-                                    <MDBListGroup className="my-4 mx-4" style={{ width: "66rem" }}>
-                                        <MDBListGroupItem color="primary">ID: {transaction.txid}</MDBListGroupItem>
-                                        <MDBListGroupItem color="primary">Asset ID: {transaction.asset.id}</MDBListGroupItem>
-                                        <MDBListGroupItem color="primary">Asset Owner: {transaction.asset.owner}</MDBListGroupItem>
-                                    </MDBListGroup>
-                                </MDBRow>
-                            </MDBCardBody>
-                        </MDBCard>
-                    );
+                {this.state.transactions.map(function (transaction) {
+                    console.log(custEx);
+                    if (transaction.asset.customer.name) {
+                        return (
+                            <MDBCard border="info" className="m-3" style={{ width: "70rem" }}>
+                                <MDBCardHeader color="blue">
+                                    <p><MDBIcon icon="user" /> Customer Details</p>
+                                </MDBCardHeader>
+                                <MDBCardBody>
+                                    <label>This asset was </label>&nbsp;<label style={{ color: "red" }}> SOLD </label>&nbsp;<label> to a customer </label><br /><br />
+                                    <strong>Name: </strong>&nbsp;&nbsp;<label>{transaction.asset.customer.name}</label><br />
+                                    <strong>Phone: </strong>&nbsp;&nbsp;<label>{transaction.asset.customer.phone}</label><br />
+                                    <strong>Date and Time: </strong>&nbsp;&nbsp;<label>{Date(transaction.asset.customer.timestamp).toString()}</label><br />
+                                    <br />
+                                    <label>Not you? </label>&nbsp;<a href="#">Report here!</a><br />
+                                </MDBCardBody>
+                            </MDBCard>
+                        );
+                    }
+                    else {
+                        return (
+                            <MDBCard border="info" className="m-3" style={{ width: "70rem" }} key={transaction.txid}>
+                                <MDBCardHeader> Transaction Details</MDBCardHeader>
+                                <MDBCardBody className="text-info">
+                                    <MDBRow className="justify-content-center">
+                                        <MDBListGroup className="my-4 mx-4" style={{ width: "66rem" }}>
+                                            <MDBListGroupItem color="primary">Asset Name: {transaction.asset.name}</MDBListGroupItem>
+                                            <MDBListGroupItem color="primary">Asset ID: {transaction.asset.id}</MDBListGroupItem>
+                                            <MDBListGroupItem color="primary">Asset Owner: {transaction.asset.owner}</MDBListGroupItem>
+                                        </MDBListGroup>
+                                    </MDBRow>
+                                </MDBCardBody>
+                            </MDBCard>
+                        );
+                    }
                 })}
-                {/* Iterates */}
-                <p>{this.state.result}</p>
+                {this.state.custExArr.map(function (fun) {
+                    if (custEx == 'false') {
+                        return (
+                            <MDBCard border="info" className="m-3" style={{ width: "70rem" }}>
+                                <MDBCardHeader color="red">
+                                    <p><MDBIcon icon="user" /> Customer Details</p>
+                                </MDBCardHeader>
+                                <MDBCardBody>
+                                    <label>This asset is </label>&nbsp;<label style={{ color: "red" }}> NOT SOLD </label>&nbsp;<label> to any customer yet </label><br /><br />
+                                    <br />
+                                    <br />
+                                    <label>Bought it? </label>&nbsp;<a href="#">Report here!</a><br />
+                                </MDBCardBody>
+                            </MDBCard>
+                        );
+                    }
+                    else{
+                        console.log("lpc");
+                    }
+                })}
             </MDBContainer>
         );
     }
