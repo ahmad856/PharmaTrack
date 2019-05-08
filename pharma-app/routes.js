@@ -23,6 +23,14 @@ module.exports = function(app){
         controller.get_all_users(req, res);
     });
 
+    app.get('/get_all_distributors', function(req, res){
+        controller.get_all_distributors(req, res);
+    });
+
+    app.get('/get_all_chemists', function(req, res){
+        controller.get_all_chemists(req, res);
+    });
+
     app.get('/get_statics', function(req, res){
         controller.get_statics(req, res);
     });
@@ -57,11 +65,19 @@ module.exports = function(app){
         controller.change_owner(req, res);
     });
 
+    app.post('/sell_asset', function(req, res){
+        controller.sell_asset(req, res);
+    });
+
     app.post('/enroll_distributor', function(req, res){
         controller.enroll_distributor(req, res);
     });
 
     app.post('/enroll_chemist', function(req, res){
         controller.enroll_chemist(req, res);
+    });
+
+    app.get('/get_asset_count', function(req, res){
+        controller.get_asset_count(req, res);
     });
 }

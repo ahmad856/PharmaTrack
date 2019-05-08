@@ -40,6 +40,12 @@ func (s *SmartContract) enrollDistributor(APIstub shim.ChaincodeStubInterface, a
 		return shim.Error("addDist: user to be added is not a Distributor")
 	}
 
+	for i := 0; i < len(current.Distributors); i++ {
+		if current.Distributors[i].ID == newdist.ID {
+    		return shim.Error("addDist: Distributor already exists")
+		}
+   	}
+
 	current.Distributors = append(current.Distributors, newdist)
 
 	manufAsBytes, _ = json.Marshal(current)
@@ -81,6 +87,12 @@ func (s *SmartContract) enrollChemist(APIstub shim.ChaincodeStubInterface, args 
 		return shim.Error("addChem: user to be added is not a Chemist")
 	}
 
+	for i := 0; i < len(current.Chemists); i++ {
+		if current.Chemists[i].ID == newchem.ID {
+    		return shim.Error("addChem: Chemist already exists")
+		}
+   	}
+	
 	current.Chemists = append(current.Chemists, newchem)
 
 	distAsBytes, _ = json.Marshal(current)

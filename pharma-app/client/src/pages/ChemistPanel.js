@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { MDBContainer, MDBDropdown, MDBDropdownMenu, MDBDropdownItem, MDBDropdownToggle, MDBInput, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBCardText, MDBListGroup, MDBListGroupItem, MDBRow } from "mdbreact";
+import { MDBContainer, MDBInput, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBCardText, MDBListGroup, MDBListGroupItem, MDBRow } from "mdbreact";
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import '../../node_modules/react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import classnames from 'classnames';
@@ -8,8 +8,6 @@ import { Row, Col } from 'react-bootstrap'
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import SlidingPane from 'react-sliding-pane';
 import 'react-sliding-pane/dist/react-sliding-pane.css';
-//import update from 'react-addons-update';
-import Select from 'react-select';
 import QrReader from "react-qr-scanner";
 
 class BSTable extends Component {
@@ -17,8 +15,6 @@ class BSTable extends Component {
         super(props);
         this.state={};
         this.state.isTransactionPaneOpen=false;
-        this.state.chemID="";
-        this.state.responseToPost="";
         this.state.transactions = [];
         this.handleInputChange = this.handleInputChange.bind(this);
     }
@@ -31,10 +27,6 @@ class BSTable extends Component {
             [name]: value
         });
     };
-    //,()=>{this.validate(name,value)}
-    // test=()=>{
-    //     this.props.onChangeOwner(1,"ahmad");
-    // }
 
     closeTransactionPanel = () => {
         this.setState({ isTransactionPaneOpen: false });
@@ -53,22 +45,6 @@ class BSTable extends Component {
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
         return body;
-    };
-
-    tranactionSubmit = async e => {
-        var id=this.props.data.id;
-        var chemId=this.state.chemID;
-        e.preventDefault();
-        const response = await fetch('/change_owner', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ post: id.concat('~',chemId) })
-        });
-
-        const body = await response.text();
-        this.setState({ responseToPost: body });
     };
 
     render() {
@@ -118,19 +94,6 @@ class BSTable extends Component {
                             </MDBRow>
                             <MDBRow className="justify-content-center">
                                 <MDBBtn size="sm" color="primary" onClick={this.openTransactionPanel}>Show Details</MDBBtn>
-                                {/* <MDBBtn size="sm" color="primary">Transact Asset</MDBBtn>
-                                <MDBDropdown dropup size="sm">
-                                    <MDBDropdownToggle caret color="primary">Transact Asset</MDBDropdownToggle>
-                                    <MDBDropdownMenu basic>
-                                        <div>
-                                            <form onSubmit={this.tranactionSubmit}>
-                                                <MDBInput label="Chemist ID *" name="chemID" type="text" value={this.state.chemID} onChange={this.handleInputChange}/>
-                                                <MDBBtn size="sm" color="primary" type="submit">Transact</MDBBtn>
-                                            </form>
-                                        </div>
-                                    </MDBDropdownMenu>
-                                </MDBDropdown>
-                                */}
                             </MDBRow>
                         </MDBCardBody>
                     </MDBCard>
@@ -158,9 +121,8 @@ class ChemistPanel extends Component {
         this.state.isChemistPaneOpen = false;
         this.state.response = "";
         this.state.responseToPost = "";
+        this.state.responseToPost2 = {};
         this.state.post = "";
-
-        this.state.userID = "";
         this.state.userID = "";
         //////////////////////////////USER/////////////////////
         this.state.user = {};
@@ -175,28 +137,16 @@ class ChemistPanel extends Component {
         this.state.user.assets=[];
 
         ////////////////////////Chemist////////////////////
-        this.state.chemId = "";
-        this.state.chemId2 = "";
-        this.state.chem = {};
-        this.state.chem.address="";
-        this.state.chem.assets=[];
-        this.state.chem.chemists=[];
-        this.state.chem.id="";
-        this.state.chem.license="";
-        this.state.chem.name="";
-        this.state.chem.owneraddress="";
-        this.state.chem.ownercnic="";
-        this.state.chem.ownername="";
-        this.state.chem.password="";
+        this.state.customer = "";
+        this.state.phone = "";
+        this.state.transactionFormErrors={customerVal:'', phoneVal:''};
+        this.state.transactionFormValid=false;
+        this.state.customerValid=false;
+        this.state.phoneValid=false;
+
         /////////////////////////QR//////////////////////
         this.state.QrResultArray=[];
-        this.state.qrbatch='';
-        this.state.qrcarton='';
-        this.state.qrnop='';
-        this.state.qrqip='';
-        this.state.distId2='';
         this.state.QrResult='';
-        this.state.qrlist=[];
         this.state.totalPrice=0;
         /////////////////////////Bind Functions////////////////
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -204,13 +154,12 @@ class ChemistPanel extends Component {
     }
 
     handleScan = (data) => {
-        console.log(data);
         var found = false;
         if (data) {
             for (var i = 0; i < this.state.user.assets.length; i++) {
-                if (data == this.state.user.assets[i].id) {
+                if (data === this.state.user.assets[i].id) {
                     for (var k = 0; k < this.state.QrResultArray.length; k++) {
-                        if (data == this.state.QrResultArray[k].id) {
+                        if (data === this.state.QrResultArray[k].id) {
                             document.getElementById("itemAlreadyExist").style.display = 'block';
                             document.getElementById("itemNotFound").style.display = 'none';
                             return;
@@ -228,28 +177,46 @@ class ChemistPanel extends Component {
                     return;
                 }
             }
-            if (found == false) {
+            if (!found) {
                 document.getElementById("itemNotFound").style.display = 'block';
                 document.getElementById("itemAlreadyExist").style.display = 'none';
             }
         }
     }
 
-    tranactionSubmitAll = async e => {
+    transactionSubmitAll = async e => {
+        var name=this.state.customer;
+        var phone=this.state.phone;
+        var timestamp = Date.now();
+        var assetId=null;
+        var error=false;
+        e.preventDefault();
         for(var i=0;i<this.state.QrResultArray.length;i++){
-            var assetId=this.state.QrResultArray[i].id;
-            var chemId=this.state.chemId2;
-            e.preventDefault();
-            const response = await fetch('/change_owner', {
+            assetId=this.state.QrResultArray[i].id;
+            const response = await fetch('/sell_asset', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ post: assetId.concat('~',chemId) })
+                body: JSON.stringify({ post: assetId.concat('~',name,'~',phone,'~',timestamp) })
             });
 
-            const body = await response.text();
-            this.setState({ responseToPost: body });
+            const body = await response.json();
+            if(body.express.status===-1){
+                error = true;
+                break;
+            }
+            this.setState({ responseToPost2: body });
+        }
+        if(error){
+            document.getElementById("transactionFailure").style.display='block';
+            document.getElementById("itemNotFound").style.display = 'none';
+            document.getElementById("itemAlreadyExist").style.display = 'none';
+        }else{
+            this.setState({QrResultArray:[]});
+            document.getElementById("transactionSuccess").style.display='block';
+            document.getElementById("itemNotFound").style.display = 'none';
+            document.getElementById("itemAlreadyExist").style.display = 'none';
         }
     };
 
@@ -285,9 +252,6 @@ class ChemistPanel extends Component {
         }else{
             this.redirectUser('/');
         }
-        // this.callGetAllAssets()
-        // .then(res => this.setState({ assets: this.flattenAssetData(res.express) }))
-        // .catch(err => console.log(err));
         this.getUser()
         .then(res => this.setState({ user: res.express }))
         .catch(err => console.log(err));
@@ -323,15 +287,7 @@ class ChemistPanel extends Component {
         return true;
     }
 
-    // updateOwner(id,name){
-    //     this.setState({
-    //         assets: update(this.state.assets, {id: {Owner: {$set: name}}})
-    //     })
-    // }
-    //() => this.setState({ isPaneOpenLeft: false })
-
     expandComponent(row) {
-        //console.log(this.updateOwner);
         return (
             <BSTable data={ row }/>
         );
@@ -346,62 +302,32 @@ class ChemistPanel extends Component {
         },()=>{this.validate(name,value)});
     };
 
-    //disabled={!this.state.formValid}
-
     isPositiveInteger(n) {
         return parseFloat(n) === n >>> 0;
     }
 
     validate(name,value){
-        var fieldErrors=this.state.assetFormErrors;
-        var length=null;
+        var fieldErrors=this.state.transactionFormErrors;
         switch(name){
-            case 'discriptionValue':
-                fieldErrors.discVal = value.length > 10 ? true : false;
-                this.setState({ discValid:fieldErrors.discVal });
+            case 'customer':
+                fieldErrors.customerVal = value.length > 10 ? true : false;
+                this.setState({ customerValid:fieldErrors.customerVal });
                 break;
-            case 'priceValue':
-                length = value.length > 0 ? true : false;
-                fieldErrors.priceVal = length && this.isPositiveInteger(value);
-                this.setState({ priceValid:fieldErrors.priceVal });
-                break;
-            case 'manufacDate':
-                fieldErrors.mgfVal = value.length > 0 ? true : false;
-                this.setState({ mgfValid:fieldErrors.mgfVal });
-                break;
-            case 'expiryDate':
-                fieldErrors.expVal = value.length > 0 ? true : false;
-                this.setState({ expValid:fieldErrors.expVal });
-                break;
-            case 'qtyValue':
-                length = value.length > 0 ? true : false;
-                fieldErrors.qtyVal = length && this.isPositiveInteger(value);
-                this.setState({ qtyValid:fieldErrors.qtyVal });
+            case 'phone':
+                fieldErrors.phoneVal = /^(\+92) {0,1}\d{3} {0,1}\d{7}$|^\d{11}$|^\d{4} \d{7}$/.test(value) ? true : false;
+                this.setState({ phoneValid:fieldErrors.phoneVal });
                 break;
             default:
                 console.log("Invalid Feild");
         }
-
         this.setState({
-            errors: fieldErrors,
-            discValid:fieldErrors.discVal,
-            priceValid:fieldErrors.priceVal,
-            mgfValid:fieldErrors.mgfVal,
-            expValid:fieldErrors.expVal,
-            qtyValid:fieldErrors.qtyVal,
-        }, this.validateAssetForm());
+            transactionFormErrors: fieldErrors,
+        }, this.validateTransactionForm );
     }
 
-    validateAssetForm() {
-        console.log("validate asset form");
-        this.setState({assetFormValid: this.state.nameValid && this.state.discValid && this.state.typeValid && this.state.priceValid && this.state.mgfValid && this.state.expValid && this.state.qtyValid });
+    validateTransactionForm() {
+        this.setState({transactionFormValid: this.state.phoneValid && this.state.customerValid });
     }
-
-    //tasks.map((task) => task.name )
-    //height='240' scrollTop={ 'Top' }
-    // this.setState({
-    //     items: update(this.state.items, {1: {name: {$set: 'updated field name'}}})
-    // })
 
     render() {
         const assetOptions = {
@@ -413,7 +339,6 @@ class ChemistPanel extends Component {
         return (
             <MDBContainer>
                 <PanelHeading title="Chemist Panel"/>
-
                 <Nav tabs pills>
                     <NavItem>
                         <NavLink className={classnames({ active: this.state.activeTab === '1' })} onClick={() => { this.toggle('1'); }}>Asset</NavLink>
@@ -437,41 +362,45 @@ class ChemistPanel extends Component {
                         </Row>
                     </TabPane>
                     <TabPane tabId="2">
-                    <Row>
-                        <Col sm={6}>
-                            <br/><br/>
-                            <MDBInput label="Chemist ID" icon="user" name="chemId2" value={this.state.chemId2} onChange={this.handleInputChange} /><br/>
-                        </Col>
-                        <Col sm={3}>
-                            <h5>Scanner:</h5>
-                            <QrReader delay={500} onError={this.handleError} onScan={this.handleScan} style={{ width:"220px", border:"2px solid red" }} />
-                            <br/>
-                        </Col>
-                        <Col sm={3}>
-                            <br/><br/>
-                            <label style={{color:"green"}}>Scanned code:   {this.state.QrResult}</label>
-                            <label id="itemNotFound" style={{color:"red", display:"none"}}>Item not found</label>
-                            <label id="itemAlreadyExist" style={{color:"red", display:"none"}}>Item already scanned</label>
-                            <br/><br/>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col sm={12}>
-                            <BootstrapTable data={this.state.QrResultArray} version='4' hover>
-                                <TableHeaderColumn isKey dataField='index'>#</TableHeaderColumn>
-                                <TableHeaderColumn dataField='name'>Asset Name</TableHeaderColumn>
-                                <TableHeaderColumn dataField='price'>Price</TableHeaderColumn>
-                            </BootstrapTable>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col md="10">
-                            <MDBBtn color="blue"  size="sm" onClick={this.tranactionSubmitAll}>Transact</MDBBtn>
-                        </Col>
-                        <Col md="2">
-                            <label style={{ color: "green" }}>Total Price: {this.state.totalPrice}</label>
-                        </Col>
-                    </Row>
+                        <form onSubmit={this.transactionSubmitAll}>
+                            <Row>
+                                <Col sm={6}>
+                                    <MDBInput label="Customer Name" icon="user" name="customer" value={this.state.customer} onChange={this.handleInputChange} />
+                                    <MDBInput label="Customer Phone Number" icon="phone" name="phone" value={this.state.phone} onChange={this.handleInputChange} />
+                                    <MDBBtn color="blue"  size="sm" type="submit" disabled={!(this.state.transactionFormValid && (this.state.QrResultArray.length > 0))}>Transact</MDBBtn>
+                                </Col>
+                                <Col sm={3}>
+                                    <h5>Scanner:</h5>
+                                    <QrReader delay={500} onError={this.handleError} onScan={this.handleScan} style={{ width:"180px", border:"2px solid red" }} />
+                                    <br/>
+                                </Col>
+                                <Col sm={3}>
+                                    <br/><br/>
+                                    <label style={{color:"green"}}>Scanned code:   {this.state.QrResult}</label>
+                                    <label id="itemNotFound" style={{color:"red", display:"none"}}>Item not found</label>
+                                    <label id="itemAlreadyExist" style={{color:"red", display:"none"}}>Item already scanned</label>
+                                    <label id="transactionSuccess" style={{color:"green", display:"none"}}>Asset(s) Transacted Successfully</label>
+                                    <label id="transactionFailure" style={{color:"red", display:"none"}}>Transaction Failed</label>
+                                    <br/><br/>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col sm={12}>
+                                    <BootstrapTable data={this.state.QrResultArray} version='4' hover>
+                                        <TableHeaderColumn isKey dataField='index'>#</TableHeaderColumn>
+                                        <TableHeaderColumn dataField='name'>Asset Name</TableHeaderColumn>
+                                        <TableHeaderColumn dataField='price'>Price</TableHeaderColumn>
+                                    </BootstrapTable>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col md={10}>
+                                </Col>
+                                <Col md={2}>
+                                    <label style={{ color: "green" }}>Total Price: {this.state.totalPrice}</label>
+                                </Col>
+                            </Row>
+                        </form>
                     </TabPane>
                 </TabContent>
             </MDBContainer>
