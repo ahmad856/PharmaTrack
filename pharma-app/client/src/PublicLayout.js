@@ -53,22 +53,15 @@ class PublicLayout extends Component {
     closeCollapse = collapseID => () =>
         this.state.collapseID === collapseID && this.setState({ collapseID: "" });
 
-    handleLoginSubmit = () =>{
-        this.loginfunc()
-        .then()
-        .catch(err => console.log(err));
-    }
-
-    redirectUser = (path) => {
-        this.props.history.push(path);
-    }
-
-    loginfunc = async () => {
+    handleLoginSubmit = async e =>{
         var id=this.state.id;
         var password=this.state.password;
+        e.preventDefault();
         const response = await fetch('/sign_in/'+id+'/'+password);
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
+        console.log(response.status);
+        console.log("status",body.express.status);
         if(body.express.status===1){
              sessionStorage.setItem("user",id);
             if(body.express.userSighnedIn===1){
@@ -83,12 +76,17 @@ class PublicLayout extends Component {
                 console.log("user not valid");
             }
         }else if(body.express.status===-2){
-            console.log("user password not valid!!!");
+            document.getElementById("passError").style.display='block';
+            document.getElementById("idError").style.display='none';
         }else{
-            console.log("user not found!!!");
+            document.getElementById("idError").style.display='block';
+            document.getElementById("passError").style.display='none';
         }
-        return body;
-    };
+    }
+
+    redirectUser = (path) => {
+        this.props.history.push(path);
+    }
 
     render() {
         const overlay = (
@@ -116,16 +114,18 @@ class PublicLayout extends Component {
                                 <MDBDropdown>
                                     <MDBDropdownToggle nav caret><MDBIcon icon="user" /></MDBDropdownToggle>
                                     <MDBDropdownMenu basic>
-                                        <div>
-                                            <form>
+                                        <form onSubmit={this.handleLoginSubmit} >
+                                            <div className="form-group">
                                                 <p className="h5 text-center mb-4">Sign in</p>
                                                 <MDBInput style={{color:"black"}} label="ID" type="text" name="id" value={this.state.id} onChange={this.handleInputChange}/>
                                                 <MDBInput label="Password" style={{color:"black"}} type="password" name="password" value={this.state.password} onChange={this.handleInputChange}/>
                                                 <div className="text-center">
-                                                    <MDBBtn size="sm" onClick={this.handleLoginSubmit}>Login</MDBBtn>
+                                                    <MDBBtn size="sm" type="submit" >Login</MDBBtn>
                                                 </div>
-                                            </form>
-                                        </div>
+                                                <label id="idError" style={{color:"red", display:"none"}}>Incorrect Username</label>
+                                                <label id="passError" style={{color:"red", display:"none"}}>Incorrect Password</label>
+                                            </div>
+                                        </form>
                                     </MDBDropdownMenu>
                                 </MDBDropdown>
                             </MDBNavItem>
@@ -134,10 +134,10 @@ class PublicLayout extends Component {
                     </MDBCollapse>
                 </MDBNavbar>
                 {collapseID && overlay}
-                <main class="wrapper" style={{ marginTop: "4rem" }}>
+                <main className="wrapper" style={{ marginTop: "4rem" }}>
                     <PublicRoutes />
                 </main>
-                <footer class="public-footer">
+                <footer className="public-footer">
                     <p className="footer-copyright mb-0 py-3 text-center">
                         &copy; {new Date().getFullYear()} Copyright: Pharma Track
                     </p>

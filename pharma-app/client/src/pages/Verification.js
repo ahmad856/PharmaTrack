@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {MDBInput, MDBIcon, MDBContainer, MDBRow, MDBCol, MDBJumbotron, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBListGroupItem, MDBListGroup } from "mdbreact";
+import { MDBIcon, MDBContainer, MDBRow, MDBCol, MDBJumbotron, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBListGroupItem, MDBListGroup } from "mdbreact";
 import QrReader from "react-qr-reader";
 
 //<img src={qrImg} alt="QR Code" height="50px" width="50px"/>
@@ -88,7 +88,7 @@ class Verification extends Component {
                             <h1>Product Verification</h1>
                             <br />
                             <form>
-                                <center><label class="fixTitle1">Scan Code :</label>
+                                <center><label className="fixTitle1">Scan Code :</label>
                                     <QrReader delay={500} onError={this.handleError} onScan={this.handleScan} style={{ width: "50%" }} />
                                     <MDBBtn size="sm" color="primary" onClick={this.verify}>Verify</MDBBtn>
                                 </center>
