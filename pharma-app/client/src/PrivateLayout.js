@@ -24,6 +24,23 @@ class PrivateLayout extends Component {
             this.redirectUser('/');
         }
     }
+    home=()=>{
+        var user = null;
+        if(sessionStorage.getItem("user")){
+            user = sessionStorage.getItem("user");
+            if(user.substring(0,5)==="admin"){
+                this.redirectUser('/login/admin');
+            }else if(user.substring(0,4)==="chem"){
+                this.redirectUser('/login/chem');
+            }else if(user.substring(0,4)==="dist"){
+                this.redirectUser('/login/dist');
+            }else{
+                this.redirectUser('/');
+            }
+        }else{
+            this.redirectUser('/');
+        }
+    }
     profile=()=>{
         this.redirectUser('/login/profile');
     }
@@ -57,6 +74,7 @@ class PrivateLayout extends Component {
                                         <MDBIcon icon="user" className="mr-1" />
                                     </MDBDropdownToggle>
                                     <MDBDropdownMenu className="dropdown-default" right>
+                                    <MDBDropdownItem onClick={this.home}>Home</MDBDropdownItem>
                                         <MDBDropdownItem onClick={this.profile}>Profile</MDBDropdownItem>
                                         <MDBDropdownItem onClick={this.logout}>Log out</MDBDropdownItem>
                                     </MDBDropdownMenu>

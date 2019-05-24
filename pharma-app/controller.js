@@ -1780,6 +1780,7 @@ module.exports = (function() {
 						var temp=JSON.parse(query_responses[0].toString());
 						if(temp.id.substring(0,5)!="admin"){
 							if(temp.id.substring(0,4)=="manu"){
+								temp.products=[];
 								if(temp.distributors==null){
 									temp.distributors=[];
 								}else {
