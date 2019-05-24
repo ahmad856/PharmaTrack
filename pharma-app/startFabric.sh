@@ -18,7 +18,7 @@ if [ ! -d ~/.hfc-key-store/ ]; then
 fi
 
 # launch network; create channel and join peer to channel
-cd ../basic-network
+cd ../basicnetwork
 ./start.sh
 
 # Now launch the CLI container in order to install, instantiate chaincode
