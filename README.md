@@ -91,20 +91,20 @@ The purpose of Pharma Track is to eliminate the risk of fraudulent pharmaceutica
 # The front-end implementation in React JS can be found in pharma-app/client
 # The main pages can be found in pharma-app/client/pages
 # These React JS pages use a component named Axios to send GET and POST requests to the REST API
-```
+
 
 ###Controller (Node JS) :
 ```sh
 # The REST API routes are defined in pharma-app/routes.js
 # The routes.js file calls controller functions defined in pharma-app/controller.js
 # The controller.js file implements one function for each route. It recieves request parameters from the front-end, invokes queries of Hyperledger Fabric chaincode, and returns the response to the front-end. 
-```
+
 
 ##Back-End (Hyperledger Fabric/Golang) :
 ```sh The chaincode (written in Go Language) found in the directory chaincode/pharma-app/
 # The chaincode defines the blockchain smart contracts in forms of structs and functions using the Hyperledger Fabric Interface (shim) 
 # The chaincode interacts with the two parts of blockchain i.e. the world-state (Couch DB) and the history ledger where data is stored in key-value pairs (JSON) 
-```
+
 
 # The basic structure, classes and initialization are defined in the file pharma-chaincode.go
 # The functions which read from the blockchain are defined in read_ledger.go
