@@ -8,6 +8,8 @@ The purpose of Pharma Track is to eliminate the risk of fraudulent pharmaceutica
     - v8.9 and higher (v9 not supported)
   - npm --version 
     - 5.6.0
+  - yarn --version
+    - 1.13.0
   - Hyperledger Fabric
     - v1.3.0
   - Docker Engine
@@ -68,6 +70,13 @@ The purpose of Pharma Track is to eliminate the risk of fraudulent pharmaceutica
 │   ├── client
 |   |   ├── node_modules
 |   |   ├── src (Front-End)
+|   |   |   ├── pages
+|   |   |   |   ├── AdminPanel.js
+|   |   |   |   ├── ChemistPanel.js
+|   |   |   |   ├── DistributorPanel.js
+|   |   |   |   ├── ManufacturerPanel.js
+|   |   |   |   ├── Profile.js
+|   |   |   |   ├── Verification.js
 |   |   ├── package.json
 │   ├── node_modules
 │   ├── controller.js (Middleware)
@@ -80,11 +89,7 @@ The purpose of Pharma Track is to eliminate the risk of fraudulent pharmaceutica
 ├── README.md
 ```
 
-
-
-
-### Development Guide
-
+## Development Guide
 
 ### Front-End (React JS) :
 ```sh
@@ -97,14 +102,16 @@ The purpose of Pharma Track is to eliminate the risk of fraudulent pharmaceutica
 ```sh
   # The REST API routes are defined in pharma-app/routes.js
   # The routes.js file calls controller functions defined in pharma-app/controller.js
-  # The controller.js file implements one function for each route. It recieves request parameters from the front-end, invokes queries of Hyperledger Fabric chaincode, and returns the response to the front-end. 
+  # The controller.js file implements one function for each route. It recieves request parameters from the front-end, invokes queries
+    of Hyperledger Fabric chaincode, and returns the response to the front-end. 
 ```
 
 ## Back-End (Hyperledger Fabric/Golang) :
 ```sh
   # The chaincode (written in Go Language) found in the directory chaincode/pharma-app/
   # The chaincode defines the blockchain smart contracts in forms of structs and functions using the Hyperledger Fabric Interface (shim) 
-  # The chaincode interacts with the two parts of blockchain i.e. the world-state (Couch DB) and the history ledger where data is stored in key-value pairs (JSON) 
+  # The chaincode interacts with the two parts of blockchain i.e. the world-state (Couch DB) and the history ledger where data is
+    stored in key-value pairs (JSON) 
 
   # The basic structure, classes and initialization are defined in the file pharma-chaincode.go
   # The functions which read from the blockchain are defined in read_ledger.go
