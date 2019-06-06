@@ -95,7 +95,7 @@ The purpose of Pharma Track is to eliminate the risk of fraudulent pharmaceutica
 ```sh
   # The front-end implementation in React JS can be found in pharma-app/client
   # The main pages can be found in pharma-app/client/pages
-  # These React JS pages use a component named Axios to send GET and POST requests to the REST API
+  # These React JS pages send GET and POST requests to the REST API
 ```
 
 ### Controller (Node JS) :
