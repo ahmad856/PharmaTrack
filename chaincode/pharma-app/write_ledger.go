@@ -10,7 +10,10 @@ import (
 	sc "github.com/hyperledger/fabric/protos/peer"
 )
 
-
+// function to see if an ID exists in an array of IDs or not
+// takes 2 arguments
+// a []string - the array of IDs in which the search is done
+// x string - the ID to find
 func Contains(a []string, x string) bool {
 
 	for _, n := range a{
@@ -20,6 +23,12 @@ func Contains(a []string, x string) bool {
 	}
 	return false
 }
+
+// function to return the index of an ID if it exists in an array of IDs
+// returns -1 if not found
+// takes 2 arguments
+// a []string - the array of IDs in which the search is done
+// x string - the ID to find
 func Find(a []string, x string) int {
 
 	for i, n := range a{
@@ -36,14 +45,16 @@ func Find(a []string, x string) int {
 
 
 
-
-
 //--------------------------------------------------------------------------------------//
 //ADMIN FUNCTIONS//
 //--------------------------------------------------------------------------------------//
 
 
-
+// this func is used to activate/suspend a user
+// takes 3 arguments
+// args[0] - ID of the admin invoking this function
+// args[1] - user ID to activate/suspend
+// args[2] - a string which is either "suspend" or "activate" to determine the action type
 func (s *SmartContract) toggleSuspendUser(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 3 {
@@ -142,6 +153,14 @@ func (s *SmartContract) toggleSuspendUser(APIstub shim.ChaincodeStubInterface, a
 	return shim.Success(nil)
 }
 
+
+// this func is used by an admin to update his profile
+// takes 5 arguments
+// args[0] - ID of the admin invoking this function
+// args[1] - new name
+// args[2] - new password
+// args[3] - new CNIC
+// args[4] - new email
 func (s *SmartContract) updateAdmin(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 5 {
@@ -227,6 +246,13 @@ func (s *SmartContract) updateAdmin(APIstub shim.ChaincodeStubInterface, args []
 	return shim.Success(nil)
 }
 
+// this func is used by an admin to create a new admin
+// takes 5 arguments
+// args[0] - ID of the admin invoking this function
+// args[1] - name of new admin
+// args[2] - password of new admin
+// args[3] - CNIC of new admin
+// args[4] - email of new admin
 func (s *SmartContract) createAdmin(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 5 {
@@ -292,6 +318,17 @@ func (s *SmartContract) createAdmin(APIstub shim.ChaincodeStubInterface, args []
 	return shim.Success(nil)
 }
 
+// this func is used by an admin to create a new manufacturer
+// takes 9 arguments
+// args[0] - ID of the admin invoking this function
+// args[1] - name of new manuf
+// args[2] - address of new manuf
+// args[3] - license numer of new manuf
+// args[4] - owner Name of new manuf
+// args[5] - owner CNIC  of new manuf
+// args[6] - owner Address of new manuf
+// args[7] - password of new manuf (auto generated from frontend and emailed privately to new user)
+// args[8] - email of new manuf
 func (s *SmartContract) recordManufacturer(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 9 {
@@ -357,16 +394,17 @@ func (s *SmartContract) recordManufacturer(APIstub shim.ChaincodeStubInterface, 
 	return shim.Success(nil)
 }
 
-/*
- * The recordDistributor method *
-Used to view the records of one particular asset
-It takes 4 argument --
- -> the key for the Distributor to be created
- -> Name for the Distributor
- -> Address of the Distributor
- -> Timestamp the distributor was recorded
-*/
-
+// this func is used by an admin to create a new Distributor
+// takes 9 arguments
+// args[0] - ID of the admin invoking this function
+// args[1] - name of new dist
+// args[2] - address of new dist
+// args[3] - license numer of new dist
+// args[4] - owner Name of new dist
+// args[5] - owner CNIC  of new dist
+// args[6] - owner Address of new dist
+// args[7] - password of new dist (auto generated from frontend and emailed privately to new user)
+// args[8] - email of new dist
 func (s *SmartContract) recordDistributor(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 9 {
@@ -433,16 +471,17 @@ func (s *SmartContract) recordDistributor(APIstub shim.ChaincodeStubInterface, a
 	return shim.Success(nil)
 }
 
-/*
- * The recordChemist method *
-Used to view the records of one particular asset
-It takes 4 argument --
- -> the key for the Chemist to be created
- -> Name for the Chemist
- -> Address of the Chemist
- -> Timestamp the Chemist was recorded
-*/
-
+// this func is used by an admin to create a new Chemist
+// takes 9 arguments
+// args[0] - ID of the admin invoking this function
+// args[1] - name of new chem
+// args[2] - address of new chem
+// args[3] - license numer of new chem
+// args[4] - owner Name of new chem
+// args[5] - owner CNIC  of new chem
+// args[6] - owner Address of new chem
+// args[7] - password of new chem (auto generated from frontend and emailed privately to new user)
+// args[8] - email of new chem
 func (s *SmartContract) recordChemist(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 9 {
@@ -512,6 +551,10 @@ func (s *SmartContract) recordChemist(APIstub shim.ChaincodeStubInterface, args 
 //END OF ADMIN FUNCTIONS//
 //-------------------------------------------------------------//
 
+// this func is used by a manufacturer to enroll a distributor
+// takes 2 arguments
+// args[0] - ID of the manufacturer invoking this function
+// args[1] - ID of the distributor the be enrolled
 func (s *SmartContract) enrollDistributor(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 2 {
@@ -555,6 +598,10 @@ func (s *SmartContract) enrollDistributor(APIstub shim.ChaincodeStubInterface, a
 	return shim.Success(nil)
 }
 
+// this func is used by a distributor to enroll a chemist
+// takes 2 arguments
+// args[0] - ID of the distrbutor invoking this function
+// args[1] - ID of the chemist the be enrolled
 func (s *SmartContract) enrollChemist(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 2 {
@@ -598,7 +645,8 @@ func (s *SmartContract) enrollChemist(APIstub shim.ChaincodeStubInterface, args 
 	return shim.Success(nil)
 }
 
-
+// this function initializes the static counters to zeroes
+// takes no args
 func (s *SmartContract) initializeCounters(APIstub shim.ChaincodeStubInterface) sc.Response {
 
 	var statics = StaticVariables{ManufacturerCount: 0, DistributorCount: 0, ChemistCount: 0, AdminCount: 0, AdminLogCount: 0}
@@ -613,7 +661,16 @@ func (s *SmartContract) initializeCounters(APIstub shim.ChaincodeStubInterface) 
 }
 
 
-
+// this func is used by a manufacturer to create a product
+// takes 8 arguments
+// args[0] - ID of the manufacturer invoking this function
+// args[1] - name of new product
+// args[2] - type of product
+// args[3] - description
+// args[4] - retail price
+// args[5] - unit quantity
+// args[6] - carton capacity (packets/carton)
+// args[7] - packet capacity (assets/packet)
 func (s *SmartContract) createProduct(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 8 {
@@ -695,7 +752,16 @@ func (s *SmartContract) createProduct(APIstub shim.ChaincodeStubInterface, args 
 }
 
 
-
+// this func is used by a manufacturer to update its product
+// takes 8 arguments
+// args[0] - ID of the product to be updated
+// args[1] - name of new product
+// args[2] - type of product
+// args[3] - description
+// args[4] - retail price
+// args[5] - unit quantity
+// args[6] - carton capacity (packets/carton)
+// args[7] - packet capacity (assets/packet)
 func (s *SmartContract) updateProduct(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 8 {
@@ -756,7 +822,14 @@ func (s *SmartContract) updateProduct(APIstub shim.ChaincodeStubInterface, args 
 
 
 
-
+// this func is used by a manufacturer to create a batch
+// creates a Batch object, and creates all the nested Cartons, Packets and Assets iteratively
+// takes 8 arguments
+// args[0] - ID of the manufacturer invoking this function
+// args[1] - product ID for which the batch is created
+// args[2] - manuf Date
+// args[3] - expiry Date
+// args[4] - no. of cartons in batch
 func (s *SmartContract) createBatch(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 5 {
@@ -925,18 +998,16 @@ func (s *SmartContract) createBatch(APIstub shim.ChaincodeStubInterface, args []
 
 
 
-/*
- * The recordManufacturer method *
-Used to view the records of one particular asset
-It takes 4 argument --
- -> the key for the Manufacturer to be created
- -> Name for the Manufacturer
- -> Address of the Manufacturer
- -> Timestamp the Manufacturer was recorded
-*/
-
-
-
+// this func is used by a User(manuf/chem/dist) to update its profile
+// takes 9 arguments
+// args[0] - ID of the user invoking this function
+// args[1] - name
+// args[2] - address
+// args[3] - password
+// args[4] - owner Name
+// args[5] - owner CNIC
+// args[6] - owner Address
+// args[7] - email
 func (s *SmartContract) updateUser(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 8 {
@@ -980,7 +1051,13 @@ func (s *SmartContract) updateUser(APIstub shim.ChaincodeStubInterface, args []s
 
 
 
-
+// this function transacts assets from one user to other
+// determines whether transaction is bulk or single
+// if transaction is bulk, transfers all the nested Cartons, Packets and Assets iteratively
+// takes 3 arguments
+// args[0] - ID of the user invoking this function
+// args[1] - assetID
+// args[2] - recipient userID
 func (s *SmartContract) changeAssetOwner(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 
@@ -1230,6 +1307,14 @@ func (s *SmartContract) changeAssetOwner(APIstub shim.ChaincodeStubInterface, ar
 	return shim.Success(nil)
 }
 
+
+// this func is used by a Chemist to sell an asset to a customer
+// takes 5 arguments
+// args[0] - ID of the chemist invoking this function
+// args[1] - assetID
+// args[2] - customer name
+// args[3] - customer phone
+// args[4] - timestamp (auto generated from frontend)
 func (s *SmartContract) sellAsset(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 5 {
@@ -1371,6 +1456,12 @@ func (s *SmartContract) sellAsset(APIstub shim.ChaincodeStubInterface, args []st
 	return shim.Success(nil)
 }
 
+
+// this func is used by a user to return an asset to its previous owner
+// calls getHistory for the asset and determines the supplier automatically
+// takes 2 arguments
+// args[0] - ID of the user invoking this function
+// args[1] - asetid
 func (s *SmartContract) returnAsset(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 2 {
