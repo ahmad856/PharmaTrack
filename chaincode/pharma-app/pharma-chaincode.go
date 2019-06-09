@@ -31,7 +31,7 @@ Structure tags are used by encoding/json library
 */
 
 
-
+//define Asset types
 
 type Batch struct {
 
@@ -96,6 +96,8 @@ type PharmaAsset struct {
 
 }
 
+
+// customer relation class stores customer info for every asset. asset is unsold if this is null
 type CustomerRelation struct {
 	Name        string `json:"name"`
 	PhoneNumber string `json:"phone"`
@@ -103,6 +105,7 @@ type CustomerRelation struct {
 }
 
 
+// each manuf has its own products, assets are created against products, for example create a batch of the product "Panadol"
 type Product struct {
 
 	ID             			 		string  `json:"id"`
@@ -120,7 +123,7 @@ type Product struct {
 }
 
 
-
+//define User types
 
 type Admin struct {
 
@@ -134,6 +137,8 @@ type Admin struct {
 	Suspended 	bool	`json:"suspended"`
 
 }
+
+//log is stored for each admin activity with relevant info
 type AdminLog struct {
 
 	ID       string `json:"id"`
@@ -207,6 +212,7 @@ type Chemist struct {
 
 }
 
+// a generic user class when type is not known
 type User struct {
 
 	ID            string `json:"id"`
@@ -236,13 +242,15 @@ type User struct {
 
 }
 
-
+// objects of this struct are returned by getHistory function showing historical info
 type TransactionHistory struct {
 	TransID string      `json:"txid"`
 	Asset   PharmaAsset `json:"asset"`
 	OwnerName string 	`json:"ownername"`
 }
 
+
+// this struct is used as a singleton class to store some static variables
 type StaticVariables struct {
 	ManufacturerCount int `json:"manufacturercount"`
 	DistributorCount  int `json:"distributorcount"`
@@ -334,7 +342,7 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 
 /*
  * The initLedger method *
-Will add test data (10 assets)to our network
+ We add some initial users and admins to run the app here
 */
 func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Response {
 

@@ -10,6 +10,8 @@ import (
 	sc "github.com/hyperledger/fabric/protos/peer"
 )
 
+// function to get the static counts
+//takes no parameters
 func (s *SmartContract) getStaticVariables(APIstub shim.ChaincodeStubInterface) sc.Response {
 
 	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
@@ -23,10 +25,13 @@ func (s *SmartContract) getStaticVariables(APIstub shim.ChaincodeStubInterface) 
 
 /////////////////////////////////////////////////////////
 //INITIAL FUNCTIONS
+// called when a user signs in to fill data tables required
 ///////////////////////////////////////////////////////
 
 //FOR ADMIN
 
+// returns all manufacturers, distributors, chemists and admins, plus the admin logs
+// takes no parameters
 func (s *SmartContract) readAllUsers(APIstub shim.ChaincodeStubInterface) sc.Response {
 	type Users struct {
 		Manufacturers []Manufacturer `json:"manufacturers"`
@@ -133,7 +138,8 @@ func (s *SmartContract) readAllUsers(APIstub shim.ChaincodeStubInterface) sc.Res
 	return shim.Success(usersAsBytes)
 }
 
-
+// returns all distributors
+// takes no parameters
 func (s *SmartContract) readAllDistributors(APIstub shim.ChaincodeStubInterface) sc.Response {
 	type Users struct {
 		Distributors  []Distributor  `json:"distributors"`
@@ -170,7 +176,8 @@ func (s *SmartContract) readAllDistributors(APIstub shim.ChaincodeStubInterface)
 	return shim.Success(usersAsBytes)
 }
 
-
+// returns all chemists
+// takes no parameters
 func (s *SmartContract) readAllChemists(APIstub shim.ChaincodeStubInterface) sc.Response {
 	type Users struct {
 		Chemists  []Chemist  `json:"chemists"`
@@ -211,6 +218,9 @@ func (s *SmartContract) readAllChemists(APIstub shim.ChaincodeStubInterface) sc.
 
 //FOR MANUF
 
+// returns the distributors, products and assets enrolled to a certain manufacturer
+// takes 1 parameter
+// args[0] = manufacturer ID
 func (s *SmartContract) initialReadManufacturer(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 1 {
@@ -289,6 +299,9 @@ func (s *SmartContract) initialReadManufacturer(APIstub shim.ChaincodeStubInterf
 
 //FOR DIST
 
+// returns the chemists and assets enrolled to a certain distributor
+// takes 1 parameter
+// args[0] = distributor ID
 func (s *SmartContract) initialReadDistributor(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 1 {
@@ -355,6 +368,9 @@ func (s *SmartContract) initialReadDistributor(APIstub shim.ChaincodeStubInterfa
 
 //FOR CHEM
 
+// returns the assets enrolled to a certain chemist
+// takes 1 parameter
+// args[0] = chemist ID
 func (s *SmartContract) initialReadChemist(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 1 {
@@ -427,8 +443,8 @@ func (s *SmartContract) queryAsset(APIstub shim.ChaincodeStubInterface, args []s
 }
 
 /*
- * The queryUser method *
-Used to view the records of one particular user
+ * The login method *
+ returns user object for a userid, does not return a suspended user
 It takes one argument -- the key for the User in question
 */
 
@@ -457,7 +473,8 @@ func (s *SmartContract) login(APIstub shim.ChaincodeStubInterface, args []string
 }
 
 
-
+//returns complete history for a given asset ID
+// takes 1 argument, the asset ID
 func (s *SmartContract) getTransactionHistory(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
