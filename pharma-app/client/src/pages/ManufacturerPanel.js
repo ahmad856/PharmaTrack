@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { MDBIcon,  MDBContainer, MDBInput, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBCardText, MDBListGroup, MDBListGroupItem, MDBRow } from "mdbreact";
+import { MDBIcon,  MDBContainer, MDBInput, MDBBtn, MDBCol, MDBCard, MDBCardHeader, MDBCardBody, MDBCardText, MDBListGroup, MDBListGroupItem, MDBRow } from "mdbreact";
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import '../../node_modules/react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import classnames from 'classnames';
@@ -39,10 +39,13 @@ class BSTable extends Component {
         return body;
     };
 
+
     render() {
         if (this.props.data) {
             return (
                 <MDBContainer>
+
+
                     {/* Show Transactions side pane */}
                     <SlidingPane isOpen={this.state.isTransactionPaneOpen} title='Transactions History' closeIcon={<div>[ X ]</div>} from='left' width='400px' onRequestClose={this.closeTransactionPanel}>
                         {/* Iterates */}
@@ -55,7 +58,20 @@ class BSTable extends Component {
                                             <MDBListGroup className="my-4 mx-4" style={{ width: "18rem" }}>
                                                 <MDBListGroupItem color="primary">ID: {transaction.txid}</MDBListGroupItem>
                                                 <MDBListGroupItem color="primary">Asset ID: {transaction.asset.id}</MDBListGroupItem>
-                                                <MDBListGroupItem color="primary">Asset Owner: {transaction.asset.owner}</MDBListGroupItem>
+                                                
+
+                                                {transaction.asset.customer.name.length>0 ? (
+                                                    <div>
+                                                    <MDBListGroupItem color="primary">Customer Name: {transaction.asset.customer.name}</MDBListGroupItem>
+                                                    <MDBListGroupItem color="primary">Customer Phone: {transaction.asset.customer.phone}</MDBListGroupItem>
+                                                    </div>
+                                                    ) : (
+                                                    <div>
+                                                    <MDBListGroupItem color="primary">Owner ID: {transaction.asset.owner}</MDBListGroupItem>
+                                                    <MDBListGroupItem color="primary">Owner Name: {transaction.asset.ownername}</MDBListGroupItem>
+                                                    </div>
+                                                )}
+
                                             </MDBListGroup>
                                         </MDBRow>
                                     </MDBCardBody>
@@ -68,21 +84,35 @@ class BSTable extends Component {
                         <MDBCardHeader> Asset Details</MDBCardHeader>
                         <MDBCardBody className="text-info">
                             <MDBRow className="justify-content-center">
-                                <MDBListGroup className="my-4 mx-4" style={{ width: "25rem" }}>
-                                    <MDBListGroupItem color="primary">ID: {this.props.data.id}</MDBListGroupItem>
-                                    <MDBListGroupItem color="primary">QRCode: {this.props.data.qr}</MDBListGroupItem>
-                                    <MDBListGroupItem color="primary">Description: {this.props.data.description}</MDBListGroupItem>
-                                    <MDBListGroupItem color="primary">Type: {this.props.data.type}</MDBListGroupItem>
+                                <MDBListGroup className="my-4 mx-4" style={{ width: "28rem" }}>
+                                    <MDBListGroupItem color="primary">Owner Name: {this.props.data.ownername}</MDBListGroupItem>
+                                    <MDBListGroupItem color="primary">Product Id: {this.props.data.productid}</MDBListGroupItem>
                                 </MDBListGroup>
-                                <MDBListGroup className="my-4 mx-4" style={{ width: "25rem" }}>
+                                <MDBListGroup className="my-4 mx-4" style={{ width: "28rem" }}>
                                     <MDBListGroupItem color="primary">Mfg Date: {this.props.data.manufactureDate}</MDBListGroupItem>
                                     <MDBListGroupItem color="primary">ExpiryDate: {this.props.data.expiryDate}</MDBListGroupItem>
-                                    <MDBListGroupItem color="primary">Timestamp: {this.props.data.timestamp}</MDBListGroupItem>
-                                    <MDBListGroupItem color="primary">Price: {this.props.data.price}</MDBListGroupItem>
                                 </MDBListGroup>
+
+                    
+                                <MDBListGroup className="my-4 mx-4" style={{ width: "28rem" }}>
+                                    <MDBListGroupItem color="primary">
+                                        <QRCode value={this.props.data.id.substring(0,10)+"000000000000000"} level="M" size="56" renderAs="svg" />
+                                        &nbsp;&nbsp;<b>Batch ID:</b> {this.props.data.id.substring(0,10)+"000000000000000"}
+                                    </MDBListGroupItem>
+                                    <MDBListGroupItem color="primary">
+                                        <QRCode value={this.props.data.id.substring(0,15)+"0000000000"} level="M" size="56" renderAs="svg" />
+                                        &nbsp;&nbsp;<b>Carton ID:</b> {this.props.data.id.substring(0,15)+"0000000000"}
+                                    </MDBListGroupItem>
+                                    <MDBListGroupItem color="primary">
+                                        <QRCode value={this.props.data.id.substring(0,20)+"00000"} level="M" size="56" renderAs="svg" />
+                                        &nbsp;&nbsp;<b>Packet ID:</b> {this.props.data.id.substring(0,20)+"00000"}
+                                    </MDBListGroupItem>
+                                </MDBListGroup>
+
+
                             </MDBRow>
                             <MDBRow className="justify-content-center">
-                                <MDBBtn size="sm" color="primary" onClick={this.openTransactionPanel}>Show Details</MDBBtn>
+                                <MDBBtn size="sm" color="primary" onClick={this.openTransactionPanel}>Show History</MDBBtn>
                             </MDBRow>
                         </MDBCardBody>
                     </MDBCard>
@@ -92,6 +122,43 @@ class BSTable extends Component {
             return (
                 <MDBCard border="info" className="m-3" style={{ maxWidth: "70rem" }}>
                     <MDBCardHeader>Asset Details</MDBCardHeader>
+                    <MDBCardBody className="text-info">
+                        <center><MDBCardText>Details not found!!!</MDBCardText></center>
+                    </MDBCardBody>
+                </MDBCard>
+            );
+        }
+    }
+}
+
+class BSTableProd extends Component {
+    render() {
+        if (this.props.data) {
+            return (
+                <MDBContainer>
+                    <MDBCard border="info" className="m-3" style={{ maxWidth: "70rem" }}>
+                        <MDBCardHeader> Product Details</MDBCardHeader>
+                        <MDBCardBody className="text-info">
+                            <MDBRow className="justify-content-center">
+                                <MDBListGroup className="my-4 mx-4" style={{ width: "25rem" }}>
+                                    <MDBListGroupItem color="primary">ID : {this.props.data.id}</MDBListGroupItem>
+                                    <MDBListGroupItem color="primary">Type : {this.props.data.type}</MDBListGroupItem>
+                                    <MDBListGroupItem color="primary">RetailPrice : {this.props.data.retailprice}</MDBListGroupItem>
+                                </MDBListGroup>
+                                <MDBListGroup className="my-4 mx-4" style={{ width: "25rem" }}>
+                                    <MDBListGroupItem color="primary">Unit Quantity : {this.props.data.unitquantity}</MDBListGroupItem>
+                                    <MDBListGroupItem color="primary">Carton Capacity : {this.props.data.cartoncapacity}</MDBListGroupItem>
+                                    <MDBListGroupItem color="primary">Packet Capacity : {this.props.data.packetcapacity}</MDBListGroupItem>
+                                </MDBListGroup>
+                            </MDBRow>
+                        </MDBCardBody>
+                    </MDBCard>
+                </MDBContainer>
+            );
+        } else {
+            return (
+                <MDBCard border="info" className="m-3" style={{ maxWidth: "70rem" }}>
+                    <MDBCardHeader>Product Details</MDBCardHeader>
                     <MDBCardBody className="text-info">
                         <center><MDBCardText>Details not found!!!</MDBCardText></center>
                     </MDBCardBody>
@@ -175,7 +242,7 @@ class ManufacturerPanel extends Component {
         super(props);
         this.state = {};
         this.state.activeTab = "1";
-        this.state.isAssetPaneOpen = false;
+        this.state.isBatchPaneOpen = false;
         this.state.isDistributorPaneOpen = false;
         this.state.response = "";
         this.state.responseToPost = "";
@@ -183,9 +250,28 @@ class ManufacturerPanel extends Component {
         this.state.post = "";
 
         this.state.userID = "";
-
+        this.state.prodId = "";
+        this.state.prodIdValid=false;
+        this.state.prodList=[];
         this.state.distList=[];
         this.state.allDistList=[];
+        ////////////////////////////PRODUCT////////////////////
+        this.state.prodNameValue="";
+        this.state.prodDiscValue="";
+        this.state.assetType=null;
+        this.state.priceValue="";
+        this.state.unitQuantityValue="";
+        this.state.cartonCapValue="";
+        this.state.packetCapValue="";
+        this.state.productFormErrors={nameVal:'', discVal:'', typeVal:'', priceVal:'', unitQtyVal:'', cartonCapVal:'', packetCapVal:''};
+        this.state.productFormValid=false;
+        this.state.prodNameValid=false;
+        this.state.prodDiscValid=false;
+        this.state.typeValid=false;
+        this.state.priceValid=false;
+        this.state.unitQuantityValid=false;
+        this.state.cartonCapValid=false;
+        this.state.packetCapValid=false;
         //////////////////////////////USER/////////////////////
         this.state.user = {};
         this.state.user.address="";
@@ -198,20 +284,22 @@ class ManufacturerPanel extends Component {
         this.state.user.password="";
         this.state.user.assets=[];
         this.state.user.distributors=[];
+        this.state.user.products=[];
+        this.state.user.batchcount=0;
+        this.state.user.email="";
+        this.state.user.status="";
+        /////////////////////////////UserProps/////////////////
+        this.state.userProps = {};
+        this.state.userProps.distributors=[];
+        this.state.userProps.products=[];//asset
+        this.state.userProps.pharmaassets=[];//asset
         /////////////////////////ASSET/////////////////////////
-        this.state.nameValue=null;
-        this.state.discriptionValue="";
-        this.state.assetType=null;
-        this.state.priceValue="";
+
         this.state.manufacDate="";
         this.state.expiryDate="";
         this.state.qtyValue="";
-        this.state.assetFormErrors={nameVal:'', discVal:'', typeVal:'', priceVal:'', mgfVal:'', expVal:'', qtyVal:''};
+        this.state.assetFormErrors={ mgfVal:'', expVal:'', qtyVal:'' };
         this.state.assetFormValid=false;
-        this.state.nameValid=false;
-        this.state.discValid=false;
-        this.state.typeValid=false;
-        this.state.priceValid=false;
         this.state.mgfValid=false;
         this.state.expValid=false;
         this.state.qtyValid=false;
@@ -249,6 +337,11 @@ class ManufacturerPanel extends Component {
 
         ////////////////////////////////////////////////////tab 4
         this.generateQRCode=this.generateQRCode.bind(this);
+
+        /////////////////////Products
+
+        ///////testTransaction
+        this.state.testId="";
     }
 
     /////////////////////////////////////////tab4
@@ -307,8 +400,8 @@ class ManufacturerPanel extends Component {
     handleScan = (data) => {
         var found = false;
         if (data) {
-            for (var i = 0; i < this.state.user.assets.length; i++) {
-                if (data === this.state.user.assets[i].id) {
+            for (var i = 0; i < this.state.userProps.pharmaassets.length; i++) {
+                if (data === this.state.userProps.pharmaassets[i].id) {
                     for (var k = 0; k < this.state.QrResultArray.length; k++) {
                         if (data === this.state.QrResultArray[k].id) {
                             document.getElementById("itemAlreadyExist").style.display = 'block';
@@ -319,7 +412,7 @@ class ManufacturerPanel extends Component {
                     found = true;
                     document.getElementById("itemAlreadyExist").style.display = 'none';
                     this.setState({ QrResult: data });
-                    var temp = JSON.parse(JSON.stringify(this.state.user.assets[i]));
+                    var temp = JSON.parse(JSON.stringify(this.state.userProps.pharmaassets[i]));
                     temp.index = this.state.QrResultArray.length + 1;
                     this.state.QrResultArray.push(temp);
                     this.setState(this.state.QrResultArray);
@@ -366,6 +459,7 @@ class ManufacturerPanel extends Component {
             document.getElementById("transactionSuccess").style.display='block';
             document.getElementById("itemNotFound").style.display = 'none';
             document.getElementById("itemAlreadyExist").style.display = 'none';
+            window.location.reload();
         }
     };
 
@@ -428,6 +522,11 @@ class ManufacturerPanel extends Component {
         this.getUser()
         .then(res => this.setState({ user: res.express }))
         .catch(err => console.log(err));
+
+        this.getAllProps()
+        .then(res => this.setState({ userProps: res.express }))
+        .catch(err => console.log(err));
+
         this.callGetAllDist()
         .then(res => this.setState({ allDistList: res.express }))
         .catch(err => console.log(err));
@@ -437,8 +536,32 @@ class ManufacturerPanel extends Component {
         const response = await fetch('/get_all_distributors');
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
+        console.log("alldist",body);
         return body;
     };
+
+    getAllProps= async () =>{
+        var id = null;
+        if(sessionStorage.getItem("user")){
+            id = sessionStorage.getItem("user");
+        }
+        const response = await fetch('/get_manufacturer_props/'+id);
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+        var prodList=body.express.products.map( (product) => ({
+            label: product.name+", "+product.description,
+            value: product.id,
+        }));
+        this.setState({prodList:prodList});
+
+        var distList=body.express.distributors.map( (distributor) => ({
+            label: distributor.name+", "+distributor.address,
+            value: distributor.id,
+        }));
+        this.setState({distList:distList});
+        console.log("allprops",body);
+        return body;
+    }
 
     getUser = async () => {
         var id = null;
@@ -447,14 +570,8 @@ class ManufacturerPanel extends Component {
         }
         const response = await fetch('/get_user/'+id);
         const body = await response.json();
-
-        var distList=body.express.distributors.map( (distributor) => ({
-            label: distributor.name+", "+distributor.address,
-            value: distributor.id,
-        }));
-
-        this.setState({distList:distList});
         if (response.status !== 200) throw Error(body.message);
+        console.log("user",body);
         return body;
     };
 
@@ -476,33 +593,39 @@ class ManufacturerPanel extends Component {
         );
     }
 
+    expandComponentProd(row) {
+        return (
+            <BSTableProd data={ row }/>
+        );
+    }
+
     expandComponentDist(row) {
         return (
             <BSTableDist data={ row }/>
         );
     }
 
-    closeAssetPanel = () => {
+    closeProductPanel = () => {
         this.setState({
-            isAssetPaneOpen: false,
-            nameValue:null,
-            discriptionValue:'',
+            isProductPaneOpen: false,
+            prodNameValue:"",
+            prodDiscValue:"",
             assetType:null,
-            priceValue:'',
-            manufacDate:'',
-            expiryDate:'',
-            qtyValue:'',
-            assetFormErrors:{nameVal:'', discVal:'', typeVal:'', priceVal:'', mgfVal:'', expVal:'', qtyVal:''},
-            assetFormValid:false,
-            nameValid:false,
-            discValid:false,
+            priceValue:"",
+            unitQuantityValue:"",
+            cartonCapValue:"",
+            packetCapValue:"",
+            productFormErrors:{nameVal:'', discVal:'', typeVal:'', priceVal:'', unitQtyVal:'', cartonCapVal:'', packetCapVal:''},
+            productFormValid:false,
+            prodNameValid:false,
+            prodDiscValid:false,
             typeValid:false,
             priceValid:false,
-            mgfValid:false,
-            expValid:false,
-            qtyValid:false,
-        });
-    };
+            unitQuantityValid:false,
+            cartonCapValid:false,
+            packetCapValid:false,
+        })
+    }
 
     handleInputChange(event) {
         const target = event.target;
@@ -519,17 +642,38 @@ class ManufacturerPanel extends Component {
 
     validate(name,value){
         var fieldErrors=this.state.assetFormErrors;
+        var prodFieldErrors=this.state.productFormErrors;
         var length=null;
         switch(name){
-            case 'discriptionValue':
-                fieldErrors.discVal = value.length > 10 ? true : false;
-                this.setState({ discValid:fieldErrors.discVal });
+            case 'prodNameValue':
+                prodFieldErrors.nameVal = value.length > 0 ? true : false;
+                this.setState({ prodNameValid:prodFieldErrors.nameVal });
+                break;
+            case 'prodDiscValue':
+                prodFieldErrors.discVal = value.length > 10 ? true : false;
+                this.setState({ prodDiscValid:prodFieldErrors.discVal });
                 break;
             case 'priceValue':
                 length = value.length > 0 ? true : false;
-                fieldErrors.priceVal = length && this.isPositiveInteger(value);
-                this.setState({ priceValid:fieldErrors.priceVal });
+                prodFieldErrors.priceVal = length && this.isPositiveInteger(value);
+                this.setState({ priceValid:prodFieldErrors.priceVal });
                 break;
+            case 'unitQuantityValue':
+                length = value.length > 0 ? true : false;
+                prodFieldErrors.unitQtyVal = length && this.isPositiveInteger(value);
+                this.setState({ unitQuantityValid:prodFieldErrors.unitQtyVal });
+                break;
+            case 'cartonCapValue':
+                length = value.length > 0 ? true : false;
+                prodFieldErrors.cartonCapVal = length && this.isPositiveInteger(value);
+                this.setState({ cartonCapValid:prodFieldErrors.cartonCapVal });
+                break;
+            case 'packetCapValue':
+                length = value.length > 0 ? true : false;
+                prodFieldErrors.packetCapVal = length && this.isPositiveInteger(value);
+                this.setState({ packetCapValid:prodFieldErrors.packetCapVal });
+                break;
+
             case 'manufacDate':
                 fieldErrors.mgfVal = value.length > 0 ? true : false;
                 this.setState({ mgfValid:fieldErrors.mgfVal });
@@ -548,22 +692,19 @@ class ManufacturerPanel extends Component {
         }
 
         this.setState({
-            errors: fieldErrors,
-            discValid:fieldErrors.discVal,
-            priceValid:fieldErrors.priceVal,
-            mgfValid:fieldErrors.mgfVal,
-            expValid:fieldErrors.expVal,
-            qtyValid:fieldErrors.qtyVal,
-        }, this.validateAssetForm );
+            productFormErrors:prodFieldErrors,
+            assetFormErrors: fieldErrors,
+        }, this.validateForm );
     }
 
-    validateAssetForm() {
-        this.setState({assetFormValid: this.state.nameValid && this.state.discValid && this.state.typeValid && this.state.priceValid && this.state.mgfValid && this.state.expValid && this.state.qtyValid });
+    validateForm() {
+        this.setState({ productFormValid: this.state.prodNameValid && this.state.prodDiscValid && this.state.typeValid && this.state.priceValid && this.state.unitQuantityValid && this.state.cartonCapValid && this.state.packetCapValid});
+        this.setState({assetFormValid: this.state.prodIdValid && this.state.mgfValid && this.state.expValid && this.state.qtyValid });
     }
 
     handleAddAsset(id, qr, name, description, owner, type, price, mgfDate, expDate, qty, timestamp) {
         var asset = {
-            index: (this.state.user.assets.length+1),
+            index: (this.state.userProps.pharmaassets.length+1),
             description: description,
             expiryDate:expDate,
             id: id,
@@ -576,8 +717,8 @@ class ManufacturerPanel extends Component {
             timestamp: timestamp,
             type:type,
         }
-        this.state.user.assets.push(asset);
-        this.setState(this.state.user);
+        this.state.userProps.pharmaassets.push(asset);
+        this.setState(this.state.userProps);
     };
 
     enrollDistributor = async e => {
@@ -599,8 +740,10 @@ class ManufacturerPanel extends Component {
             .catch(err => console.log(err));
             this.setState({distId:'0',distIdValid:false});
             document.getElementById("enrollmentFailure").style.display='none';
+            document.getElementById("enrollmentSuccess").style.display='block';
         }else{
             document.getElementById("enrollmentFailure").style.display='block';
+            document.getElementById("enrollmentSuccess").style.display='none';
             this.setState({distId:'0',distIdValid:false});
         }
     }
@@ -612,7 +755,7 @@ class ManufacturerPanel extends Component {
         if (response.status !== 200) throw Error(body.message);
         if(body.express!==-1){
             var dist = {
-                index: (this.state.user.distributors.length+1),
+                index: (this.state.userProps.distributors.length+1),
                 address: body.express.address,
                 id: body.express.id,
                 license: body.express.license,
@@ -625,55 +768,208 @@ class ManufacturerPanel extends Component {
                 label: body.express.name+", "+body.express.address,
                 value: body.express.id,
             }
-            this.state.user.distributors.push(dist);
+
+            this.state.userProps.distributors.push(dist);
             this.state.distList.push(tempDist);
-            this.setState(this.state.user);
+            this.setState(this.state.userProps);
             this.setState(this.state.distList);
         }
         return body;
     };
 
+    //updating Ahmad Shahid
     handleSubmit = async e => {
-        var id="asset"+(this.state.user.assets.length+1);
-        var qr="abcdef";
-        var name=this.state.nameValue.label;
-        var description=this.state.discriptionValue;
-        var owner=this.state.userID;
-        var type=this.state.assetType.label;
-        var price=this.state.priceValue;
+        var manufId = sessionStorage.getItem("user");
+        var prodId=this.state.prodId;
         var mgfDate=this.state.manufacDate;
         var expDate=this.state.expiryDate;
         var qty=this.state.qtyValue;
-        var timestamp=Date.now();
-        this.closeAssetPanel();
+        this.closeBatchPanel();
         e.preventDefault();
-        const response = await fetch('/add_asset', {
+        const response = await fetch('/add_batch', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ post: id.concat('~',qr,'~',name,'~',description,'~',owner,'~',type,'~',price,'~',mgfDate,'~',expDate,'~',qty,'~',timestamp) })
+            body: JSON.stringify({ post: manufId.concat('~',prodId,'~',mgfDate,'~',expDate,'~',qty) })
         });
         const body = await response.json();
         this.setState({ responseToPost: body });
         if(body.express.status===1){
-            this.handleAddAsset(id, qr, name, description, owner, type, price, mgfDate, expDate, qty, timestamp);
+            //this.handleAddAsset(id, name, description, owner, type, price, mgfDate, expDate, qty, timestamp);
             document.getElementById("assetFailure").style.display='none';
+            document.getElementById("assetSuccess").style.display='block';
+            window.location.reload();
         }else{
             document.getElementById("assetFailure").style.display='block';
+            document.getElementById("assetSuccess").style.display='none';
         }
+    };
+
+    closeBatchPanel = () => {
+        this.setState({
+            isBatchPaneOpen: false,
+            manufacDate:'',
+            expiryDate:'',
+            qtyValue:'',
+            assetFormErrors:{mgfVal:'', expVal:'', qtyVal:''},
+            assetFormValid:false,
+            mgfValid:false,
+            expValid:false,
+            qtyValid:false,
+            prodId : "",
+            prodIdValid:false,
+        });
+    };
+    // updating Ahmad Shahid
+
+    onAddBatch=()=>{
+        this.setState({ isBatchPaneOpen: true });
+        this.getAllCounts()
+        .then(res => this.setState({ count: res.express }))//get batch count
+        .catch(err => console.log(err));
+    }
+
+    onAddProduct=()=>{
+        this.setState({ isProductPaneOpen: true });
+        this.getAllCounts()
+        .then(res => this.setState({ count: res.express }))//get product count
+        .catch(err => console.log(err));
+    }
+
+    handleProductSubmit = async e => {
+        var manufId = sessionStorage.getItem("user");
+        var id="prod"+this.state.count.productcount;
+        var name=this.state.prodNameValue;
+        var type=this.state.assetType.label;
+        var description=this.state.prodDiscValue;
+        var retailPrice=this.state.priceValue;
+        var unitQty=this.state.unitQuantityValue;
+        var cartonCap=this.state.cartonCapValue;
+        var packetCap=this.state.packetCapValue;
+        this.closeProductPanel();
+        e.preventDefault();
+        const response = await fetch('/add_product', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ post: manufId.concat('~',name,'~',type,'~',description,'~',retailPrice,'~',unitQty,'~',cartonCap,'~',packetCap) })
+        });
+        const body = await response.json();
+        this.setState({ responseToPost: body });
+        if(body.express.status===1){
+            this.handleAddProduct(manufId, id, name, type, description, retailPrice, unitQty, cartonCap, packetCap);
+            document.getElementById("productFailure").style.display='none';
+            document.getElementById("productSuccess").style.display='block';
+        }else{
+            document.getElementById("productFailure").style.display='block';
+            document.getElementById("productSuccess").style.display='none';
+        }
+    }
+
+    handleAddProduct(manufId, id, name, type, description, retailPrice, unitQty, cartonCap, packetCap){
+        var product={
+            index:(this.state.userProps.products.length+1),
+            manufId:manufId,
+            id:id,
+            name:name,
+            type:type,
+            description:description,
+            retailprice:retailPrice,
+            unitquantity:unitQty,
+            cartoncapacity:cartonCap,
+            packetcapacity:packetCap,
+        }
+        this.state.userProps.products.push(product);
+        this.setState(this.state.userProps);
+        var tempProd={
+            label: name+", "+description,
+            value: id,
+        }
+
+        this.state.prodList.push(tempProd);
+        this.setState(this.state.prodList);
+    }
+
+    handleAllProdChange = (event) => {
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+        this.setState( { [name]: value } );
+        if(value!=='0'){
+            this.setState({prodIdValid: true});
+        }else{
+            this.setState({prodIdValid: false});
+        }
+    }
+
+    testTransaction=async e=>{
+        var id = null;
+        if(sessionStorage.getItem("user")){
+            id = sessionStorage.getItem("user");
+        }
+        var distId=this.state.distId2;
+        var body=null;
+        var error=false;
+        e.preventDefault();
+        var assetId=this.state.testId;
+        const response = await fetch('/change_owner', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ post: id.concat('~',assetId,'~',distId) })
+        });
+
+        body = await response.json();
+        if(body.express.status===-1){
+            error = true;
+        }
+        this.setState({ responseToPost2: body });
+        if(error){
+            document.getElementById("transactionFailure").style.display='block';
+            document.getElementById("itemNotFound").style.display = 'none';
+            document.getElementById("itemAlreadyExist").style.display = 'none';
+        } else{
+            this.setState({distId2:'0',testId:"", distId2Valid:false,QrResultArray:[]});
+            document.getElementById("transactionSuccess").style.display='block';
+            document.getElementById("itemNotFound").style.display = 'none';
+            document.getElementById("itemAlreadyExist").style.display = 'none';
+            window.location.reload();
+        }
+    }
+
+    getAllCounts = async () => {
+        const response = await fetch('/get_statics');
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+        console.log(body);
+        return body;
+    };
+    // updating Ahmad Shahid
+
+    qrFormatter(cell, row){
+
+        return (<QRCode value={ cell } level="M" size="56" renderAs="svg" />);
     };
 
     render() {
         const assetOptions = {
             onlyOneExpanding: true,
-            page:1, sizePerPageList: [ { text: '10', value: 10 }, { text: '20', value: 20 }, { text: '50', value: 50 }, { text: 'All', value: this.state.user.assets.length } ],
+            page:1, sizePerPageList: [ { text: '10', value: 10 }, { text: '20', value: 20 }, { text: '50', value: 50 }, { text: 'All', value: this.state.userProps.pharmaassets.length } ],
+            sizePerPage: 10, pageStartIndex: 1, paginationSize: 3, prePage: 'Prev', nextPage: 'Next', firstPage: 'First', lastPage: 'Last', paginationPosition: 'top'
+        }
+
+        const productOptions = {
+            onlyOneExpanding: true,
+            page:1, sizePerPageList: [ { text: '10', value: 10 }, { text: '20', value: 20 }, { text: '50', value: 50 }, { text: 'All', value: this.state.userProps.products.length } ],
             sizePerPage: 10, pageStartIndex: 1, paginationSize: 3, prePage: 'Prev', nextPage: 'Next', firstPage: 'First', lastPage: 'Last', paginationPosition: 'top'
         }
 
         const distOptions = {
             onlyOneExpanding: true,
-            page:1, sizePerPageList: [ { text: '10', value: 10 }, { text: '20', value: 20 }, { text: '50', value: 50 }, { text: 'All', value: this.state.user.distributors.length } ],
+            page:1, sizePerPageList: [ { text: '10', value: 10 }, { text: '20', value: 20 }, { text: '50', value: 50 }, { text: 'All', value: this.state.userProps.distributors.length } ],
             sizePerPage: 10, pageStartIndex: 1, paginationSize: 3, prePage: 'Prev', nextPage: 'Next', firstPage: 'First', lastPage: 'Last', paginationPosition: 'top'
         }
 
@@ -686,47 +982,72 @@ class ManufacturerPanel extends Component {
         return (
             <MDBContainer>
                 <PanelHeading title="Manufacturer Panel"/>
-                {/* Add asset side pane */}
-                <SlidingPane closeIcon={<div>[ X ]</div>} isOpen={this.state.isAssetPaneOpen} title='Add Asset' from='right' width='400px' onRequestClose={this.closeAssetPanel}>
+                {/* updating Ahmad Shahid */}
+                {/* Add batch side pane */}
+                <SlidingPane closeIcon={<div>[ X ]</div>} isOpen={this.state.isBatchPaneOpen} title='Add Batch' from='right' width='400px' onRequestClose={this.closeBatchPanel}>
                     <form onSubmit={this.handleSubmit}>
-                        <Select required className={this.state.nameValid ? "success" : "error"} placeholder="Asset Name *" value={this.state.nameValue} onChange={this.handleChange} options={assetNames}/>
-                        <MDBInput required id={this.state.discValid ? "success" : "error"} type="textarea" label="Description" rows="2" name="discriptionValue" value={this.state.discriptionValue} onChange={this.handleInputChange}/>
-                        <Select required className={this.state.typeValid ? "success" : "error"} placeholder="Asset Type *" value={this.state.assetType} onChange={this.handleTypeChange} options={assetTypes}/>
-                        <MDBInput required id={this.state.priceValid ? "success" : "error"} label="Price *" name="priceValue" type="number" min="1" value={this.state.priceValue} onChange={this.handleInputChange}/>
+                        <select required className={this.state.prodIdValid ? "custom-select is-valid" : "custom-select is-invalid"} value={this.state.prodId} onChange={this.handleAllProdChange} name="prodId" >
+                            <option value = '0'>Product *</option>
+                            {this.state.prodList.map(function(item, i){
+                                return <option key={i} value={item.value}>{item.label}</option>
+                             })}
+                        </select>
                         <MDBInput required id={this.state.mgfValid ? "success" : "error"} label="Manufacture Date *" hint="mm/dd/yyyy" name="manufacDate" type="date" value={this.state.manufacDate} onChange={this.handleInputChange}/>
                         <MDBInput required id={this.state.expValid ? "success" : "error"} label="Expiry Date *" hint="mm/dd/yyyy" name="expiryDate" type="date" value={this.state.expiryDate} onChange={this.handleInputChange}/>
-                        <MDBInput required id={this.state.qtyValid ? "success" : "error"} label="Quantity *" name="qtyValue" type="number" min="1" value={this.state.qtyValue} onChange={this.handleInputChange}/>
+                        <MDBInput required id={this.state.qtyValid ? "success" : "error"} label="Carton Quantity *" name="qtyValue" type="number" min="1" value={this.state.qtyValue} onChange={this.handleInputChange}/>
                         <center><MDBBtn size="sm" color="primary" type="submit" disabled={!this.state.assetFormValid}>Add</MDBBtn></center>
                     </form>
                 </SlidingPane>
 
+                {/* Add product side pane */}
+                <SlidingPane closeIcon={<div>[ X ]</div>} isOpen={this.state.isProductPaneOpen} title='Add Product' from='right' width='400px' onRequestClose={this.closeProductPanel}>
+                    <form onSubmit={this.handleProductSubmit}>
+                        <MDBInput required id={this.state.prodNameValid ? "success" : "error"} label="Product Name *" name="prodNameValue" type="text" value={this.state.prodNameValue} onChange={this.handleInputChange}/>
+                        <MDBInput required id={this.state.prodDiscValid ? "success" : "error"} type="textarea" label="Description" rows="1" name="prodDiscValue" value={this.state.prodDiscValue} onChange={this.handleInputChange}/>
+                        <Select required className={this.state.typeValid ? "success" : "error"} placeholder="Asset Type *" value={this.state.assetType} onChange={this.handleTypeChange} options={assetTypes}/>
+                        <MDBInput required id={this.state.priceValid ? "success" : "error"} label="Price *" name="priceValue" type="number" min="1" value={this.state.priceValue} onChange={this.handleInputChange}/>
+                        <MDBInput required id={this.state.unitQuantityValid ? "success" : "error"} label="Unit Quantity *" name="unitQuantityValue" type="number" min="1" value={this.state.unitQuantityValue} onChange={this.handleInputChange}/>
+                        <MDBInput required id={this.state.cartonCapValid ? "success" : "error"} label="Carton Capacity *" name="cartonCapValue" type="number" min="1" value={this.state.cartonCapValue} onChange={this.handleInputChange}/>
+                        <MDBInput required id={this.state.packetCapValid ? "success" : "error"} label="Packet Capacity *" name="packetCapValue" type="number" min="1" value={this.state.packetCapValue} onChange={this.handleInputChange}/>
+                        <center><MDBBtn size="sm" color="primary" type="submit" disabled={!this.state.productFormValid}>Add</MDBBtn></center>
+                    </form>
+                </SlidingPane>
+
+                {/* updating Ahmad Shahid */}
+
                 <Nav tabs pills>
                     <NavItem>
-                        <NavLink className={classnames({ active: this.state.activeTab === '1' })} onClick={() => { this.toggle('1'); }}>Asset</NavLink>
+                        <NavLink className={classnames({ active: this.state.activeTab === '1' })} onClick={() => { this.toggle('1'); }}>Assets</NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink className={classnames({ active: this.state.activeTab === '2' })} onClick={() => { this.toggle('2'); }}>Distributor</NavLink>
+                        <NavLink className={classnames({ active: this.state.activeTab === '2' })} onClick={() => { this.toggle('2'); }}>Distributors</NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink className={classnames({ active: this.state.activeTab === '3' })} onClick={() => { this.toggle('3'); }}>Transaction</NavLink>
+                        <NavLink className={classnames({ active: this.state.activeTab === '3' })} onClick={() => { this.toggle('3'); }}>Transactions</NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink className={classnames({ active: this.state.activeTab === '4' })} onClick={() => { this.toggle('4'); }}>QR Codes</NavLink>
+                        <NavLink className={classnames({ active: this.state.activeTab === '4' })} onClick={() => { this.toggle('4'); }}>Products</NavLink>
+                    </NavItem>
+                    <NavItem>
+                        <NavLink className={classnames({ active: this.state.activeTab === '5' })} onClick={() => { this.toggle('5'); }}>QR Codes</NavLink>
                     </NavItem>
                 </Nav>
                 <TabContent activeTab={this.state.activeTab}>
                     <TabPane tabId="1">
                         <Row>
                             <Col sm={12}>
-                                <label id="assetFailure" style={{color:"red", display:"none"}}>Cannot Create Asset.</label>
-                                <MDBBtn size="sm" color="primary" onClick={()=>this.setState({ isAssetPaneOpen: true })} >Add Asset</MDBBtn>
-                                <BootstrapTable data={ this.state.user.assets } version='4' hover condensed pagination options={ assetOptions }  expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponent } >
-                                    <TableHeaderColumn isKey dataField='index'>No.</TableHeaderColumn>
-                                    <TableHeaderColumn dataField='name' filter={{ type: 'TextFilter', delay: 100 }}>Asset Name</TableHeaderColumn>
+                                {/* updating Ahmad Shahid */}
+                                <label id="assetFailure" style={{color:"red", display:"none"}}>Cannot Create Batch.</label>
+                                <label id="assetSuccess" style={{color:"green", display:"none"}}>Batch Created.</label>
+                                <MDBBtn size="sm" color="primary" onClick={this.onAddBatch} >Add Batch</MDBBtn>
+                                <BootstrapTable data={ this.state.userProps.pharmaassets } version='4' hover condensed pagination options={ assetOptions }  expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponent } >
+                                    <TableHeaderColumn isKey dataField='index' width='70' >No.</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='id' width='70' dataFormat={this.qrFormatter.bind(this)}>QR Code</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='id'>Asset ID</TableHeaderColumn>
                                     <TableHeaderColumn dataField='owner' filter={{ type: 'TextFilter', delay: 100 }}>Owner</TableHeaderColumn>
-                                    <TableHeaderColumn dataField='quantity' >Quantity</TableHeaderColumn>
                                 </BootstrapTable>
                                 <br/><br/>
+                                {/* updating Ahmad Shahid */}
                             </Col>
                         </Row>
                     </TabPane>
@@ -734,7 +1055,8 @@ class ManufacturerPanel extends Component {
                         <Row>
                             <Col sm={12}>
                                 <br/>
-                                <label id="enrollmentFailure" style={{color:"red", display:"none"}}>Cannot Enroll Distributor, selected distributor alredy enrolled.</label>
+                                <label id="enrollmentFailure" style={{color:"red", display:"none"}}>Cannot Enroll Distributor, selected distributor already enrolled.</label>
+                                <label id="enrollmentSuccess" style={{color:"green", display:"none"}}>Distributor Enrolled Successfully!!!</label>
                                 <form onSubmit={this.enrollDistributor} >
                                     <div className="form-group">
                                     <select required className={this.state.distIdValid ? "custom-select is-valid" : "custom-select is-invalid"} value={this.state.distId} onChange={this.handleAllDistChange} name="distId" >
@@ -747,8 +1069,8 @@ class ManufacturerPanel extends Component {
                                     <MDBBtn size="sm" color="primary" type="submit" disabled={!this.state.distIdValid}>Enroll</MDBBtn>
                                 </form>
 
-                                <BootstrapTable data={ this.state.user.distributors } version='4' hover condensed pagination options={ distOptions } expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponentDist } >
-                                    <TableHeaderColumn isKey dataField='index'>No.</TableHeaderColumn>
+                                <BootstrapTable data={ this.state.userProps.distributors } version='4' hover condensed pagination options={ distOptions } expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponentDist } >
+                                    <TableHeaderColumn isKey dataField='index' width='70' >No.</TableHeaderColumn>
                                     <TableHeaderColumn dataField='name' filter={{ type: 'TextFilter', delay: 100 }}>Distributor Name</TableHeaderColumn>
                                     <TableHeaderColumn dataField='owneraddress' filter={{ type: 'TextFilter', delay: 100 }}>Owner</TableHeaderColumn>
                                     <TableHeaderColumn dataField='ownercnic' >Owner CNIC</TableHeaderColumn>
@@ -769,7 +1091,10 @@ class ManufacturerPanel extends Component {
                                             return <option key={i} value={item.value}>{item.label}</option>
                                          })}
                                     </select>
-                                    <MDBBtn color="blue"  size="sm" type="submit" disabled={!(this.state.distId2Valid && (this.state.QrResultArray.length > 0)) }>Transact</MDBBtn>
+                                    <MDBInput label="Product Id *" name="testId" type="text" value={this.state.testId} onChange={this.handleInputChange}/>
+                                    <MDBBtn color="blue" size="sm" onClick={this.testTransaction}>Transact (Text Input)</MDBBtn>
+
+                                    <MDBBtn color="blue" size="sm" type="submit" disabled={!(this.state.distId2Valid && (this.state.QrResultArray.length > 0)) }>Transact (QR Code)</MDBBtn>
 
                                 </Col>
                                 <Col sm={3}>
@@ -788,9 +1113,9 @@ class ManufacturerPanel extends Component {
                             <Row>
                                 <Col sm={12}>
                                     <BootstrapTable data={this.state.QrResultArray} version='4' hover condensed pagination options={ scanAssetOptions }>
-                                        <TableHeaderColumn isKey dataField='index'>#</TableHeaderColumn>
-                                        <TableHeaderColumn dataField='name'>Asset Name</TableHeaderColumn>
-                                        <TableHeaderColumn dataField='price'>Price</TableHeaderColumn>
+                                        <TableHeaderColumn isKey dataField='index' width='70'>#</TableHeaderColumn>
+                                        <TableHeaderColumn dataField='id'>Asset ID</TableHeaderColumn>
+                                        <TableHeaderColumn dataField='owner'>Owner</TableHeaderColumn>
                                     </BootstrapTable>
                                 </Col>
                             </Row>
@@ -804,6 +1129,23 @@ class ManufacturerPanel extends Component {
                         </form>
                     </TabPane>
                     <TabPane tabId="4">
+                        <Row>
+                            <Col sm={12}>
+                                {/* updating Ahmad Shahid */}
+                                <label id="productFailure" style={{color:"red", display:"none"}}>Cannot Create Product.</label>
+                                <label id="productSuccess" style={{color:"green", display:"none"}}>Product created successfully.</label>
+                                <MDBBtn size="sm" color="primary" onClick={this.onAddProduct} >Create Product</MDBBtn>
+                                <BootstrapTable data={ this.state.userProps.products } version='4' hover condensed pagination options={ productOptions } expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponentProd }  >
+                                    <TableHeaderColumn isKey dataField='index' width='70' >No.</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='name' filter={{ type: 'TextFilter', delay: 100 }}>Product Name</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='description'>Product Name</TableHeaderColumn>
+                                </BootstrapTable>
+                                <br/><br/>
+                                {/* updating Ahmad Shahid */}
+                            </Col>
+                        </Row>
+                    </TabPane>
+                    <TabPane tabId="5">
                         <Row>
                             <Col sm={12}>
                                 <center>

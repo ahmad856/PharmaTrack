@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { MDBIcon, MDBContainer, MDBRow, MDBCol, MDBJumbotron, MDBBtn, MDBCard, MDBCardHeader, MDBCardBody, MDBListGroupItem, MDBListGroup } from "mdbreact";
+import {MDBIcon, MDBInput, MDBContainer, MDBBtn, MDBCard, MDBCol, MDBJumbotron, MDBCardHeader, MDBCardBody, MDBCardText, MDBListGroup, MDBListGroupItem, MDBRow, MDBModal, MDBModalBody, MDBModalHeader, MDBModalFooter } from "mdbreact";
 import QrReader from "react-qr-reader";
 
 //<img src={qrImg} alt="QR Code" height="50px" width="50px"/>
@@ -12,6 +12,11 @@ class Verification extends Component {
         this.state.custExArr=[];
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleScan = this.handleScan.bind(this);
+        this.modal= false;
+        this.state.emailname="";
+        this.state.emailtext="";
+        this.state.emaildate="";
+
     }
 
     redirectUser = (path) => {
@@ -60,6 +65,42 @@ class Verification extends Component {
         .catch(err => console.log(err));
     };
 
+
+    sendSoldEmail = async() =>{
+        const msg = 'I bought this asset with ID: '+this.state.code+' but it is recorded with some other customer.';
+        this.setState({
+            emailtext: msg
+        });
+        this.togglemodal();
+    }
+    sendUnsoldEmail = async() =>{
+        const msg = 'I bought this asset with ID: '+this.state.code+' but it is still recorded as unsold.';
+        this.setState({
+            emailtext: msg
+        });
+        this.togglemodal();
+    }
+
+    sendEmail = async () => {
+        
+        this.togglemodal();
+
+        const response = await fetch('/email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+                body: JSON.stringify({ post: 'Name: '+this.state.emailname+'\nMessage: '+this.state.emailtext+'\nDate Bought: '+this.state.emaildate })
+        });
+        
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+        console.log(body);
+        return body;
+    };
+
+
+
     getAllTransactions = async () => {
         var id=this.state.code;
         console.log(id);
@@ -76,11 +117,38 @@ class Verification extends Component {
         if (response.status !== 200) throw Error(body.message);
         return body;
     };
+
+
+    togglemodal = () => {
+
+        this.setState({
+            modal: !this.state.modal,
+        });
+    }
+
+
     // <p>_____OR_____</p>
     render() {
-        var custEx='false';
+        var custEx='empty';
         return (
             <MDBContainer>
+
+                    <MDBModal isOpen={this.state.modal} toggle={this.togglemodal} size="lg">
+                        <MDBModalHeader toggle={this.togglemodal}>Report Problem</MDBModalHeader>
+                        <MDBModalBody>
+
+                            <MDBInput label="Name" name="emailname" type="text" class="message-input" value={this.state.emailname} onChange={this.handleInputChange}/>
+                            <MDBInput label="Complaint/Comments" name="emailtext" type="text" value={this.state.emailtext} onChange={this.handleInputChange}/>
+                            <MDBInput label="When did you buy this asset?" hint="mm/dd/yyyy" name="emaildate" type="date" value={this.state.emaildate} onChange={this.handleInputChange}/>
+
+
+                        </MDBModalBody>
+                        <MDBModalFooter>
+                            <MDBBtn color="secondary" onClick={this.sendEmail}>Send</MDBBtn>
+                        </MDBModalFooter>
+                    </MDBModal>
+
+
                 <MDBRow>
                     <MDBCol md="8" className="mx-auto">
                         <MDBJumbotron className="mt-3">
@@ -90,17 +158,21 @@ class Verification extends Component {
                             <form>
                                 <center><label className="fixTitle1">Scan Code :</label>
                                     <QrReader delay={500} onError={this.handleError} onScan={this.handleScan} style={{ width: "50%" }} />
-                                    <MDBBtn size="sm" color="primary" onClick={this.verify}>Verify</MDBBtn>
+                                    <MDBBtn size="sm" color="primary" onClick={this.verify}>Verify (QR Code)</MDBBtn>
                                 </center>
                             </form>
+
+                            <MDBInput label="Product Id *" name="code" type="text" value={this.state.code} onChange={this.handleInputChange}/>
+                            <MDBBtn color="blue" size="sm" onClick={this.verify}>Verify (Text Input)</MDBBtn>
                         </MDBJumbotron>
                     </MDBCol>
                 </MDBRow>
 
                 {/* Iterates */}
-                {this.state.transactions.map(function (transaction) {
+                {this.state.transactions.map((transaction) => {
                     console.log(custEx);
                     if (transaction.asset.customer.name) {
+                        custEx= 'true';
                         return (
                             <MDBCard border="info" className="m-3" style={{ width: "70rem" }}>
                                 <MDBCardHeader color="blue">
@@ -108,16 +180,19 @@ class Verification extends Component {
                                 </MDBCardHeader>
                                 <MDBCardBody>
                                     <label>This asset was </label>&nbsp;<label style={{ color: "red" }}> SOLD </label>&nbsp;<label> to a customer </label><br /><br />
-                                    <strong>Name: </strong>&nbsp;&nbsp;<label>{transaction.asset.customer.name}</label><br />
-                                    <strong>Phone: </strong>&nbsp;&nbsp;<label>{transaction.asset.customer.phone}</label><br />
+                                    <strong>Name: </strong>&nbsp;&nbsp;<label>{transaction.asset.customer.name}</label><br/>
+                                    <strong>Phone: </strong>&nbsp;&nbsp;<label>{transaction.asset.customer.phone}</label><br/>
                                     <strong>Date and Time: </strong>&nbsp;&nbsp;<label>{Date(transaction.asset.customer.timestamp).toString()}</label><br />
-                                    <br />
-                                    <label>Not you? </label>&nbsp;<a href="#">Report here!</a><br />
+                                    <br/>
+                                    <label>Not you? </label>&nbsp;
+                                    <MDBBtn size="sm" color="red" onClick={this.sendSoldEmail}>Report Here!</MDBBtn>
+
                                 </MDBCardBody>
                             </MDBCard>
                         );
                     }
                     else {
+                        custEx= 'false';
                         return (
                             <MDBCard border="info" className="m-3" style={{ width: "70rem" }} key={transaction.txid}>
                                 <MDBCardHeader> Transaction Details</MDBCardHeader>
@@ -134,9 +209,8 @@ class Verification extends Component {
                         );
                     }
                 })}
-                {this.state.custExArr.map(function (fun) {
-                    if (custEx == 'false') {
-                        return (
+                {
+                    custEx == 'false' ? (
                             <MDBCard border="info" className="m-3" style={{ width: "70rem" }}>
                                 <MDBCardHeader color="red">
                                     <p><MDBIcon icon="user" /> Customer Details</p>
@@ -145,15 +219,14 @@ class Verification extends Component {
                                     <label>This asset is </label>&nbsp;<label style={{ color: "red" }}> NOT SOLD </label>&nbsp;<label> to any customer yet </label><br /><br />
                                     <br />
                                     <br />
-                                    <label>Bought it? </label>&nbsp;<a href="#">Report here!</a><br />
+                                    <label>Bought it? </label>&nbsp;
+                                    <MDBBtn size="sm" color="red" onClick={this.sendUnsoldEmail}>Report Here!</MDBBtn>
+
                                 </MDBCardBody>
                             </MDBCard>
-                        );
-                    }
-                    else{
-                        console.log("lpc");
-                    }
-                })}
+                    ) : (console.log("else"))
+                    
+                }
             </MDBContainer>
         );
     }
