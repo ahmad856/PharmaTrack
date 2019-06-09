@@ -66,7 +66,8 @@ class HomePage extends Component {
                                     <MDBCol size="10" md="8" lg="10" className="float-right">
                                         <h4 className="font-weight-bold">M. Ahmad Shahid</h4>
                                         <p className="grey-text">
-                                          Team Lead/Front End/controller!!!
+                                          Team Lead<br/>
+                                          Front End/controller guy!!!
                                         </p>
                                     </MDBCol>
                                 </MDBCol>
