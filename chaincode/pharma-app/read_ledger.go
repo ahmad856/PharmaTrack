@@ -1,10 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	sc "github.com/hyperledger/fabric/protos/peer"
@@ -14,111 +14,398 @@ func (s *SmartContract) getStaticVariables(APIstub shim.ChaincodeStubInterface) 
 
 	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
 	if staticsAsBytes == nil {
-		return shim.Error("GetStaticVariables: Could not locate asset")
+		return shim.Error("In function getStaticVariables: Statics not found.")
 	}
 	return shim.Success(staticsAsBytes)
 }
+
+
+
+/////////////////////////////////////////////////////////
+//INITIAL FUNCTIONS
+///////////////////////////////////////////////////////
+
+//FOR ADMIN
 
 func (s *SmartContract) readAllUsers(APIstub shim.ChaincodeStubInterface) sc.Response {
 	type Users struct {
 		Manufacturers []Manufacturer `json:"manufacturers"`
 		Distributors  []Distributor  `json:"distributors"`
 		Chemists      []Chemist      `json:"chemists"`
+		Admins        []Admin        `json:"admins"`
+		AdminLogs     []AdminLog        `json:"adminlogs"`
+
 	}
 	var allUsers Users
 	var statics StaticVariables
 
 	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
 	if staticsAsBytes == nil {
-		return shim.Error("func: readAllUser... Could not get static variables")
+		return shim.Error("In function readAllUsers: Statics not found.")
 	}
 	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
 
-	if statics.ManufacturerCount > 0 {
 
-		// ---- Get All Manufacturers ---- //
-		resultsIterator, err := APIstub.GetStateByRange("manuf0", "manuf"+strconv.Itoa(statics.ManufacturerCount))
-		if err != nil {
-			return shim.Error(err.Error())
+	manufid := 0
+	for manufid<statics.ManufacturerCount {
+
+		manufAsBytes, _ := APIstub.GetState("manuf"+strconv.Itoa(manufid))
+		if manufAsBytes == nil {
+			return shim.Error("In function readAllUsers: A Manufacturer was not found.")
 		}
-		defer resultsIterator.Close()
+		manuf := Manufacturer{}
+		json.Unmarshal(manufAsBytes, &manuf)
 
-		for resultsIterator.HasNext() {
-			aKeyValue, err := resultsIterator.Next()
-			if err != nil {
-				return shim.Error(err.Error())
-			}
-			queryKeyAsStr := aKeyValue.Key
-			queryValAsBytes := aKeyValue.Value
-			fmt.Println("on manufacturer id - ", queryKeyAsStr)
-			var manuf Manufacturer
-			json.Unmarshal(queryValAsBytes, &manuf)                        //un stringify it aka JSON.parse()
-			allUsers.Manufacturers = append(allUsers.Manufacturers, manuf) //add this manuf to the list
-		}
-		fmt.Println("manufacturers array - ", allUsers.Manufacturers)
+		allUsers.Manufacturers = append(allUsers.Manufacturers, manuf)
 
-	} else {
-		return shim.Error("func: readAllUser... no manufacturers")
+		manufid += 1
 	}
+	fmt.Println("manufacturers array - ", allUsers.Manufacturers)
 
-	if statics.DistributorCount > 0 {
+	distid := 0
+	for distid<statics.DistributorCount {
 
-		// ---- Get All Distributors ---- //
-		resultsIterator, err := APIstub.GetStateByRange("dist0", "dist"+strconv.Itoa(statics.DistributorCount))
-		if err != nil {
-			return shim.Error(err.Error())
+		distAsBytes, _ := APIstub.GetState("dist"+strconv.Itoa(distid))
+		if distAsBytes == nil {
+			return shim.Error("In function readAllUsers: A Distributor was not found.")
 		}
-		defer resultsIterator.Close()
+		dist := Distributor{}
+		json.Unmarshal(distAsBytes, &dist)
 
-		for resultsIterator.HasNext() {
-			aKeyValue, err := resultsIterator.Next()
-			if err != nil {
-				return shim.Error(err.Error())
-			}
-			queryKeyAsStr := aKeyValue.Key
-			queryValAsBytes := aKeyValue.Value
-			fmt.Println("on distributor id - ", queryKeyAsStr)
-			var dist Distributor
-			json.Unmarshal(queryValAsBytes, &dist)                      //un stringify it aka JSON.parse()
-			allUsers.Distributors = append(allUsers.Distributors, dist) //add this dist to the list
-		}
-		fmt.Println("distributors array - ", allUsers.Distributors)
+		allUsers.Distributors = append(allUsers.Distributors, dist)
 
-	} else {
-		return shim.Error("func: readAllUser... no distributors")
+		distid += 1
 	}
+	fmt.Println("distributors array - ", allUsers.Distributors)
 
-	if statics.ChemistCount > 0 {
+	chemid := 0
+	for chemid<statics.ChemistCount {
 
-		// ---- Get All chemists ---- //
-		resultsIterator, err := APIstub.GetStateByRange("chem0", "chem"+strconv.Itoa(statics.ChemistCount))
-		if err != nil {
-			return shim.Error(err.Error())
+		chemAsBytes, _ := APIstub.GetState("chem"+strconv.Itoa(chemid))
+		if chemAsBytes == nil {
+			return shim.Error("In function readAllUsers: A Chemist was not found.")
 		}
-		defer resultsIterator.Close()
+		chem := Chemist{}
+		json.Unmarshal(chemAsBytes, &chem)
 
-		for resultsIterator.HasNext() {
-			aKeyValue, err := resultsIterator.Next()
-			if err != nil {
-				return shim.Error(err.Error())
-			}
-			queryKeyAsStr := aKeyValue.Key
-			queryValAsBytes := aKeyValue.Value
-			fmt.Println("on chemist id - ", queryKeyAsStr)
-			var chem Chemist
-			json.Unmarshal(queryValAsBytes, &chem)              //un stringify it aka JSON.parse()
-			allUsers.Chemists = append(allUsers.Chemists, chem) //add this chem to the list
-		}
-		fmt.Println("chemists array - ", allUsers.Chemists)
+		allUsers.Chemists = append(allUsers.Chemists, chem)
 
-	} else {
-		return shim.Error("func: readAllUser... no chemists")
+		chemid += 1
 	}
+	fmt.Println("chemists array - ", allUsers.Chemists)
+
+	adminid := 0
+	for adminid<statics.AdminCount {
+
+		adminAsBytes, _ := APIstub.GetState("admin"+strconv.Itoa(adminid))
+		if adminAsBytes == nil {
+			return shim.Error("In function readAllUsers: An Admin was not found.")
+		}
+		admin := Admin{}
+		json.Unmarshal(adminAsBytes, &admin)
+
+		allUsers.Admins = append(allUsers.Admins, admin)
+
+		adminid += 1
+	}
+	fmt.Println("admins array - ", allUsers.Admins)
+
+	adminlogid := 0
+	for adminlogid<statics.AdminLogCount {
+
+		adminlogAsBytes, _ := APIstub.GetState("adminlog"+strconv.Itoa(adminlogid))
+		if adminlogAsBytes == nil {
+			return shim.Error("In function readAllUsers: An Admin Log was not found.")
+		}
+		adminlog := AdminLog{}
+		json.Unmarshal(adminlogAsBytes, &adminlog)
+
+		allUsers.AdminLogs = append(allUsers.AdminLogs, adminlog)
+
+		adminlogid += 1
+	}
+	fmt.Println("admin logs array - ", allUsers.AdminLogs)
+
+
 
 	//change to array of bytes
 	usersAsBytes, _ := json.Marshal(allUsers) //convert to array of bytes
 	return shim.Success(usersAsBytes)
 }
+
+
+func (s *SmartContract) readAllDistributors(APIstub shim.ChaincodeStubInterface) sc.Response {
+	type Users struct {
+		Distributors  []Distributor  `json:"distributors"`
+
+	}
+	var allUsers Users
+	var statics StaticVariables
+
+	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
+	if staticsAsBytes == nil {
+		return shim.Error("In function readAllUsers: Statics not found.")
+	}
+	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
+
+
+	distid := 0
+	for distid<statics.DistributorCount {
+
+		distAsBytes, _ := APIstub.GetState("dist"+strconv.Itoa(distid))
+		if distAsBytes == nil {
+			return shim.Error("In function readAllDistributors: A Distributor was not found.")
+		}
+		dist := Distributor{}
+		json.Unmarshal(distAsBytes, &dist)
+
+		allUsers.Distributors = append(allUsers.Distributors, dist)
+
+		distid += 1
+	}
+	fmt.Println("distributors array - ", allUsers.Distributors)
+
+	//change to array of bytes
+	usersAsBytes, _ := json.Marshal(allUsers) //convert to array of bytes
+	return shim.Success(usersAsBytes)
+}
+
+
+func (s *SmartContract) readAllChemists(APIstub shim.ChaincodeStubInterface) sc.Response {
+	type Users struct {
+		Chemists  []Chemist  `json:"chemists"`
+
+	}
+	var allUsers Users
+	var statics StaticVariables
+
+	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
+	if staticsAsBytes == nil {
+		return shim.Error("In function readAllUsers: Statics not found.")
+	}
+	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
+
+
+	chemid := 0
+	for chemid<statics.ChemistCount {
+
+		chemAsBytes, _ := APIstub.GetState("chem"+strconv.Itoa(chemid))
+		if chemAsBytes == nil {
+			return shim.Error("In function readAllChemists: A Chemist was not found.")
+		}
+		chem := Chemist{}
+		json.Unmarshal(chemAsBytes, &chem)
+
+		allUsers.Chemists = append(allUsers.Chemists, chem)
+
+		chemid += 1
+	}
+	fmt.Println("chemists array - ", allUsers.Chemists)
+
+	//change to array of bytes
+	usersAsBytes, _ := json.Marshal(allUsers) //convert to array of bytes
+	return shim.Success(usersAsBytes)
+}
+
+
+
+//FOR MANUF
+
+func (s *SmartContract) initialReadManufacturer(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 1 {
+		return shim.Error("In function initialReadManufacturer: Incorrect number of arguments. Expecting 1.")
+	}
+
+	if !strings.HasPrefix(args[0], "manuf") {
+		return shim.Error("In function initialReadManufacturer: Manufacturer ID provided is not valid. Manufacturer IDs start with 'manuf'.")
+	}
+
+	manufAsBytes, _ := APIstub.GetState(args[0])
+	if manufAsBytes == nil {
+		return shim.Error("In function initialReadManufacturer: Given Manufacturer not found.")
+	}
+
+	current := Manufacturer{}
+	json.Unmarshal(manufAsBytes, &current)
+
+
+	type InitialManuf struct {
+		Distributors  []Distributor  `json:"distributors"`
+		Products		[]Product 		`json:"products"`
+
+		PharmaAssets	[]PharmaAsset 		`json:"pharmaassets"`
+
+	}
+
+	var data InitialManuf
+
+	for _, distid := range current.Distributors {
+
+			distAsBytes, _ := APIstub.GetState(distid)
+			if distAsBytes == nil {
+				return shim.Error("In function initialReadManufacturer: A Distributor was not found.")
+			}
+			dist := Distributor{}
+			json.Unmarshal(distAsBytes, &dist)
+
+			if dist.Suspended==false {
+				data.Distributors = append(data.Distributors, dist)
+			}
+
+	}
+	for _, prodid := range current.Products {
+
+			prodAsBytes, _ := APIstub.GetState(prodid)
+			if prodAsBytes == nil {
+				return shim.Error("In function initialReadManufacturer: A Product was not found.")
+			}
+			prod := Product{}
+			json.Unmarshal(prodAsBytes, &prod)
+
+			data.Products = append(data.Products, prod)
+
+	}
+	for _, assetid := range current.Assets {
+
+			assetAsBytes, _ := APIstub.GetState(assetid)
+			if assetAsBytes == nil {
+				return shim.Error("In function initialReadManufacturer: An Asset was not found."+assetid)
+			}
+
+			asset := PharmaAsset{}
+			json.Unmarshal(assetAsBytes, &asset)
+			data.PharmaAssets = append(data.PharmaAssets, asset)
+
+	}
+
+
+
+	//change to array of bytes
+	dataAsBytes, _ := json.Marshal(data) //convert to array of bytes
+	return shim.Success(dataAsBytes)
+}
+
+
+//FOR DIST
+
+func (s *SmartContract) initialReadDistributor(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 1 {
+		return shim.Error("In function initialReadDistributor: Incorrect number of arguments. Expecting 1.")
+	}
+
+	if !strings.HasPrefix(args[0], "dist") {
+		return shim.Error("In function initialReadDistributor: Distributor ID provided is not valid. Distributor IDs start with 'dist'.")
+	}
+
+	distAsBytes, _ := APIstub.GetState(args[0])
+	if distAsBytes == nil {
+		return shim.Error("In function initialReadDistributor: Given Distributor not found.")
+	}
+
+	current := Distributor{}
+	json.Unmarshal(distAsBytes, &current)
+
+
+	type InitialDist struct {
+		Chemists 		 []Chemist  `json:"chemists"`
+
+		PharmaAssets	[]PharmaAsset 		`json:"pharmaassets"`
+
+	}
+
+	var data InitialDist
+
+	for _, chemid := range current.Chemists {
+
+			chemAsBytes, _ := APIstub.GetState(chemid)
+			if chemAsBytes == nil {
+				return shim.Error("In function initialReadDistributor: A Chemist was not found.")
+			}
+			chem := Chemist{}
+			json.Unmarshal(chemAsBytes, &chem)
+
+			if chem.Suspended==false {
+				data.Chemists = append(data.Chemists, chem)
+			}
+
+	}
+
+	for _, assetid := range current.Assets {
+
+			assetAsBytes, _ := APIstub.GetState(assetid)
+			if assetAsBytes == nil {
+				return shim.Error("In function initialReadDistributor: An Asset was not found.")
+			}
+
+			asset := PharmaAsset{}
+			json.Unmarshal(assetAsBytes, &asset)
+			data.PharmaAssets = append(data.PharmaAssets, asset)
+
+	}
+
+
+
+	//change to array of bytes
+	dataAsBytes, _ := json.Marshal(data) //convert to array of bytes
+	return shim.Success(dataAsBytes)
+}
+
+
+//FOR CHEM
+
+func (s *SmartContract) initialReadChemist(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 1 {
+		return shim.Error("In function initialReadChemist: Incorrect number of arguments. Expecting 1.")
+	}
+
+	if !strings.HasPrefix(args[0], "chem") {
+		return shim.Error("In function initialReadChemist: Chemist ID provided is not valid. Chemist IDs start with 'chem'.")
+	}
+
+	chemAsBytes, _ := APIstub.GetState(args[0])
+	if chemAsBytes == nil {
+		return shim.Error("In function initialReadChemist: Given Chemist not found.")
+	}
+
+	current := Chemist{}
+	json.Unmarshal(chemAsBytes, &current)
+
+
+	type InitialChem struct {
+
+		PharmaAssets	[]PharmaAsset 		`json:"pharmaassets"`
+
+	}
+
+	var data InitialChem
+
+	for _, assetid := range current.Assets {
+
+			assetAsBytes, _ := APIstub.GetState(assetid)
+			if assetAsBytes == nil {
+				return shim.Error("In function initialReadChemist: An Asset was not found.")
+			}
+
+			asset := PharmaAsset{}
+			json.Unmarshal(assetAsBytes, &asset)
+			data.PharmaAssets = append(data.PharmaAssets, asset)
+
+	}
+
+
+
+
+	//change to array of bytes
+	dataAsBytes, _ := json.Marshal(data) //convert to array of bytes
+	return shim.Success(dataAsBytes)
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
 
 /*
  * The queryAsset method *
@@ -129,12 +416,12 @@ It takes one argument -- the key for the Asset in question
 func (s *SmartContract) queryAsset(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 1 {
-		return shim.Error("Incorrect number of arguments. Expecting 1")
+		return shim.Error("In function queryAsset: Incorrect number of arguments. Expecting 1.")
 	}
 
 	assetAsBytes, _ := APIstub.GetState(args[0])
 	if assetAsBytes == nil {
-		return shim.Error("Could not locate asset")
+		return shim.Error("In function queryAsset: Asset not found.")
 	}
 	return shim.Success(assetAsBytes)
 }
@@ -145,86 +432,31 @@ Used to view the records of one particular user
 It takes one argument -- the key for the User in question
 */
 
-func (s *SmartContract) queryUser(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+func (s *SmartContract) login(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 1 {
-		return shim.Error("Incorrect number of arguments. Expecting 1")
+		return shim.Error("In function login: Incorrect number of arguments. Expecting 1.")
+	}
+	if !(strings.HasPrefix(args[0], "admin") || strings.HasPrefix(args[0], "manuf") || strings.HasPrefix(args[0], "dist") || strings.HasPrefix(args[0], "chem")) {
+		return shim.Error("In function login: Invalid User ID. User IDs start with 'admin', 'manuf', 'dist' or 'chem'.")
 	}
 
 	userAsBytes, _ := APIstub.GetState(args[0])
 	if userAsBytes == nil {
-		return shim.Error("Could not locate user")
+		return shim.Error("In function login: User not found.")
 	}
+
+	user := User{}
+	json.Unmarshal(userAsBytes, &user)
+
+	if user.Suspended==true {
+		return shim.Error("In function login: This User has been suspended by an Admin.")
+	}
+
 	return shim.Success(userAsBytes)
 }
 
-/*
- * The queryOwner method *
-Used to view the records of one particular Asset
-It takes one argument -- the key for the owner in question
-*/
 
-func (s *SmartContract) queryOwner(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-
-	if len(args) != 1 {
-		return shim.Error("Incorrect number of arguments. Expecting 1")
-	}
-
-	ownerAsBytes, _ := APIstub.GetState(args[0])
-	if ownerAsBytes == nil {
-		return shim.Error("Could not locate asset")
-	}
-	return shim.Success(ownerAsBytes)
-}
-
-/*
- * The queryAllAssets method *
-allows for assessing all the records added to the ledger(all assets)
-This method does not take any arguments. Returns JSON string containing results.
-*/
-
-func (s *SmartContract) queryAllAssets(APIstub shim.ChaincodeStubInterface) sc.Response {
-
-	startKey := "0"
-	endKey := "999"
-
-	resultsIterator, err := APIstub.GetStateByRange(startKey, endKey)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-	defer resultsIterator.Close()
-
-	// buffer is a JSON array containing QueryResults
-	var buffer bytes.Buffer
-	buffer.WriteString("[")
-
-	bArrayMemberAlreadyWritten := false
-	for resultsIterator.HasNext() {
-		queryResponse, err := resultsIterator.Next()
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		// Add comma before array members,suppress it for the first array member
-		if bArrayMemberAlreadyWritten == true {
-			buffer.WriteString(",")
-		}
-		buffer.WriteString("{\"Key\":")
-		buffer.WriteString("\"")
-		buffer.WriteString(queryResponse.Key)
-		buffer.WriteString("\"")
-
-		buffer.WriteString(", \"Record\":")
-		// Record is a JSON object, so we write as-is
-		buffer.WriteString(string(queryResponse.Value))
-		buffer.WriteString("}")
-		bArrayMemberAlreadyWritten = true
-	}
-	buffer.WriteString("]")
-
-	fmt.Printf("- queryAllAssets:\n%s\n", buffer.String())
-
-	return shim.Success(buffer.Bytes())
-}
 
 func (s *SmartContract) getTransactionHistory(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 	if len(args) != 1 {
@@ -235,7 +467,7 @@ func (s *SmartContract) getTransactionHistory(APIstub shim.ChaincodeStubInterfac
 
 	iterator, err := APIstub.GetHistoryForKey(args[0])
 	if err != nil {
-		return shim.Error("Error getting history")
+		return shim.Error("Error getting history.")
 	}
 	defer iterator.Close()
 
@@ -245,7 +477,7 @@ func (s *SmartContract) getTransactionHistory(APIstub shim.ChaincodeStubInterfac
 			return shim.Error(err.Error())
 		}
 		if historyItem == nil {
-			return shim.Error("history item is null")
+			return shim.Error("History Item is Null.")
 		}
 
 		var tempHistoryItem TransactionHistory
@@ -264,92 +496,4 @@ func (s *SmartContract) getTransactionHistory(APIstub shim.ChaincodeStubInterfac
 	return shim.Success(historyAsBytes)
 }
 
-////////////////////////////////////////read Distributors
-func (s *SmartContract) readAllDistributors(APIstub shim.ChaincodeStubInterface) sc.Response {
-	type Users struct {
-		Distributors  []Distributor  `json:"distributors"`
-	}
-	var allDist Users
-	var statics StaticVariables
 
-	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
-	if staticsAsBytes == nil {
-		return shim.Error("func: readAllUser... Could not get static variables")
-	}
-	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
-
-	if statics.DistributorCount > 0 {
-		// ---- Get All Distributors ---- //
-		resultsIterator, err := APIstub.GetStateByRange("dist0", "dist"+strconv.Itoa(statics.DistributorCount))
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		defer resultsIterator.Close()
-
-		for resultsIterator.HasNext() {
-			aKeyValue, err := resultsIterator.Next()
-			if err != nil {
-				return shim.Error(err.Error())
-			}
-			queryKeyAsStr := aKeyValue.Key
-			queryValAsBytes := aKeyValue.Value
-			fmt.Println("on distributor id - ", queryKeyAsStr)
-			var dist Distributor
-			json.Unmarshal(queryValAsBytes, &dist)                      //un stringify it aka JSON.parse()
-			allDist.Distributors = append(allDist.Distributors, dist) //add this dist to the list
-		}
-		fmt.Println("distributors array - ", allDist.Distributors)
-
-	} else {
-		return shim.Error("func: readAllDistributors... no distributors")
-	}
-
-	//change to array of bytes
-	usersAsBytes, _ := json.Marshal(allDist) //convert to array of bytes
-	return shim.Success(usersAsBytes)
-}
-
-////////////////////////////////////////read Chemist
-func (s *SmartContract) readAllChemists(APIstub shim.ChaincodeStubInterface) sc.Response {
-	type Users struct {
-		Chemists  []Chemist  `json:"chemists"`
-	}
-	var allChem Users
-	var statics StaticVariables
-
-	staticsAsBytes, _ := APIstub.GetState("StaticVariables")
-	if staticsAsBytes == nil {
-		return shim.Error("func: readAllUser... Could not get static variables")
-	}
-	json.Unmarshal(staticsAsBytes, &statics) //un stringify it aka JSON.parse()
-
-	if statics.ChemistCount > 0 {
-		// ---- Get All Chemist ---- //
-		resultsIterator, err := APIstub.GetStateByRange("chem0", "chem"+strconv.Itoa(statics.ChemistCount))
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		defer resultsIterator.Close()
-
-		for resultsIterator.HasNext() {
-			aKeyValue, err := resultsIterator.Next()
-			if err != nil {
-				return shim.Error(err.Error())
-			}
-			queryKeyAsStr := aKeyValue.Key
-			queryValAsBytes := aKeyValue.Value
-			fmt.Println("on chemist id - ", queryKeyAsStr)
-			var chem Chemist
-			json.Unmarshal(queryValAsBytes, &chem)                      //un stringify it aka JSON.parse()
-			allChem.Chemists = append(allChem.Chemists, chem) //add this chem to the list
-		}
-		fmt.Println("chemists array - ", allChem.Chemists)
-
-	} else {
-		return shim.Error("func: readAllChemists... no Chemist")
-	}
-
-	//change to array of bytes
-	usersAsBytes, _ := json.Marshal(allChem) //convert to array of bytes
-	return shim.Success(usersAsBytes)
-}
