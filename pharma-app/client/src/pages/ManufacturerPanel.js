@@ -58,7 +58,7 @@ class BSTable extends Component {
                                             <MDBListGroup className="my-4 mx-4" style={{ width: "18rem" }}>
                                                 <MDBListGroupItem color="primary">ID: {transaction.txid}</MDBListGroupItem>
                                                 <MDBListGroupItem color="primary">Asset ID: {transaction.asset.id}</MDBListGroupItem>
-                                                
+
 
                                                 {transaction.asset.customer.name.length>0 ? (
                                                     <div>
@@ -93,7 +93,7 @@ class BSTable extends Component {
                                     <MDBListGroupItem color="primary">ExpiryDate: {this.props.data.expiryDate}</MDBListGroupItem>
                                 </MDBListGroup>
 
-                    
+
                                 <MDBListGroup className="my-4 mx-4" style={{ width: "28rem" }}>
                                     <MDBListGroupItem color="primary">
                                         <QRCode value={this.props.data.id.substring(0,10)+"000000000000000"} level="M" size="56" renderAs="svg" />
@@ -1138,7 +1138,7 @@ class ManufacturerPanel extends Component {
                                 <BootstrapTable data={ this.state.userProps.products } version='4' hover condensed pagination options={ productOptions } expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponentProd }  >
                                     <TableHeaderColumn isKey dataField='index' width='70' >No.</TableHeaderColumn>
                                     <TableHeaderColumn dataField='name' filter={{ type: 'TextFilter', delay: 100 }}>Product Name</TableHeaderColumn>
-                                    <TableHeaderColumn dataField='description'>Product Name</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='description'>Product Description</TableHeaderColumn>
                                 </BootstrapTable>
                                 <br/><br/>
                                 {/* updating Ahmad Shahid */}

@@ -82,7 +82,7 @@ class Verification extends Component {
     }
 
     sendEmail = async () => {
-        
+
         this.togglemodal();
 
         const response = await fetch('/email', {
@@ -92,7 +92,7 @@ class Verification extends Component {
             },
                 body: JSON.stringify({ post: 'Name: '+this.state.emailname+'\nMessage: '+this.state.emailtext+'\nDate Bought: '+this.state.emaildate })
         });
-        
+
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
         console.log(body);
@@ -199,7 +199,7 @@ class Verification extends Component {
                                 <MDBCardBody className="text-info">
                                     <MDBRow className="justify-content-center">
                                         <MDBListGroup className="my-4 mx-4" style={{ width: "66rem" }}>
-                                            <MDBListGroupItem color="primary">Asset Name: {transaction.asset.name}</MDBListGroupItem>
+                                            <MDBListGroupItem color="primary">Asset Name: {transaction.asset.productname}</MDBListGroupItem>
                                             <MDBListGroupItem color="primary">Asset ID: {transaction.asset.id}</MDBListGroupItem>
                                             <MDBListGroupItem color="primary">Asset Owner: {transaction.asset.owner}</MDBListGroupItem>
                                         </MDBListGroup>
@@ -225,7 +225,7 @@ class Verification extends Component {
                                 </MDBCardBody>
                             </MDBCard>
                     ) : (console.log("else"))
-                    
+
                 }
             </MDBContainer>
         );
