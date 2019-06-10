@@ -1072,7 +1072,7 @@ class ManufacturerPanel extends Component {
                                 <BootstrapTable data={ this.state.userProps.distributors } version='4' hover condensed pagination options={ distOptions } expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponentDist } >
                                     <TableHeaderColumn isKey dataField='index' width='70' >No.</TableHeaderColumn>
                                     <TableHeaderColumn dataField='name' filter={{ type: 'TextFilter', delay: 100 }}>Distributor Name</TableHeaderColumn>
-                                    <TableHeaderColumn dataField='owneraddress' filter={{ type: 'TextFilter', delay: 100 }}>Owner</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='owneraddress' filter={{ type: 'TextFilter', delay: 100 }}>Owner Address</TableHeaderColumn>
                                     <TableHeaderColumn dataField='ownercnic' >Owner CNIC</TableHeaderColumn>
                                 </BootstrapTable>
                                 <br/><br/>

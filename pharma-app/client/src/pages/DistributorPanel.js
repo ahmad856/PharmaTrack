@@ -55,8 +55,8 @@ class BSTable extends Component {
         var expirydate = new Date(parts[0], parts[1] - 1, parts[2]);
 
         const diffTime = Math.abs(today.getTime() - expirydate.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-        
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
 
         if(today>=expirydate){
             this.togglemodal();
@@ -149,7 +149,7 @@ class BSTable extends Component {
                                             <MDBListGroup className="my-4 mx-4" style={{ width: "18rem" }}>
                                                 <MDBListGroupItem color="primary">ID: {transaction.txid}</MDBListGroupItem>
                                                 <MDBListGroupItem color="primary">Asset ID: {transaction.asset.id}</MDBListGroupItem>
-                                                
+
                                                 {transaction.asset.customer.name.length>0 ? (
                                                     <div>
                                                     <MDBListGroupItem color="primary">Customer Name: {transaction.asset.customer.name}</MDBListGroupItem>
@@ -702,7 +702,7 @@ class DistributorPanel extends Component {
                                 <BootstrapTable data={ this.state.userProps.chemists } version='4' hover condensed pagination options={ chemOptions } expandableRow={ this.isExpandableRow } expandComponent={ this.expandComponentDist } >
                                     <TableHeaderColumn isKey dataField='index' width='70'>No.</TableHeaderColumn>
                                     <TableHeaderColumn dataField='name' filter={{ type: 'TextFilter', delay: 100 }}>Chemist Name</TableHeaderColumn>
-                                    <TableHeaderColumn dataField='owneraddress' filter={{ type: 'TextFilter', delay: 100 }}>Owner</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='owneraddress' filter={{ type: 'TextFilter', delay: 100 }}>Owner Address</TableHeaderColumn>
                                     <TableHeaderColumn dataField='ownercnic' >Owner CNIC</TableHeaderColumn>
                                 </BootstrapTable>
                                 <br/><br/>
